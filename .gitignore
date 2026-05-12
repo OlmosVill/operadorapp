@@ -43,3 +43,32 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Variables de entorno — NUNCA commitear
+.env
+.env.local
+.env.production
+
+# Drift — archivos generados
+*.drift.dart
+*.g.dart
+*.freezed.dart
+
+# Supabase local — no commitear estado de Docker
+supabase/.branches/
+supabase/.temp/
+
+# Keystore de Android (firma de release)
+*.jks
+*.keystore
+key.properties
+
+# Archivos de cobertura
+coverage/
+lcov.info
+
+# Docker
+.docker/
+
+# Logs de lefthook
+.lefthook-local.yml

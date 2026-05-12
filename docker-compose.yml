@@ -1,0 +1,43 @@
+# docker-compose.yml
+# Referencia para desarrollo local con Supabase.
+# En la práctica, usar `supabase start` (Supabase CLI) que gestiona
+# estos servicios automáticamente via su propio Docker Compose interno.
+# Este archivo existe como documentación de los servicios que corren.
+
+# Para iniciar: supabase start
+# Para parar:   supabase stop
+# Para resetear BD: supabase db reset
+
+# Supabase CLI levanta los siguientes servicios:
+#
+# supabase-db        → PostgreSQL 15 en localhost:54322
+# supabase-rest      → PostgREST API en localhost:54321
+# supabase-auth      → GoTrue Auth en localhost:54321/auth
+# supabase-storage   → Storage API en localhost:54321/storage
+# supabase-realtime  → Realtime WebSocket en localhost:54321/realtime
+# supabase-studio    → Dashboard web en localhost:54323
+# supabase-inbucket  → Email local (para probar auth emails) en localhost:54324
+# supabase-edge      → Edge Functions en localhost:54321/functions
+
+# Para conectarse directamente a PostgreSQL con psql:
+# psql postgresql://postgres:postgres@localhost:54322/postgres
+
+version: "3.8"
+
+services:
+  # Placeholder: Supabase CLI maneja sus propios contenedores.
+  # Agregar aquí servicios adicionales del proyecto si se necesitan:
+  #
+  # ejemplo — servidor de desarrollo de Edge Functions personalizadas:
+  # edge-functions-dev:
+  #   image: denoland/deno:1.44.0
+  #   volumes:
+  #     - ./supabase/functions:/home/deno/functions
+  #   command: deno run --allow-all /home/deno/functions/index.ts
+  #   ports:
+  #     - "8000:8000"
+
+  # Documento de red compartida por si se agregan servicios
+  placeholder:
+    image: alpine:3.19
+    command: echo "Usar 'supabase start' para levantar Supabase local"

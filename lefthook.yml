@@ -1,0 +1,21 @@
+pre-commit:
+  parallel: false
+  commands:
+    format:
+      glob: "*.dart"
+      run: dart format --set-exit-if-changed {staged_files}
+      stage_fixed: true
+
+    analyze:
+      run: flutter analyze --no-pub
+      fail_text: "El análisis estático falló. Corrige los errores antes de commitear."
+
+    test-fast:
+      run: flutter test --tags=fast --no-pub
+      fail_text: "Los tests rápidos fallaron. Todos deben pasar antes de commitear."
+
+pre-push:
+  commands:
+    test-all:
+      run: flutter test --no-pub
+      fail_text: "Los tests completos fallaron."

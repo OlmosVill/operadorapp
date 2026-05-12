@@ -1,0 +1,136 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ─────────────────────────────────────────
+  # Job 1: Análisis estático y formato
+  # ─────────────────────────────────────────
+  lint:
+    name: Lint y análisis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.22.x"
+          channel: stable
+          cache: true
+
+      - name: Instalar dependencias
+        run: flutter pub get
+
+      - name: Generar código
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Verificar formato
+        run: dart format --set-exit-if-changed .
+
+      - name: Análisis estático
+        run: flutter analyze --no-pub
+
+  # ─────────────────────────────────────────
+  # Job 2: Tests unitarios y de widget
+  # ─────────────────────────────────────────
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.22.x"
+          channel: stable
+          cache: true
+
+      - name: Instalar dependencias
+        run: flutter pub get
+
+      - name: Generar código
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Crear .env de prueba
+        run: |
+          echo "SUPABASE_URL=http://localhost:54321" > .env
+          echo "SUPABASE_ANON_KEY=test-anon-key" >> .env
+          echo "MAP_PROVIDER=osm" >> .env
+          echo "GOOGLE_MAPS_API_KEY=" >> .env
+
+      - name: Ejecutar tests
+        run: flutter test --coverage --no-pub
+
+      - name: Subir reporte de cobertura
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          file: coverage/lcov.info
+          fail_ci_if_error: false
+
+  # ─────────────────────────────────────────
+  # Job 3: Build APK (Android release)
+  # Solo en push a main o PR a main
+  # ─────────────────────────────────────────
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Configurar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.22.x"
+          channel: stable
+          cache: true
+
+      - name: Instalar dependencias
+        run: flutter pub get
+
+      - name: Generar código
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Crear .env de CI
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
+          echo "MAP_PROVIDER=osm" >> .env
+          echo "GOOGLE_MAPS_API_KEY=" >> .env
+
+      - name: Build APK debug (sin firma por ahora)
+        run: flutter build apk --debug --no-pub
+
+      - name: Subir APK como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: operadorapp-debug-${{ github.sha }}
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 7
+
+  # ─────────────────────────────────────────
+  # iOS: pendiente hasta tener macOS runner
+  # y cuenta Apple Developer
+  # ─────────────────────────────────────────
+  # build-ios:
+  #   runs-on: macos-latest
+  #   ...
