@@ -4,7 +4,10 @@
       "PowerShell(flutter analyze *)",
       "Bash(dart run *)",
       "Bash(flutter analyze *)",
-      "Bash(flutter test *)"
+      "Bash(flutter test *)",
+      "Bash(dart pub *)",
+      "Bash(findstr latlong2 *)",
+      "Bash(dir *)"
     ]
   }
 }

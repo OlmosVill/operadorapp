@@ -22,7 +22,7 @@ App móvil Flutter para operadores de tractocamiones de una empresa logística. 
 | Navegación | go_router | ^17.x |
 | Modelos | freezed + freezed_annotation | ^3.x → requiere `sealed class` |
 | Backend | supabase_flutter | local: 127.0.0.1:54321 |
-| DB local | drift (SQLite) | configurado, sin tablas aún (Fase 2) |
+| DB local | drift (SQLite) | 12 tablas, 3 DAOs, SyncService activo |
 | Errores | fpdart Either<AppError, T> | en toda la capa domain/data |
 | Mapas | flutter_map (OSM) / google_maps | seleccionable via .env MAP_PROVIDER |
 | Config | flutter_dotenv | .env como asset |
@@ -85,18 +85,33 @@ lib/shared/widgets/  # AppLoadingWidget, AppErrorWidget
 Completa. Ver `docs/`: ARCHITECTURE.md, DATABASE.md, OFFLINE_STRATEGY.md, NOTIFICATIONS.md, ROADMAP.md, STACK.md.
 
 ### ✅ Fase 1 — Setup + Auth + Perfil básico + Temas
-Completa. 15/15 tests pasando. App corre en emulador Android.
+Completa. 15/15 tests pasando.
 
-Archivos clave completados:
+Archivos clave:
 - `lib/main.dart` — inicialización completa (AppConfig → Supabase → SharedPrefs → ProviderScope)
 - `lib/core/router/app_router.dart` — GoRouter con auth guard y ShellRoute (home/perfil/settings)
 - `lib/features/auth/` — Login, ForgotPassword, providers, usecases, repositorio con Supabase
 - `lib/features/profile/` — ProfileScreen con foto, nivel badge, barra de progreso, stats
 - `lib/features/settings/` — SettingsScreen (tema, notificaciones, logout)
-- `lib/features/trips/presentation/screens/home_screen.dart` — placeholder Fase 4
+- `lib/features/trips/presentation/screens/home_screen.dart` — placeholder hasta Fase 4
 
-### 🔄 Próxima: Fase 2 — Offline-first con Drift
-Sin empezar. Ver `docs/OFFLINE_STRATEGY.md` para diseño detallado.
+### ✅ Fase 2 — Drift Local + Sincronización Supabase + Repositorios
+Completa. 18/18 tests pasando.
+
+Archivos clave:
+- `lib/core/database/tables.dart` — 12 tablas Drift (OperadoresTable, ViajesTable, GpsPuntosTable, IncidenciasTable, AlertasTable, ReportesTable, PremiosCatalogoTable, PremiosCanjeadosTable, MovimientosPuntosTable, NotificacionesTable, PendingOpsTable, SyncMetadataTable)
+- `lib/core/database/app_database.dart` — AppDatabase con DAOs: ProfileDao, TripsDao, SyncDao
+- `lib/core/services/connectivity_service.dart` — ConnectivityService (connectivity_plus)
+- `lib/core/services/sync_service.dart` — pull incremental Supabase→Drift; parseo EWKB geography
+- `lib/features/profile/` — refactorizado a offline-first con StreamProvider que observa Drift
+- `lib/features/trips/domain/` — Trip, TripDetail, TripIncident, SecurityAlert, GpsPoint (Freezed)
+- `lib/features/trips/data/` — DriftTripsLocalDatasource + TripsRepositoryImpl
+- `lib/features/trips/presentation/providers/trips_provider.dart` — tripsProvider + tripDetailProvider
+- `lib/core/providers/core_providers.dart` — appDatabaseProvider, connectivityServiceProvider, syncServiceProvider
+- `lib/features/settings/` — indicador de sync (online/offline) en SettingsScreen
+
+### 🔄 Próxima: Fase 3 — Historial de Viajes + Detalle con Mapa
+Ver `docs/ROADMAP.md`. Requiere: TripsListScreen, TripDetailScreen, TripMapView, MapAdapter.
 
 ---
 
@@ -180,6 +195,16 @@ GOOGLE_MAPS_API_KEY=
 
 7. **`dart:async` import en `app_router.dart`** — Estaba importado sin uso; el analizador lo rechaza con `very_good_analysis`.
 
+8. **`tableName` reservado en Drift** — Si nombras una columna `tableName` en una `Table`, Drift lo interpreta como el override del nombre SQL de la tabla, no como columna. Renombrar a `tableKey` u otro nombre.
+
+9. **Super-parámetros en DAOs de Drift** — `ProfileDao(super.db)` dispara el lint `matching_super_parameters` porque el parámetro del padre se llama `attachedDatabase`. Usar la forma explícita: `ProfileDao(AppDatabase db) : super(db);`
+
+10. **`StreamProvider<T>` con repositorio que devuelve `Either`** — El `.watchProfile()` devuelve `Stream<Either<AppError, T>>`. En el `StreamProvider<T>` hay que mapear: `.map((r) => r.fold((e) => throw ..., (v) => v))`. Sin ese `.map`, el analizador lanza error de tipo.
+
+11. **`sqlite3_flutter_libs: ^0.6.0+eol` no funciona en Android** — La versión `+eol` ("end of life") es un stub vacío que no empaqueta `libsqlite3.so` ni exporta `applyWorkaroundToOpenSqlite3OnOldAndroidVersions`. Usar `^0.5.0` en su lugar.
+
+12. **`applyWorkaroundToOpenSqlite3OnOldAndroidVersions()` requerido en Android** — Llamar antes de inicializar `AppDatabase` en `main()` para que SQLite se cargue correctamente. Importar desde `package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart`.
+
 8. **`StateNotifier` constructor fire-and-forget** — Llamar a `_load()` en el constructor de un `StateNotifier` sin `await` genera warning `discarded_futures`. Solución: `unawaited(_load())` con `import 'dart:async'`.
 
 ---
@@ -201,8 +226,22 @@ VALUES ('<uuid>', '12345', 'Juan Demo', '2022-01-15');
 
 ---
 
-## Para la próxima sesión
+## Para la próxima sesión (Fase 3)
 
-- [ ] Confirmar que el login funciona end-to-end (email provider desbloqueado + usuario creado)
-- [ ] Aprobar inicio de **Fase 2**: offline-first con Drift (tablas locales, sync con Supabase, operaciones pendientes)
-- [ ] Fase 2 depende de: Drift setup, `database.dart`, modelos locales, sync providers
+- [ ] `TripsListScreen` — lista paginada de viajes con pull-to-refresh, agrupada por fecha
+- [ ] `TripDetailScreen` — estadísticas del viaje, calificación, puntos obtenidos, incidencias, alertas
+- [ ] `TripMapView` — polyline de ruta desde `GpsPoint`, adaptador OSM / Google Maps
+- [ ] `MapAdapter` — interface + `OpenStreetMapAdapter` (default dev) + `GoogleMapsAdapter`
+- [ ] Conectar `home_screen.dart` con el estado de viaje activo (detectar si hay viaje `en_curso`)
+
+---
+
+## Flujo de trabajo — responsabilidades del desarrollador
+
+- **Tests**: El desarrollador los corre manualmente (`flutter test`) antes de cada commit.
+- **Commits**: El desarrollador los hace siempre. Claude NO hace `git add`, `git commit` ni `git push`
+bajo ninguna circunstancia, aunque se lo pidan.
+- **Análisis**: El desarrollador corre `flutter analyze` cuando quiera verificar calidad.
+
+Claude solo escribe y edita archivos. El ciclo build → test → commit es responsabilidad del
+desarrollador.

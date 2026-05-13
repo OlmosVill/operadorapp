@@ -53,7 +53,8 @@ final tripsProvider = StreamProvider<List<Trip>>((ref) {
 
 // ─── Detalle de viaje ─────────────────────────────────────────────────────────
 
-final AutoDisposeFamilyFutureProvider<TripDetail, String> tripDetailProvider =
+// ignore: specify_nonobvious_property_types
+final tripDetailProvider =
     FutureProvider.autoDispose.family<TripDetail, String>((ref, tripId) async {
   final result =
       await ref.read(getTripDetailUseCaseProvider).call(tripId: tripId);

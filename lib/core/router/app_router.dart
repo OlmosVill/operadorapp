@@ -9,6 +9,8 @@ import 'package:operadorapp/features/auth/presentation/screens/login_screen.dart
 import 'package:operadorapp/features/profile/presentation/screens/profile_screen.dart';
 import 'package:operadorapp/features/settings/presentation/screens/settings_screen.dart';
 import 'package:operadorapp/features/trips/presentation/screens/home_screen.dart';
+import 'package:operadorapp/features/trips/presentation/screens/trip_detail_screen.dart';
+import 'package:operadorapp/features/trips/presentation/screens/trips_list_screen.dart';
 
 // Notifier que escucha cambios de auth y notifica al router
 class _RouterNotifier extends ChangeNotifier {
@@ -59,6 +61,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (_, __) => const HomeScreen(),
           ),
           GoRoute(
+            path: '/trips',
+            builder: (_, __) => const TripsListScreen(),
+          ),
+          GoRoute(
             path: '/profile',
             builder: (_, __) => const ProfileScreen(),
           ),
@@ -67,6 +73,12 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (_, __) => const SettingsScreen(),
           ),
         ],
+      ),
+      GoRoute(
+        path: '/trips/:id',
+        builder: (_, state) => TripDetailScreen(
+          tripId: state.pathParameters['id']!,
+        ),
       ),
     ],
   );
@@ -82,8 +94,9 @@ class _AppShell extends ConsumerWidget {
     final location = GoRouterState.of(context).matchedLocation;
 
     final currentIndex = switch (true) {
-      _ when location.startsWith('/profile') => 1,
-      _ when location.startsWith('/settings') => 2,
+      _ when location.startsWith('/trips') => 1,
+      _ when location.startsWith('/profile') => 2,
+      _ when location.startsWith('/settings') => 3,
       _ => 0,
     };
 
@@ -96,8 +109,10 @@ class _AppShell extends ConsumerWidget {
             case 0:
               context.go('/home');
             case 1:
-              context.go('/profile');
+              context.go('/trips');
             case 2:
+              context.go('/profile');
+            case 3:
               context.go('/settings');
           }
         },
@@ -106,6 +121,11 @@ class _AppShell extends ConsumerWidget {
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home),
             label: 'Inicio',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.route_outlined),
+            selectedIcon: Icon(Icons.route),
+            label: 'Viajes',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outlined),

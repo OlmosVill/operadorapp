@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -9,10 +11,16 @@ import 'package:operadorapp/core/theme/app_theme.dart';
 import 'package:operadorapp/features/settings/domain/entities/app_settings.dart';
 import 'package:operadorapp/features/settings/presentation/providers/settings_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Necessary on Android to locate libsqlite3.so on older API levels
+  if (Platform.isAndroid) {
+    await applyWorkaroundToOpenSqlite3OnOldAndroidVersions();
+  }
 
   await initializeDateFormatting('es_MX');
   await AppConfig.initialize();
