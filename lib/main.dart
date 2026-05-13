@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:operadorapp/core/config/app_config.dart';
+import 'package:operadorapp/core/database/app_database.dart';
 import 'package:operadorapp/core/providers/core_providers.dart';
 import 'package:operadorapp/core/router/app_router.dart';
 import 'package:operadorapp/core/theme/app_theme.dart';
@@ -12,6 +14,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await initializeDateFormatting('es_MX');
   await AppConfig.initialize();
 
   await Supabase.initialize(
@@ -20,11 +23,13 @@ Future<void> main() async {
   );
 
   final prefs = await SharedPreferences.getInstance();
+  final db = AppDatabase();
 
   runApp(
     ProviderScope(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
+        appDatabaseProvider.overrideWithValue(db),
       ],
       child: const OperadorApp(),
     ),

@@ -6,4 +6,8 @@ abstract interface class ProfileRepository {
   Future<Either<AppError, OperatorProfile>> getProfile({
     required String authUserId,
   });
+
+  Stream<Either<AppError, OperatorProfile>> watchProfile({
+    required String authUserId,
+  });
 }

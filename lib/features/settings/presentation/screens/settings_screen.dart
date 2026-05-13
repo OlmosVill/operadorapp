@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:operadorapp/core/providers/core_providers.dart';
 import 'package:operadorapp/core/theme/app_colors.dart';
 import 'package:operadorapp/features/auth/presentation/providers/auth_provider.dart';
 import 'package:operadorapp/features/settings/domain/entities/app_settings.dart';
@@ -90,6 +91,10 @@ class SettingsScreen extends ConsumerWidget {
           ),
 
           const SizedBox(height: 16),
+          _SectionHeader(title: 'Sincronización'),
+          _SyncStatusCard(),
+
+          const SizedBox(height: 16),
           _SectionHeader(title: 'Cuenta'),
           Card(
             child: ListTile(
@@ -141,6 +146,31 @@ class SettingsScreen extends ConsumerWidget {
       await ref.read(logoutNotifierProvider.notifier).logout();
       if (context.mounted) context.go('/login');
     }
+  }
+}
+
+class _SyncStatusCard extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isOnline = ref.watch(isOnlineProvider).value ?? true;
+
+    return Card(
+      child: ListTile(
+        leading: Icon(
+          isOnline
+              ? Icons.cloud_done_outlined
+              : Icons.cloud_off_outlined,
+          color: isOnline ? AppColors.success : AppColors.asphaltBorder,
+        ),
+        title: Text(isOnline ? 'Conectado' : 'Sin conexión'),
+        subtitle: Text(
+          isOnline
+              ? 'Los datos se sincronizan automáticamente'
+              : 'Usando datos locales — se sincronizará al volver la red',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ),
+    );
   }
 }
 
