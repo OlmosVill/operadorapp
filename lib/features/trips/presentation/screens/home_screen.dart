@@ -1,21 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:operadorapp/core/theme/app_colors.dart';
+import 'package:operadorapp/features/profile/domain/entities/operator_profile.dart';
 import 'package:operadorapp/features/profile/presentation/providers/profile_provider.dart';
 import 'package:operadorapp/features/profile/presentation/widgets/level_badge.dart';
+import 'package:operadorapp/features/trips/domain/entities/trip.dart';
+import 'package:operadorapp/features/trips/presentation/providers/home_provider.dart';
+import 'package:operadorapp/features/trips/presentation/widgets/active_trip_card.dart';
+import 'package:operadorapp/features/trips/presentation/widgets/trip_card.dart';
 import 'package:operadorapp/shared/widgets/app_loading_widget.dart';
 
-// TODO(fase-4): Reemplazar con home dinámico:
-//   - Card de viaje activo con mapa miniatura y estado en tiempo real (Realtime)
-//   - Animaciones de entrada con flutter_animate o Rive
-//   - Indicador de racha de días con buenas métricas
-//   - Acceso rápido a escanear QR de inicio/fin de viaje
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    updateHomLastSeen(ref);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final profileAsync = ref.watch(profileProvider);
+    final homeState = ref.watch(homeStateProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -36,142 +50,489 @@ class HomeScreen extends ConsumerWidget {
       ),
       body: profileAsync.when(
         loading: () => const AppLoadingWidget(message: 'Cargando...'),
-        error: (_, __) => _HomeContent.empty(),
+        error: (_, __) => const SizedBox.shrink(),
         data: (profile) => _HomeContent(
-          greeting: '¡Hola, ${profile.fullName.split(' ').first}!',
-          employeeNumber: profile.employeeNumber,
-          availablePoints: profile.availablePoints,
+          profile: profile,
+          homeState: homeState,
         ),
       ),
     );
   }
 }
 
+// ─── Content dispatcher ─────────────────────────────────────────────────────
+
 class _HomeContent extends StatelessWidget {
-  const _HomeContent({
-    required this.greeting,
-    required this.employeeNumber,
-    required this.availablePoints,
+  const _HomeContent({required this.profile, required this.homeState});
+
+  final OperatorProfile profile;
+  final HomeState homeState;
+
+  @override
+  Widget build(BuildContext context) {
+    return switch (homeState) {
+      HomeStateActiveTrip(:final trip) => _ActiveTripView(
+          profile: profile,
+          trip: trip,
+        ),
+      HomeStateReturning(:final recentTrips, :final recentPoints) =>
+        _WelcomeBackView(
+          profile: profile,
+          recentTrips: recentTrips,
+          recentPoints: recentPoints,
+        ),
+      HomeStateDashboard(
+        :final monthTrips,
+        :final totalKm,
+        :final totalPoints,
+        :final streak,
+      ) =>
+        _DashboardView(
+          profile: profile,
+          monthTrips: monthTrips,
+          totalKm: totalKm,
+          totalPoints: totalPoints,
+          streak: streak,
+        ),
+    };
+  }
+}
+
+// ─── Case A: active trip ────────────────────────────────────────────────────
+
+class _ActiveTripView extends StatelessWidget {
+  const _ActiveTripView({required this.profile, required this.trip});
+
+  final OperatorProfile profile;
+  final Trip trip;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final firstName = profile.fullName.split(' ').first;
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              '¡Hola, $firstName!',
+              style: theme.textTheme.headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.15, end: 0),
+          ),
+          const SizedBox(height: 4),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              'Tienes un viaje en curso.',
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: AppColors.textSecondaryDark),
+            ).animate().fadeIn(duration: 400.ms, delay: 60.ms),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: ActiveTripCard(trip: trip),
+          )
+              .animate()
+              .fadeIn(duration: 400.ms, delay: 120.ms)
+              .slideY(begin: 0.15, end: 0),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _PointsBalanceCard(
+              availablePoints: profile.availablePoints,
+            ),
+          ).animate().fadeIn(duration: 400.ms, delay: 200.ms),
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Case B: returning user ─────────────────────────────────────────────────
+
+class _WelcomeBackView extends StatelessWidget {
+  const _WelcomeBackView({
+    required this.profile,
+    required this.recentTrips,
+    required this.recentPoints,
   });
 
-  factory _HomeContent.empty() => const _HomeContent(
-        greeting: '¡Bienvenido!',
-        employeeNumber: '',
-        availablePoints: 0,
-      );
+  final OperatorProfile profile;
+  final List<Trip> recentTrips;
+  final int recentPoints;
 
-  final String greeting;
-  final String employeeNumber;
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final firstName = profile.fullName.split(' ').first;
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              '¡Bienvenido de\nvuelta, $firstName!',
+              style: theme.textTheme.headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.15, end: 0),
+          ),
+          if (recentPoints > 0) ...[
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _PointsBadge(points: recentPoints),
+            ).animate().fadeIn(duration: 400.ms, delay: 80.ms),
+          ],
+          const SizedBox(height: 16),
+          ...recentTrips.map(
+            (t) => TripCard(
+              trip: t,
+              onTap: () => context.push('/trips/${t.id}'),
+            )
+                .animate()
+                .fadeIn(duration: 350.ms, delay: 120.ms)
+                .slideY(begin: 0.1, end: 0),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _PointsBalanceCard(
+              availablePoints: profile.availablePoints,
+            ),
+          ).animate().fadeIn(duration: 400.ms, delay: 320.ms),
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Case C: dashboard ──────────────────────────────────────────────────────
+
+class _DashboardView extends StatelessWidget {
+  const _DashboardView({
+    required this.profile,
+    required this.monthTrips,
+    required this.totalKm,
+    required this.totalPoints,
+    required this.streak,
+  });
+
+  final OperatorProfile profile;
+  final List<Trip> monthTrips;
+  final double totalKm;
+  final int totalPoints;
+  final int streak;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final firstName = profile.fullName.split(' ').first;
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              '¡Hola, $firstName!',
+              style: theme.textTheme.headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.15, end: 0),
+          ),
+          const SizedBox(height: 4),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              'Emp. ${profile.employeeNumber}',
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: AppColors.textSecondaryDark),
+            ).animate().fadeIn(duration: 400.ms, delay: 60.ms),
+          ),
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _MonthStatsRow(
+              tripCount: monthTrips.length,
+              totalKm: totalKm,
+              totalPoints: totalPoints,
+            ),
+          )
+              .animate()
+              .fadeIn(duration: 400.ms, delay: 100.ms)
+              .slideY(begin: 0.1, end: 0),
+          if (streak > 0) ...[
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _StreakCard(streak: streak),
+            ).animate().fadeIn(duration: 400.ms, delay: 180.ms),
+          ],
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _PointsBalanceCard(
+              availablePoints: profile.availablePoints,
+            ),
+          ).animate().fadeIn(duration: 400.ms, delay: 240.ms),
+          if (monthTrips.isEmpty) ...[
+            const SizedBox(height: 24),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: _NoTripPlaceholder(),
+            ),
+          ],
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Shared sub-widgets ─────────────────────────────────────────────────────
+
+class _MonthStatsRow extends StatelessWidget {
+  const _MonthStatsRow({
+    required this.tripCount,
+    required this.totalKm,
+    required this.totalPoints,
+  });
+
+  final int tripCount;
+  final double totalKm;
+  final int totalPoints;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _StatTile(
+            icon: Icons.route_outlined,
+            label: 'Viajes\neste mes',
+            value: '$tripCount',
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _StatTile(
+            icon: Icons.local_shipping_outlined,
+            label: 'KM\ntotales',
+            value: '${totalKm.toStringAsFixed(0)} km',
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _StatTile(
+            icon: Icons.stars_rounded,
+            label: 'Puntos\nganados',
+            value: '+$totalPoints',
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StatTile extends StatelessWidget {
+  const _StatTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: theme.colorScheme.primary, size: 18),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: theme.textTheme.titleSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withAlpha(120),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StreakCard extends StatelessWidget {
+  const _StreakCard({required this.streak});
+
+  final int streak;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.local_fire_department_rounded,
+              color: AppColors.amber,
+              size: 28,
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$streak ${streak == 1 ? 'día' : 'días'} consecutivos',
+                  style: theme.textTheme.titleSmall
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  '¡Sigue así!',
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: AppColors.textSecondaryDark),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PointsBalanceCard extends StatelessWidget {
+  const _PointsBalanceCard({required this.availablePoints});
+
   final int availablePoints;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF4A2800), Color(0xFF2A1800)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.amber.withAlpha(40)),
+      ),
+      child: Row(
         children: [
-          Text(
-            greeting,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+          const Icon(Icons.stars_rounded, color: AppColors.amber),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '$availablePoints pts disponibles',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: AppColors.amber,
                   fontWeight: FontWeight.bold,
                 ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Emp. $employeeNumber',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondaryDark,
-                ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // TODO(fase-4): Reemplazar con ActiveTripCard cuando haya viaje activo,
-          // o NextTripCard con la próxima ruta asignada. Por ahora es placeholder.
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: AppColors.asphaltCard,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.asphaltBorder),
-            ),
-            child: Column(
-              children: [
-                const Icon(
-                  Icons.local_shipping_outlined,
-                  color: AppColors.amber,
-                  size: 48,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Sin viaje activo',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Tu próxima ruta aparecerá aquí',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondaryDark,
-                      ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Puntos disponibles
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF4A2800), Color(0xFF2A1800)],
               ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.amber.withAlpha(40)),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.stars_rounded, color: AppColors.amber),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '$availablePoints pts disponibles',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: AppColors.amber,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                    Text(
-                      'Ve a Premios para canjear',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.amber.withAlpha(180),
-                          ),
-                    ),
-                  ],
+              Text(
+                'Ve a Premios para canjear',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppColors.amber.withAlpha(180),
                 ),
-              ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PointsBadge extends StatelessWidget {
+  const _PointsBadge({required this.points});
+
+  final int points;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(Icons.stars_rounded, color: AppColors.amber, size: 20),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(
+            '+$points puntos mientras estuviste fuera',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColors.amber,
+              fontWeight: FontWeight.w600,
             ),
           ),
+        ),
+      ],
+    );
+  }
+}
 
-          const Spacer(),
+class _NoTripPlaceholder extends StatelessWidget {
+  const _NoTripPlaceholder();
 
-          // Aviso de fase en desarrollo
-          Center(
-            child: Text(
-              'Fase 4 — Home dinámico con animaciones',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.asphaltBorder,
-                    fontSize: 10,
-                  ),
-            ),
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppColors.asphaltCard,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.asphaltBorder),
+      ),
+      child: Column(
+        children: [
+          const Icon(
+            Icons.local_shipping_outlined,
+            color: AppColors.amber,
+            size: 40,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Sin viajes este mes',
+            style: theme.textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Tu próxima ruta aparecerá aquí',
+            style: theme.textTheme.bodySmall
+                ?.copyWith(color: AppColors.textSecondaryDark),
           ),
         ],
       ),

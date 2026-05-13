@@ -41,7 +41,7 @@ final class AuthRepositoryImpl implements AuthRepository {
     } on AuthException catch (e) {
       _logger.w('Auth error', error: e.message);
       return Left(AuthError(message: _mapAuthMessage(e.message)));
-    } catch (e, st) {
+    } on Object catch (e, st) {
       _logger.e('Unexpected login error', error: e, stackTrace: st);
       return Left(UnexpectedError(error: e, stackTrace: st));
     }
@@ -52,7 +52,7 @@ final class AuthRepositoryImpl implements AuthRepository {
     try {
       await _remote.signOut();
       return const Right(unit);
-    } catch (e, st) {
+    } on Object catch (e, st) {
       _logger.e('Logout error', error: e, stackTrace: st);
       return Left(UnexpectedError(error: e, stackTrace: st));
     }
@@ -83,7 +83,7 @@ final class AuthRepositoryImpl implements AuthRepository {
       return const Right(unit);
     } on AuthException catch (e) {
       return Left(AuthError(message: _mapAuthMessage(e.message)));
-    } catch (e, st) {
+    } on Object catch (e, st) {
       return Left(UnexpectedError(error: e, stackTrace: st));
     }
   }

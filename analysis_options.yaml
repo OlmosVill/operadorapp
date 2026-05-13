@@ -20,6 +20,9 @@ linter:
     public_member_api_docs: false        # no es una librería pública
     one_member_abstracts: false          # usamos clases abstractas para Adapter pattern
     avoid_classes_with_only_static_members: false  # usamos para AppColors, AppStrings
+    # Drift DatabaseAccessor usa 'attachedDatabase' como nombre del parámetro padre;
+    # super params requeriría renombrarlo, lo que dispara matching_super_parameters.
+    use_super_parameters: false
 
     # Activadas explícitamente
     always_use_package_imports: true

@@ -110,8 +110,29 @@ Archivos clave:
 - `lib/core/providers/core_providers.dart` — appDatabaseProvider, connectivityServiceProvider, syncServiceProvider
 - `lib/features/settings/` — indicador de sync (online/offline) en SettingsScreen
 
-### 🔄 Próxima: Fase 3 — Historial de Viajes + Detalle con Mapa
-Ver `docs/ROADMAP.md`. Requiere: TripsListScreen, TripDetailScreen, TripMapView, MapAdapter.
+### ✅ Fase 3 — Historial de Viajes + Detalle con Mapa
+Completa. 18/18 tests pasando.
+
+Archivos clave:
+- `lib/core/maps/map_adapter.dart` — interface `MapAdapter` (seleccionable via `AppConfig.mapProvider`)
+- `lib/core/maps/osm_map_adapter.dart` — implementación flutter_map (OSM, default dev)
+- `lib/core/maps/google_map_adapter.dart` — implementación google_maps_flutter (activar con `MAP_PROVIDER=google`)
+- `lib/features/trips/presentation/widgets/trip_card.dart` — card de viaje: origen→destino, estado, KM, puntos
+- `lib/features/trips/presentation/widgets/trip_map_view.dart` — widget que selecciona adapter por config
+- `lib/features/trips/presentation/screens/trips_list_screen.dart` — lista agrupada por mes, pull-to-refresh
+- `lib/features/trips/presentation/screens/trip_detail_screen.dart` — detalle: stats, mapa GPS, incidencias, alertas
+- `lib/core/router/app_router.dart` — pestaña Viajes añadida (índice 1); `/trips` en ShellRoute; `/trips/:id` fuera del shell (pantalla completa sin nav bar)
+
+### ✅ Fase 4 — Home Dinámico + Animaciones
+Completa. Lint limpiado (0 issues tras `flutter analyze`).
+
+Archivos clave:
+- `lib/features/trips/presentation/providers/home_provider.dart` — `HomeState` sealed class (activeTrip, welcomeBack, dashboard), `homeStateProvider`, `updateHomLastSeen`
+- `lib/features/trips/presentation/screens/home_screen.dart` — `ConsumerStatefulWidget` con 3 vistas: `_ActiveTripView`, `_WelcomeBackView`, `_DashboardView`; animaciones flutter_animate
+- `lib/features/trips/presentation/widgets/active_trip_card.dart` — card de viaje activo con mapa miniatura, punto pulsante, stats (tiempo, KM, rendimiento)
+
+### 🔄 Próxima: Fase 5 — Catálogo de Premios + Canje
+Ver `docs/ROADMAP.md`. Requiere: PremiosCatálogo (tabla local Drift), pantalla de tienda, flujo de canje via Edge Function.
 
 ---
 
@@ -205,7 +226,9 @@ GOOGLE_MAPS_API_KEY=
 
 12. **`applyWorkaroundToOpenSqlite3OnOldAndroidVersions()` requerido en Android** — Llamar antes de inicializar `AppDatabase` en `main()` para que SQLite se cargue correctamente. Importar desde `package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart`.
 
-8. **`StateNotifier` constructor fire-and-forget** — Llamar a `_load()` en el constructor de un `StateNotifier` sin `await` genera warning `discarded_futures`. Solución: `unawaited(_load())` con `import 'dart:async'`.
+13. **`StateNotifier` constructor fire-and-forget** — Llamar a `_load()` en el constructor de un `StateNotifier` sin `await` genera warning `discarded_futures`. Solución: `unawaited(_load())` con `import 'dart:async'`.
+
+14. **`latlong2` — el archivo de librería es `latlong.dart`, no `latlong2.dart`** — El paquete se llama `latlong2` pero su archivo interno es `lib/latlong.dart`. El import correcto es `import 'package:latlong2/latlong.dart'`. Usar `latlong2/latlong2.dart` produce `uri_does_not_exist`.
 
 ---
 
@@ -226,13 +249,15 @@ VALUES ('<uuid>', '12345', 'Juan Demo', '2022-01-15');
 
 ---
 
-## Para la próxima sesión (Fase 3)
+## Para la próxima sesión (Fase 5)
 
-- [ ] `TripsListScreen` — lista paginada de viajes con pull-to-refresh, agrupada por fecha
-- [ ] `TripDetailScreen` — estadísticas del viaje, calificación, puntos obtenidos, incidencias, alertas
-- [ ] `TripMapView` — polyline de ruta desde `GpsPoint`, adaptador OSM / Google Maps
-- [ ] `MapAdapter` — interface + `OpenStreetMapAdapter` (default dev) + `GoogleMapsAdapter`
-- [ ] Conectar `home_screen.dart` con el estado de viaje activo (detectar si hay viaje `en_curso`)
+- [ ] Sincronizar `premios_catalogo` en SyncService → tabla `PremiosCatalogoTable` local
+- [ ] `PremiosRepository` + `GetPremiosUseCase` + `CanjeUseCase` (canje vía Edge Function)
+- [ ] `RewardsScreen` — catálogo de premios con filtro por nivel y puntos disponibles
+- [ ] Integrar pestaña Premios en ShellRoute (índice 2, desplazando Settings al 3)
+- [ ] Historial de canjes en `PremiosCanjeadosTable`
+
+> **Pendiente de `dart run build_runner build`**: se reordenaron parámetros en `GpsPoint` y `SecurityAlert` (Freezed) — regenerar `.freezed.dart` antes del siguiente `flutter test`.
 
 ---
 

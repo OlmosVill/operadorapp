@@ -13,7 +13,9 @@ final class GetProfileUseCase {
   }) {
     if (authUserId.isEmpty) {
       return Future.value(
-        const Left(AuthError(message: 'Sesión inválida. Inicia sesión de nuevo.')),
+        const Left(
+          AuthError(message: 'Sesión inválida. Inicia sesión de nuevo.'),
+        ),
       );
     }
     return _repository.getProfile(authUserId: authUserId);

@@ -20,7 +20,7 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _SectionHeader(title: 'Apariencia'),
+          const _SectionHeader(title: 'Apariencia'),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -62,13 +62,14 @@ class SettingsScreen extends ConsumerWidget {
           ),
 
           const SizedBox(height: 16),
-          _SectionHeader(title: 'Notificaciones'),
+          const _SectionHeader(title: 'Notificaciones'),
           Card(
             child: Column(
               children: [
                 SwitchListTile(
                   value: settings.inAppNotificationsEnabled,
-                  onChanged: (v) => notifier.setInAppNotificationsEnabled(enabled: v),
+                  onChanged: (v) =>
+                      notifier.setInAppNotificationsEnabled(enabled: v),
                   title: const Text('Notificaciones en app'),
                   subtitle: const Text('Alertas dentro de la aplicación'),
                   secondary: const Icon(Icons.notifications_outlined),
@@ -80,7 +81,8 @@ class SettingsScreen extends ConsumerWidget {
                 // y suscribirse al topic del operador en Firebase.
                 SwitchListTile(
                   value: settings.pushNotificationsEnabled,
-                  onChanged: (v) => notifier.setPushNotificationsEnabled(enabled: v),
+                  onChanged: (v) =>
+                      notifier.setPushNotificationsEnabled(enabled: v),
                   title: const Text('Notificaciones push'),
                   subtitle: const Text('Disponibles próximamente'),
                   secondary: const Icon(Icons.phone_android_outlined),
@@ -91,11 +93,11 @@ class SettingsScreen extends ConsumerWidget {
           ),
 
           const SizedBox(height: 16),
-          _SectionHeader(title: 'Sincronización'),
+          const _SectionHeader(title: 'Sincronización'),
           _SyncStatusCard(),
 
           const SizedBox(height: 16),
-          _SectionHeader(title: 'Cuenta'),
+          const _SectionHeader(title: 'Cuenta'),
           Card(
             child: ListTile(
               leading: const Icon(Icons.logout, color: AppColors.error),

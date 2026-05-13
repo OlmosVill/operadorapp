@@ -3,8 +3,6 @@ import 'package:operadorapp/core/theme/app_colors.dart';
 
 abstract final class AppTheme {
   static ThemeData get dark => ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
         colorScheme: const ColorScheme.dark(
           primary: AppColors.amber,
           onPrimary: Colors.black,
@@ -60,7 +58,7 @@ abstract final class AppTheme {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: AppColors.asphaltBorder, width: 1),
+            side: const BorderSide(color: AppColors.asphaltBorder),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
@@ -90,7 +88,10 @@ abstract final class AppTheme {
           hintStyle: const TextStyle(color: AppColors.textSecondaryDark),
           prefixIconColor: AppColors.textSecondaryDark,
           suffixIconColor: AppColors.textSecondaryDark,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -155,8 +156,6 @@ abstract final class AppTheme {
       );
 
   static ThemeData get light => ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.light,
         colorScheme: const ColorScheme.light(
           primary: AppColors.amberDark,
           onPrimary: Colors.white,
@@ -241,7 +240,10 @@ abstract final class AppTheme {
           labelStyle: const TextStyle(color: AppColors.textSecondaryLight),
           hintStyle: const TextStyle(color: AppColors.textSecondaryLight),
           prefixIconColor: AppColors.textSecondaryLight,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -273,7 +275,9 @@ abstract final class AppTheme {
         ),
         switchTheme: SwitchThemeData(
           thumbColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) return AppColors.amberDark;
+            if (states.contains(WidgetState.selected)) {
+              return AppColors.amberDark;
+            }
             return Colors.grey;
           }),
           trackColor: WidgetStateProperty.resolveWith((states) {

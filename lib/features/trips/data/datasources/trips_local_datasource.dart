@@ -68,7 +68,7 @@ final class DriftTripsLocalDatasource implements TripsLocalDatasource {
     return rows.map(_rowToAlert).toList();
   }
 
-  // ─── Mappers ────────────────────────────────────────────────────────────────
+  // ─── Mappers ──────────────────────────────────────────────────────────────
 
   Trip _rowToTrip(ViajeRow r) => Trip(
         id: r.id,

@@ -47,29 +47,32 @@ void main() {
   });
 
   group('AuthRepositoryImpl.login —', () {
-    test('retorna Right(session) cuando datasource responde con user', () async {
-      when(
-        () => mockDatasource.signIn(
+    test(
+      'retorna Right(session) cuando datasource responde con user',
+      () async {
+        when(
+          () => mockDatasource.signIn(
+            employeeNumber: tEmployeeNumber,
+            password: tPassword,
+          ),
+        ).thenAnswer((_) async => FakeAuthResponse(user: tUser));
+
+        final result = await sut.login(
           employeeNumber: tEmployeeNumber,
           password: tPassword,
-        ),
-      ).thenAnswer((_) async => FakeAuthResponse(user: tUser));
+        );
 
-      final result = await sut.login(
-        employeeNumber: tEmployeeNumber,
-        password: tPassword,
-      );
-
-      expect(result.isRight(), isTrue);
-      result.fold(
-        (_) => fail('Debería ser Right'),
-        (session) {
-          expect(session.operatorId, 'uid-001');
-          expect(session.employeeNumber, tEmployeeNumber);
-          expect(session.isAuthenticated, isTrue);
-        },
-      );
-    });
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (_) => fail('Debería ser Right'),
+          (session) {
+            expect(session.operatorId, 'uid-001');
+            expect(session.employeeNumber, tEmployeeNumber);
+            expect(session.isAuthenticated, isTrue);
+          },
+        );
+      },
+    );
 
     test('retorna AuthError si el datasource devuelve user null', () async {
       when(

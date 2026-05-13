@@ -242,7 +242,9 @@ class _InfoCard extends StatelessWidget {
     if (totalMonths < 12) return '$totalMonths meses';
     final y = totalMonths ~/ 12;
     final m = totalMonths % 12;
-    return m == 0 ? '$y año${y > 1 ? 's' : ''}' : '$y año${y > 1 ? 's' : ''} $m mes${m > 1 ? 'es' : ''}';
+    final yearStr = '$y año${y > 1 ? 's' : ''}';
+    if (m == 0) return yearStr;
+    return '$yearStr $m mes${m > 1 ? 'es' : ''}';
   }
 
   @override

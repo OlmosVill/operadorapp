@@ -19,7 +19,7 @@ final class AppConfig {
   final String? googleMapsApiKey;
 
   static Future<void> initialize() async {
-    await dotenv.load(fileName: '.env');
+    await dotenv.load();
 
     _instance = AppConfig._(
       supabaseUrl: dotenv.env['SUPABASE_URL']!,

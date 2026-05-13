@@ -7,7 +7,7 @@ import 'package:operadorapp/features/profile/domain/entities/operator_profile.da
 import 'package:operadorapp/features/profile/domain/repositories/profile_repository.dart';
 import 'package:operadorapp/features/profile/domain/usecases/get_profile_usecase.dart';
 
-// ─── Datasources & Repository ────────────────────────────────────────────────
+// ─── Datasources & Repository ───────────────────────────────────────────────
 
 final profileLocalDatasourceProvider = Provider<ProfileLocalDatasource>(
   (ref) => DriftProfileLocalDatasource(ref.read(appDatabaseProvider)),
@@ -25,7 +25,7 @@ final getProfileUseCaseProvider = Provider<GetProfileUseCase>(
   (ref) => GetProfileUseCase(ref.read(profileRepositoryProvider)),
 );
 
-// ─── Perfil reactivo offline-first ────────────────────────────────────────────
+// ─── Perfil reactivo offline-first ──────────────────────────────────────────
 //
 // StreamProvider que observa Drift directamente: cualquier escritura del
 // SyncService en la tabla local desencadena una actualización en la UI.

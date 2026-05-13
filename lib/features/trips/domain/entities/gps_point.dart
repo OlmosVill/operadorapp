@@ -9,9 +9,9 @@ sealed class GpsPoint with _$GpsPoint {
     required String viajeId,
     required double lat,
     required double lng,
+    required DateTime timestampGps,
     double? velocidadKmh,
     double? rumboGrados,
     double? altitudM,
-    required DateTime timestampGps,
   }) = _GpsPoint;
 }

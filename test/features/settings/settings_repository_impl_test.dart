@@ -17,22 +17,31 @@ void main() {
   });
 
   group('SettingsRepositoryImpl.getSettings —', () {
-    test('devuelve valores por defecto cuando SharedPreferences está vacío', () async {
-      when(() => mockPrefs.getString(AppConstants.themeKey)).thenReturn(null);
-      when(() => mockPrefs.getBool(AppConstants.pushNotifKey)).thenReturn(null);
-      when(() => mockPrefs.getBool(AppConstants.inAppNotifKey)).thenReturn(null);
+    test(
+      'devuelve valores por defecto cuando SharedPreferences está vacío',
+      () async {
+        when(() => mockPrefs.getString(AppConstants.themeKey))
+            .thenReturn(null);
+        when(() => mockPrefs.getBool(AppConstants.pushNotifKey))
+            .thenReturn(null);
+        when(() => mockPrefs.getBool(AppConstants.inAppNotifKey))
+            .thenReturn(null);
 
-      final settings = await sut.getSettings();
+        final settings = await sut.getSettings();
 
-      expect(settings.themeMode, AppThemeMode.system);
-      expect(settings.pushNotificationsEnabled, isTrue);
-      expect(settings.inAppNotificationsEnabled, isTrue);
-    });
+        expect(settings.themeMode, AppThemeMode.system);
+        expect(settings.pushNotificationsEnabled, isTrue);
+        expect(settings.inAppNotificationsEnabled, isTrue);
+      },
+    );
 
     test('deserializa el themeMode guardado correctamente', () async {
-      when(() => mockPrefs.getString(AppConstants.themeKey)).thenReturn('dark');
-      when(() => mockPrefs.getBool(AppConstants.pushNotifKey)).thenReturn(true);
-      when(() => mockPrefs.getBool(AppConstants.inAppNotifKey)).thenReturn(true);
+      when(() => mockPrefs.getString(AppConstants.themeKey))
+          .thenReturn('dark');
+      when(() => mockPrefs.getBool(AppConstants.pushNotifKey))
+          .thenReturn(true);
+      when(() => mockPrefs.getBool(AppConstants.inAppNotifKey))
+          .thenReturn(true);
 
       final settings = await sut.getSettings();
 
@@ -41,8 +50,10 @@ void main() {
 
     test('lee los valores de notificaciones guardados', () async {
       when(() => mockPrefs.getString(AppConstants.themeKey)).thenReturn(null);
-      when(() => mockPrefs.getBool(AppConstants.pushNotifKey)).thenReturn(false);
-      when(() => mockPrefs.getBool(AppConstants.inAppNotifKey)).thenReturn(false);
+      when(() => mockPrefs.getBool(AppConstants.pushNotifKey))
+          .thenReturn(false);
+      when(() => mockPrefs.getBool(AppConstants.inAppNotifKey))
+          .thenReturn(false);
 
       final settings = await sut.getSettings();
 
@@ -63,17 +74,22 @@ void main() {
         () => mockPrefs.setBool(AppConstants.inAppNotifKey, true),
       ).thenAnswer((_) async => true);
 
-      final settings = AppSettings(
+      const settings = AppSettings(
         themeMode: AppThemeMode.light,
         pushNotificationsEnabled: false,
-        inAppNotificationsEnabled: true,
       );
 
       await sut.saveSettings(settings);
 
-      verify(() => mockPrefs.setString(AppConstants.themeKey, 'light')).called(1);
-      verify(() => mockPrefs.setBool(AppConstants.pushNotifKey, false)).called(1);
-      verify(() => mockPrefs.setBool(AppConstants.inAppNotifKey, true)).called(1);
+      verify(
+        () => mockPrefs.setString(AppConstants.themeKey, 'light'),
+      ).called(1);
+      verify(
+        () => mockPrefs.setBool(AppConstants.pushNotifKey, false),
+      ).called(1);
+      verify(
+        () => mockPrefs.setBool(AppConstants.inAppNotifKey, true),
+      ).called(1);
     });
   });
 }

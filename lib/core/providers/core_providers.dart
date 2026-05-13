@@ -7,7 +7,7 @@ import 'package:operadorapp/core/services/sync_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// ─── Infraestructura ──────────────────────────────────────────────────────────
+// ─── Infraestructura ────────────────────────────────────────────────────────
 
 final supabaseClientProvider = Provider<SupabaseClient>(
   (_) => Supabase.instance.client,
@@ -33,7 +33,7 @@ final loggerProvider = Provider<Logger>(
   ),
 );
 
-// ─── Conectividad ─────────────────────────────────────────────────────────────
+// ─── Conectividad ───────────────────────────────────────────────────────────
 
 final connectivityServiceProvider = Provider<ConnectivityService>(
   (_) => ConnectivityService(Connectivity()),
@@ -44,7 +44,7 @@ final isOnlineProvider = StreamProvider<bool>((ref) {
   return service.onlineStream;
 });
 
-// ─── Sincronización ───────────────────────────────────────────────────────────
+// ─── Sincronización ─────────────────────────────────────────────────────────
 
 final syncServiceProvider = Provider<SyncService>(
   (ref) => SyncService(

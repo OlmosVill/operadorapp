@@ -42,7 +42,7 @@ final class TripsRepositoryImpl implements TripsRepository {
       final trips =
           await _local.getTrips(operadorId, limit: limit, offset: offset);
       return Right(trips);
-    } catch (e, st) {
+    } on Object catch (e, st) {
       _logger.e('getTrips error', error: e, stackTrace: st);
       return Left(UnexpectedError(error: e, stackTrace: st));
     }
@@ -73,7 +73,7 @@ final class TripsRepositoryImpl implements TripsRepository {
           gpsPoints: gpsPoints,
         ),
       );
-    } catch (e, st) {
+    } on Object catch (e, st) {
       _logger.e('getTripDetail error', error: e, stackTrace: st);
       return Left(UnexpectedError(error: e, stackTrace: st));
     }

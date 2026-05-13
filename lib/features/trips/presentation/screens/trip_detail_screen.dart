@@ -32,7 +32,7 @@ class TripDetailScreen extends ConsumerWidget {
   }
 }
 
-// ─── Detail layout ────────────────────────────────────────────────────────────
+// ─── Detail layout ──────────────────────────────────────────────────────────
 
 class _DetailView extends StatelessWidget {
   const _DetailView({required this.detail});
@@ -87,7 +87,7 @@ class _DetailView extends StatelessWidget {
   }
 }
 
-// ─── Reusable sub-widgets ─────────────────────────────────────────────────────
+// ─── Reusable sub-widgets ───────────────────────────────────────────────────
 
 class _TripTitle extends StatelessWidget {
   const _TripTitle({required this.origen, required this.destino});
@@ -164,7 +164,10 @@ class _StatusBar extends StatelessWidget {
                 color: AppColors.success,
               ),
               const SizedBox(width: 6),
-              Text(fmt.format(trip.fechaInicio!), style: theme.textTheme.bodySmall),
+              Text(
+                fmt.format(trip.fechaInicio!),
+                style: theme.textTheme.bodySmall,
+              ),
             ],
           ),
         ],
@@ -174,7 +177,10 @@ class _StatusBar extends StatelessWidget {
             children: [
               const Icon(Icons.flag_rounded, size: 16, color: AppColors.amber),
               const SizedBox(width: 6),
-              Text(fmt.format(trip.fechaFin!), style: theme.textTheme.bodySmall),
+              Text(
+                fmt.format(trip.fechaFin!),
+                style: theme.textTheme.bodySmall,
+              ),
             ],
           ),
         ],
@@ -355,7 +361,8 @@ class _IncidentTile extends StatelessWidget {
       ),
       title: Text(
         incident.tipo,
-        style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+        style: theme.textTheme.bodyMedium
+            ?.copyWith(fontWeight: FontWeight.w600),
       ),
       subtitle: incident.descripcion != null
           ? Text(
@@ -374,7 +381,8 @@ class _IncidentTile extends StatelessWidget {
           ),
           if (incident.impactoPuntos != 0)
             Text(
-              '${incident.impactoPuntos > 0 ? '+' : ''}${incident.impactoPuntos} pts',
+              '${incident.impactoPuntos > 0 ? '+' : ''}'
+              '${incident.impactoPuntos} pts',
               style: theme.textTheme.bodySmall
                   ?.copyWith(color: AppColors.error),
             ),
@@ -393,7 +401,8 @@ class _AlertTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final fmt = DateFormat('dd/MM · HH:mm', 'es_MX');
-    final subtitle = (alert.valorMedido != null && alert.umbralPermitido != null)
+    final subtitle = (alert.valorMedido != null &&
+            alert.umbralPermitido != null)
         ? 'Medido: ${alert.valorMedido!.toStringAsFixed(1)} '
             '/ Límite: ${alert.umbralPermitido!.toStringAsFixed(1)}'
         : null;
@@ -415,7 +424,8 @@ class _AlertTile extends StatelessWidget {
       ),
       title: Text(
         alert.tipo,
-        style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+        style: theme.textTheme.bodyMedium
+            ?.copyWith(fontWeight: FontWeight.w600),
       ),
       subtitle: subtitle != null ? Text(subtitle) : null,
       trailing: Column(

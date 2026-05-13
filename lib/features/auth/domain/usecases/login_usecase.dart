@@ -20,7 +20,9 @@ final class LoginUseCase {
     if (password.length < 6) {
       return Future.value(
         const Left(
-          ValidationError(message: 'La contraseña debe tener al menos 6 caracteres'),
+          ValidationError(
+            message: 'La contraseña debe tener al menos 6 caracteres',
+          ),
         ),
       );
     }

@@ -139,7 +139,10 @@ class SyncService {
     try {
       final rows = await _supabase
           .from('viaje_puntos_gps')
-          .select('id, viaje_id, coordenada, velocidad_kmh, rumbo_grados, altitud_m, timestamp_gps')
+          .select(
+            'id, viaje_id, coordenada, velocidad_kmh, '
+            'rumbo_grados, altitud_m, timestamp_gps',
+          )
           .eq('viaje_id', viajeId)
           .order('timestamp_gps');
 
@@ -292,7 +295,8 @@ class SyncService {
     if (value == null) return null;
 
     // PostgREST returns geography as hex-encoded EWKB.
-    // Format: 01 (LE) + 01000020 (Point+SRID flag) + E6100000 (SRID 4326) + X (lng, 8B) + Y (lat, 8B)
+    // Format: 01 (LE) + 01000020 (Point+SRID flag) + E6100000 (SRID 4326)
+    // + X (lng, 8B) + Y (lat, 8B)
     if (value is String && value.length >= 50) {
       try {
         final bytes = Uint8List.fromList(

@@ -14,7 +14,7 @@ void main() {
 
   const tEmployeeNumber = '12345';
   const tPassword = 'secret123';
-  final tSession = OperatorSession(
+  const tSession = OperatorSession(
     operatorId: 'uid-001',
     employeeNumber: tEmployeeNumber,
     isAuthenticated: true,
@@ -48,27 +48,46 @@ void main() {
       ).called(1);
     });
 
-    test('retorna ValidationError si el número de empleado está vacío', () async {
-      final result = await sut(employeeNumber: '  ', password: tPassword);
+    test(
+      'retorna ValidationError si el número de empleado está vacío',
+      () async {
+        final result = await sut(employeeNumber: '  ', password: tPassword);
 
-      expect(result.isLeft(), isTrue);
-      result.fold(
-        (error) => expect(error, isA<ValidationError>()),
-        (_) => fail('Debería ser Left'),
-      );
-      verifyNever(() => mockRepo.login(employeeNumber: any(named: 'employeeNumber'), password: any(named: 'password')));
-    });
+        expect(result.isLeft(), isTrue);
+        result.fold(
+          (error) => expect(error, isA<ValidationError>()),
+          (_) => fail('Debería ser Left'),
+        );
+        verifyNever(
+          () => mockRepo.login(
+            employeeNumber: any(named: 'employeeNumber'),
+            password: any(named: 'password'),
+          ),
+        );
+      },
+    );
 
-    test('retorna ValidationError si la contraseña tiene menos de 6 caracteres', () async {
-      final result = await sut(employeeNumber: tEmployeeNumber, password: '12345');
+    test(
+      'retorna ValidationError si la contraseña tiene menos de 6 caracteres',
+      () async {
+        final result = await sut(
+          employeeNumber: tEmployeeNumber,
+          password: '12345',
+        );
 
-      expect(result.isLeft(), isTrue);
-      result.fold(
-        (error) => expect(error, isA<ValidationError>()),
-        (_) => fail('Debería ser Left'),
-      );
-      verifyNever(() => mockRepo.login(employeeNumber: any(named: 'employeeNumber'), password: any(named: 'password')));
-    });
+        expect(result.isLeft(), isTrue);
+        result.fold(
+          (error) => expect(error, isA<ValidationError>()),
+          (_) => fail('Debería ser Left'),
+        );
+        verifyNever(
+          () => mockRepo.login(
+            employeeNumber: any(named: 'employeeNumber'),
+            password: any(named: 'password'),
+          ),
+        );
+      },
+    );
 
     test('propaga el Left del repositorio tal cual', () async {
       const tError = AuthError(message: 'Credenciales incorrectas');
@@ -87,22 +106,28 @@ void main() {
       expect(result, const Left<AppError, OperatorSession>(tError));
     });
 
-    test('trimea espacios del número de empleado antes de llamar al repositorio', () async {
-      when(
-        () => mockRepo.login(
-          employeeNumber: tEmployeeNumber,
-          password: tPassword,
-        ),
-      ).thenAnswer((_) async => Right(tSession));
+    test(
+      'trimea espacios del número de empleado antes de llamar al repositorio',
+      () async {
+        when(
+          () => mockRepo.login(
+            employeeNumber: tEmployeeNumber,
+            password: tPassword,
+          ),
+        ).thenAnswer((_) async => Right(tSession));
 
-      await sut(employeeNumber: '  $tEmployeeNumber  ', password: tPassword);
-
-      verify(
-        () => mockRepo.login(
-          employeeNumber: tEmployeeNumber,
+        await sut(
+          employeeNumber: '  $tEmployeeNumber  ',
           password: tPassword,
-        ),
-      ).called(1);
-    });
+        );
+
+        verify(
+          () => mockRepo.login(
+            employeeNumber: tEmployeeNumber,
+            password: tPassword,
+          ),
+        ).called(1);
+      },
+    );
   });
 }

@@ -8,11 +8,11 @@ sealed class SecurityAlert with _$SecurityAlert {
     required String id,
     required String viajeId,
     required String tipo,
+    required DateTime timestampAlerta,
     double? valorMedido,
     double? umbralPermitido,
     double? lat,
     double? lng,
-    required DateTime timestampAlerta,
     @Default(0) int impactoPuntos,
   }) = _SecurityAlert;
 }

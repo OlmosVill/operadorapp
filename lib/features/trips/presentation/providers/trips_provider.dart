@@ -32,7 +32,7 @@ final getTripDetailUseCaseProvider = Provider<GetTripDetailUseCase>(
   (ref) => GetTripDetailUseCase(ref.read(tripsRepositoryProvider)),
 );
 
-// ─── Lista de viajes reactiva ─────────────────────────────────────────────────
+// ─── Lista de viajes reactiva ───────────────────────────────────────────────
 
 final tripsProvider = StreamProvider<List<Trip>>((ref) {
   final authAsync = ref.watch(authStateProvider);
@@ -51,8 +51,10 @@ final tripsProvider = StreamProvider<List<Trip>>((ref) {
       );
 });
 
-// ─── Detalle de viaje ─────────────────────────────────────────────────────────
+// ─── Detalle de viaje ───────────────────────────────────────────────────────
 
+// FutureProvider.autoDispose.family devuelve un tipo complejo; la anotación
+// explícita haría la declaración ilegible.
 // ignore: specify_nonobvious_property_types
 final tripDetailProvider =
     FutureProvider.autoDispose.family<TripDetail, String>((ref, tripId) async {

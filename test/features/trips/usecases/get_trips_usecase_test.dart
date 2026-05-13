@@ -21,8 +21,8 @@ void main() {
       origen: 'Monterrey',
       destino: 'CDMX',
       estado: TripStatus.completado,
-      createdAt: DateTime(2025, 5, 1),
-      updatedAt: DateTime(2025, 5, 1),
+      createdAt: DateTime(2025, 5),
+      updatedAt: DateTime(2025, 5),
     ),
   ];
 

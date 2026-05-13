@@ -66,6 +66,9 @@ class LoginNotifier extends StateNotifier<AsyncValue<void>> {
       };
 }
 
+// StateNotifierProvider.autoDispose devuelve AutoDisposeStateNotifierProvider;
+// la anotación explícita hace la línea muy extensa.
+// ignore: specify_nonobvious_property_types
 final loginNotifierProvider =
     StateNotifierProvider.autoDispose<LoginNotifier, AsyncValue<void>>(
   LoginNotifier.new,
@@ -86,6 +89,7 @@ class LogoutNotifier extends StateNotifier<AsyncValue<void>> {
   }
 }
 
+// ignore: specify_nonobvious_property_types
 final logoutNotifierProvider =
     StateNotifierProvider.autoDispose<LogoutNotifier, AsyncValue<void>>(
   LogoutNotifier.new,

@@ -4,8 +4,8 @@ import 'package:operadorapp/features/profile/domain/entities/operator_profile.da
 
 class LevelBadge extends StatelessWidget {
   const LevelBadge({
-    super.key,
     required this.level,
+    super.key,
     this.size = 48,
     this.showLabel = true,
   });
@@ -90,10 +90,10 @@ class LevelBadge extends StatelessWidget {
 
 class LevelProgressBar extends StatelessWidget {
   const LevelProgressBar({
-    super.key,
     required this.currentPoints,
     required this.level,
     this.nextLevelPoints,
+    super.key,
   });
 
   final int currentPoints;

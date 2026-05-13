@@ -37,8 +37,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
     result.fold(
       (error) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('No se pudo enviar el correo. Contacta a RH.'),
+        const SnackBar(
+          content: Text('No se pudo enviar el correo. Contacta a RH.'),
           backgroundColor: AppColors.error,
         ),
       ),
@@ -69,7 +69,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Ingresa tu número de empleado y te enviaremos un enlace para restablecer tu contraseña al correo registrado.',
+            'Ingresa tu número de empleado y te enviaremos un enlace '
+            'para restablecer tu contraseña al correo registrado.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppColors.textSecondaryDark,
                 ),
@@ -114,7 +115,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.mark_email_read_outlined, color: AppColors.success, size: 64),
+        const Icon(
+          Icons.mark_email_read_outlined,
+          color: AppColors.success,
+          size: 64,
+        ),
         const SizedBox(height: 24),
         Text(
           '¡Correo enviado!',
@@ -124,7 +129,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         ),
         const SizedBox(height: 12),
         Text(
-          'Revisa tu correo y sigue las instrucciones para restablecer tu contraseña.',
+          'Revisa tu correo y sigue las instrucciones para '
+          'restablecer tu contraseña.',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: AppColors.textSecondaryDark,

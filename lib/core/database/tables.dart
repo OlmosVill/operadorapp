@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 
-// ─── Operadores ───────────────────────────────────────────────────────────────
+// ─── Operadores ─────────────────────────────────────────────────────────────
 
 @DataClassName('OperadorRow')
 class OperadoresTable extends Table {
@@ -29,7 +29,7 @@ class OperadoresTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-// ─── Viajes ───────────────────────────────────────────────────────────────────
+// ─── Viajes ─────────────────────────────────────────────────────────────────
 
 @DataClassName('ViajeRow')
 class ViajesTable extends Table {
@@ -61,7 +61,7 @@ class ViajesTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-// ─── GPS Points ───────────────────────────────────────────────────────────────
+// ─── GPS Points ─────────────────────────────────────────────────────────────
 
 // lat/lng stored separately — Supabase GEOGRAPHY(POINT) is parsed on sync
 @DataClassName('GpsPointRow')
@@ -79,7 +79,7 @@ class GpsPuntosTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-// ─── Incidencias ──────────────────────────────────────────────────────────────
+// ─── Incidencias ────────────────────────────────────────────────────────────
 
 @DataClassName('IncidenciaRow')
 class IncidenciasTable extends Table {
@@ -98,7 +98,7 @@ class IncidenciasTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-// ─── Alertas de Seguridad ─────────────────────────────────────────────────────
+// ─── Alertas de Seguridad ───────────────────────────────────────────────────
 
 @DataClassName('AlertaRow')
 class AlertasTable extends Table {
@@ -117,7 +117,7 @@ class AlertasTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-// ─── Reportes ─────────────────────────────────────────────────────────────────
+// ─── Reportes ───────────────────────────────────────────────────────────────
 
 @DataClassName('ReporteRow')
 class ReportesTable extends Table {
@@ -141,7 +141,7 @@ class ReportesTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-// ─── Premios Catálogo ─────────────────────────────────────────────────────────
+// ─── Premios Catálogo ───────────────────────────────────────────────────────
 
 @DataClassName('PremioRow')
 class PremiosCatalogoTable extends Table {
@@ -162,7 +162,7 @@ class PremiosCatalogoTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-// ─── Premios Canjeados ────────────────────────────────────────────────────────
+// ─── Premios Canjeados ──────────────────────────────────────────────────────
 
 @DataClassName('CanjeRow')
 class PremiosCanjeadosTable extends Table {
@@ -178,7 +178,7 @@ class PremiosCanjeadosTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-// ─── Movimientos de Puntos ────────────────────────────────────────────────────
+// ─── Movimientos de Puntos ──────────────────────────────────────────────────
 
 @DataClassName('MovimientoRow')
 class MovimientosPuntosTable extends Table {
@@ -196,7 +196,7 @@ class MovimientosPuntosTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-// ─── Notificaciones In-App ────────────────────────────────────────────────────
+// ─── Notificaciones In-App ──────────────────────────────────────────────────
 
 @DataClassName('NotificacionRow')
 class NotificacionesTable extends Table {
@@ -215,7 +215,7 @@ class NotificacionesTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-// ─── Operaciones Pendientes (local-only) ─────────────────────────────────────
+// ─── Operaciones Pendientes (local-only) ────────────────────────────────────
 
 @DataClassName('PendingOpRow')
 class PendingOpsTable extends Table {
@@ -229,7 +229,7 @@ class PendingOpsTable extends Table {
   TextColumn get errorMessage => text().nullable()();
 }
 
-// ─── Metadatos de Sincronización (local-only) ────────────────────────────────
+// ─── Metadatos de Sincronización (local-only) ───────────────────────────────
 
 @DataClassName('SyncMetaRow')
 class SyncMetadataTable extends Table {
