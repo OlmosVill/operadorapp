@@ -501,9 +501,22 @@ CREATE INDEX idx_movimientos_created_at ON movimientos_puntos(operador_id, creat
 CREATE INDEX idx_notif_operador_id ON notificaciones_in_app(operador_id);
 CREATE INDEX idx_notif_no_leidas ON notificaciones_in_app(operador_id) WHERE leida = false;
 
+-- tractos
+CREATE INDEX idx_tractos_updated_at ON tractos(updated_at DESC); -- sync incremental
+
 -- historial_tractos_operador
 CREATE INDEX idx_historial_operador_id ON historial_tractos_operador(operador_id);
 CREATE INDEX idx_historial_tracto_id ON historial_tractos_operador(tracto_id);
+CREATE INDEX idx_historial_updated_at ON historial_tractos_operador(updated_at DESC); -- sync incremental
+
+-- reportes (sync incremental + filtros)
+CREATE INDEX idx_reportes_updated_at ON reportes(operador_id, updated_at DESC);
+
+-- premios_catalogo (sync incremental)
+CREATE INDEX idx_premios_catalogo_updated_at ON premios_catalogo(updated_at DESC);
+
+-- premios_canjeados (sync incremental)
+CREATE INDEX idx_canjes_updated_at ON premios_canjeados(operador_id, updated_at DESC);
 
 
 -- =============================================================================

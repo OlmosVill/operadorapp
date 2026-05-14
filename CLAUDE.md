@@ -22,7 +22,7 @@ App móvil Flutter para operadores de tractocamiones de una empresa logística. 
 | Navegación | go_router | ^17.x |
 | Modelos | freezed + freezed_annotation | ^3.x → requiere `sealed class` |
 | Backend | supabase_flutter | local: 127.0.0.1:54321 |
-| DB local | drift (SQLite) | 12 tablas, 3 DAOs, SyncService activo |
+| DB local | drift (SQLite) | 14 tablas, 6 DAOs, SyncService activo |
 | Errores | fpdart Either<AppError, T> | en toda la capa domain/data |
 | Mapas | flutter_map (OSM) / google_maps | seleccionable via .env MAP_PROVIDER |
 | Config | flutter_dotenv | .env como asset |
@@ -308,14 +308,22 @@ VALUES ('<uuid>', '12345', 'Juan Demo', '2022-01-15');
 
 ---
 
-## Para la próxima sesión (Fase 5.2 — Catálogo de Premios + Canje)
+## Para la siguiente sesión (Fase 8 — Notificaciones In-App + Preparación Push)
 
-- [ ] `syncPremios()` en SyncService → tabla `PremiosCatalogoTable` local
-- [ ] `PremiosRepository` + `GetPremiosUseCase` + `CanjeUseCase` (canje vía Edge Function)
-- [ ] `RewardsScreen` — catálogo de premios con filtro por nivel y puntos disponibles
-- [ ] Integrar pestaña Premios en ShellRoute (índice 2, desplazando Settings al 3)
-- [ ] Historial de canjes en `PremiosCanjeadosTable`
-- [ ] Edge Function `canjear-premio` (Deno) que valida puntos, descuenta y crea registro
+- [ ] `NotificationsScreen` — lista de notificaciones con indicador de no leídas
+- [ ] Supabase Realtime conectado a `notificaciones_in_app` (tabla ya en BD + Realtime habilitado en migración)
+- [ ] Banner overlay con `flutter_animate` (slide desde arriba, auto-dismiss 4s)
+- [ ] Badge en `NavigationBar` actualizado en tiempo real (conteo de no leídas)
+- [ ] `FcmNotificationService` implementado pero desactivado vía config (tabla `operador_devices` ya existe)
+- [ ] Registrar FCM token en `operador_devices` al hacer login
+- [ ] Ver `docs/NOTIFICATIONS.md` para diseño completo de push
+
+Contexto importante para Fase 8:
+- `notificaciones_in_app` ya tiene RLS (`notif_select_own`, `notif_update_own`) y Realtime habilitado
+- `operador_devices` ya tiene RLS completo (select/insert/update/delete propios)
+- El trigger `fn_acreditar_puntos_viaje` ya inserta notificaciones al acreditar puntos
+- El trigger `fn_on_canje_aprobado` ya inserta notificación al aprobar canjes
+- Falta: leer esas notificaciones en la app y mostrarlas como banners/pantalla
 
 ---
 
