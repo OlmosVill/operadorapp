@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:operadorapp/core/theme/app_colors.dart';
 import 'package:operadorapp/features/profile/presentation/providers/profile_provider.dart';
@@ -25,8 +26,15 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          const SliverAppBar.medium(
-            title: Text('Premios'),
+          SliverAppBar.medium(
+            title: const Text('Premios'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.map_outlined),
+                tooltip: 'Roadmap',
+                onPressed: () => context.push('/rewards/roadmap'),
+              ),
+            ],
           ),
           SliverToBoxAdapter(
             child: _BalanceCard()

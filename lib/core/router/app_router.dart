@@ -8,6 +8,7 @@ import 'package:operadorapp/features/auth/presentation/screens/forgot_password_s
 import 'package:operadorapp/features/auth/presentation/screens/login_screen.dart';
 import 'package:operadorapp/features/points/presentation/screens/points_screen.dart';
 import 'package:operadorapp/features/profile/presentation/screens/profile_screen.dart';
+import 'package:operadorapp/features/rewards/presentation/screens/rewards_roadmap_screen.dart';
 import 'package:operadorapp/features/rewards/presentation/screens/rewards_screen.dart';
 import 'package:operadorapp/features/settings/presentation/screens/settings_screen.dart';
 import 'package:operadorapp/features/trips/presentation/screens/home_screen.dart';
@@ -79,6 +80,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile',
         builder: (_, __) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/rewards/roadmap',
+        builder: (_, __) => const RewardsRoadmapScreen(),
       ),
       GoRoute(
         path: '/points',

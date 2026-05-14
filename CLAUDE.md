@@ -163,7 +163,16 @@ Archivos clave:
 - `supabase/functions/canjear-premio/index.ts` — Edge Function Deno; valida JWT, puntos, nivel y stock
 - `lib/core/router/app_router.dart` — ShellRoute: Home(0), Viajes(1), Premios(2), Settings(3); Perfil fuera del nav bar (accesible por LevelBadge en AppBar)
 
-### 🔄 Próxima: Fase 6
+### ✅ Fase 6 — Roadmap de Premios
+Completa. 32/32 tests pasando. 0 issues `flutter analyze`.
+
+Archivos clave:
+- `lib/features/rewards/presentation/screens/rewards_roadmap_screen.dart` — timeline con filtro por nivel; `filterAndSortPremios()` top-level (testeable)
+- `lib/features/rewards/presentation/widgets/roadmap_milestone.dart` — hito con nodo coloreado por tipo, barra de progreso, nodo pulsante si `isTarget`
+- `lib/core/router/app_router.dart` — ruta `/rewards/roadmap` standalone
+- `lib/features/rewards/presentation/screens/rewards_screen.dart` — botón mapa en AppBar → `/rewards/roadmap`
+
+### 🔄 Próxima: Fase 7 — Historial de Tractos
 Ver `docs/ROADMAP.md`.
 
 ---

@@ -160,20 +160,23 @@ antes de ver una sola línea de código Dart.
 
 ---
 
-## Fase 6 — Catálogo y Roadmap de Premios + Flujo de Canje
+## Fase 6 — Roadmap de Premios ✅
 
-**Objetivo:** La sección más aspiracional de la app. Timeline de premios con animaciones "wow".
+**Objetivo:** Timeline visual de premios como hitos con animaciones por categoría.
 
-- [ ] `RewardsRoadmapScreen` — timeline vertical scrolleable
-- [ ] Cada premio como "hito" con imagen/animación y barra de progreso
-- [ ] Animaciones por categoría: tarjeta regalo, producto, experiencia, vehículo
-- [ ] Filtro por nivel requerido
-- [ ] `RedeemConfirmationSheet` — confirmación de canje con resumen
-- [ ] Edge Function `canjear_premio` — valida puntos, descuenta, crea registro
-- [ ] `MyCanjearScreen` — historial de canjes con estados (colores por estado)
-- [ ] Notificación in-app al cambiar estado del canje
+- [x] `RewardsRoadmapScreen` — timeline vertical scrolleable con filtro por nivel
+- [x] Cada premio como "hito": nodo coloreado por tipo, barra de progreso, pts restantes
+- [x] Nodo pulsante para el próximo objetivo del operador (`isTarget`)
+- [x] Animación de entrada por tipo: `tarjetaRegalo` (verde), `producto` (azul), `experiencia` (morado), `vehiculo` (ámbar), `otro` (gris)
+- [x] Filtro por nivel requerido (chips horizontales + "Todos")
+- [x] Botón "Canjear" en hitos alcanzados → abre `CanjeSheet`
+- [x] Accesible desde `RewardsScreen` vía ícono de mapa en AppBar → `/rewards/roadmap`
+- [x] `RedeemConfirmationSheet` → ya existía como `CanjeSheet` (5.2) ✅
+- [x] Edge Function `canjear-premio` → ya existía (5.2) ✅
+- [x] Historial de canjes → ya existía como tab "Mis Canjes" (5.2) ✅
+- [ ] Notificación in-app al cambiar estado del canje → movido a Fase 8
 
-**Commit final:** `feat: fase 6 completa — roadmap de premios + canje`
+**Commit final:** `feat: fase 6 completa — roadmap de premios`
 
 ---
 
