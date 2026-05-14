@@ -89,6 +89,8 @@ class LogoutNotifier extends StateNotifier<AsyncValue<void>> {
   }
 }
 
+// StateNotifierProvider.autoDispose infiere AsyncValue<void> como
+// AsyncValue<Object?> sin el tipo explícito en Riverpod 3 legacy.
 // ignore: specify_nonobvious_property_types
 final logoutNotifierProvider =
     StateNotifierProvider.autoDispose<LogoutNotifier, AsyncValue<void>>(

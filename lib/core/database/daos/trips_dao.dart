@@ -51,7 +51,7 @@ class TripsDao extends DatabaseAccessor<AppDatabase> with _$TripsDaoMixin {
         (b) => b.insertAllOnConflictUpdate(viajesTable, rows),
       );
 
-  // ─── GPS Points ─────────────────────────────────────────────────────────────
+  // ─── GPS Points ──────────────────────────────────────────────────────────
 
   Future<List<GpsPointRow>> getGpsPoints(String viajeId) =>
       (select(gpsPuntosTable)
@@ -63,7 +63,7 @@ class TripsDao extends DatabaseAccessor<AppDatabase> with _$TripsDaoMixin {
         (b) => b.insertAllOnConflictUpdate(gpsPuntosTable, rows),
       );
 
-  // ─── Incidencias ────────────────────────────────────────────────────────────
+  // ─── Incidencias ─────────────────────────────────────────────────────────
 
   Future<List<IncidenciaRow>> getIncidencias(String viajeId) =>
       (select(incidenciasTable)
@@ -75,7 +75,7 @@ class TripsDao extends DatabaseAccessor<AppDatabase> with _$TripsDaoMixin {
         (b) => b.insertAllOnConflictUpdate(incidenciasTable, rows),
       );
 
-  // ─── Alertas ────────────────────────────────────────────────────────────────
+  // ─── Alertas ─────────────────────────────────────────────────────────────
 
   Future<List<AlertaRow>> getAlertas(String viajeId) =>
       (select(alertasTable)
@@ -87,7 +87,7 @@ class TripsDao extends DatabaseAccessor<AppDatabase> with _$TripsDaoMixin {
         (b) => b.insertAllOnConflictUpdate(alertasTable, rows),
       );
 
-  // ─── Reportes ───────────────────────────────────────────────────────────────
+  // ─── Reportes ────────────────────────────────────────────────────────────
 
   Future<List<ReporteRow>> getReportesByViaje(String viajeId) =>
       (select(reportesTable)

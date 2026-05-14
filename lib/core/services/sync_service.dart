@@ -275,6 +275,131 @@ class SyncService {
     }
   }
 
+  // ─── Premios ─────────────────────────────────────────────────────────────
+
+  Future<void> syncCatalogo() async {
+    try {
+      final since = await _db.rewardsDao.getLastUpdatedAt();
+      var query = _supabase
+          .from('premios_catalogo')
+          .select()
+          .eq('activo', true);
+
+      if (since != null) {
+        query = query.gt('updated_at', since.toIso8601String());
+      }
+
+      final rows = await query.order('orden');
+      if (rows.isEmpty) return;
+
+      final companions = rows.map(_premioCompanion).toList();
+      await _db.rewardsDao.upsertPremios(companions);
+      _logger.d('syncCatalogo: ${rows.length} premios sincronizados');
+    } on Exception catch (e) {
+      _logger.w('syncCatalogo falló', error: e);
+    }
+  }
+
+  Future<void> syncCanjes(String operadorId) async {
+    try {
+      final rows = await _supabase
+          .from('premios_canjeados')
+          .select()
+          .eq('operador_id', operadorId)
+          .order('fecha_solicitud');
+
+      if (rows.isEmpty) return;
+
+      final companions = rows.map(_canjeCompanion).toList();
+      await _db.rewardsDao.upsertCanjes(companions);
+      _logger.d(
+        'syncCanjes: ${rows.length} canjes sincronizados',
+      );
+    } on Exception catch (e) {
+      _logger.w('syncCanjes falló', error: e);
+    }
+  }
+
+  PremiosCatalogoTableCompanion _premioCompanion(
+    Map<String, dynamic> r,
+  ) =>
+      PremiosCatalogoTableCompanion(
+        id: Value(r['id'] as String),
+        nombre: Value(r['nombre'] as String),
+        descripcion: Value(r['descripcion'] as String?),
+        tipo: Value(r['tipo'] as String),
+        costoPuntos: Value(r['costo_puntos'] as int),
+        nivelMinimo: Value(r['nivel_minimo'] as String?),
+        imagenUrl: Value(r['imagen_url'] as String?),
+        stock: Value(r['stock'] as int?),
+        activo: Value(r['activo'] as bool? ?? true),
+        orden: Value(r['orden'] as int?),
+        updatedAt: Value(
+          _parseDateTime(r['updated_at']) ?? DateTime.now().toUtc(),
+        ),
+      );
+
+  PremiosCanjeadosTableCompanion _canjeCompanion(
+    Map<String, dynamic> r,
+  ) =>
+      PremiosCanjeadosTableCompanion(
+        id: Value(r['id'] as String),
+        operadorId: Value(r['operador_id'] as String),
+        premioId: Value(r['premio_id'] as String),
+        puntosCanjeados: Value(r['puntos_canjeados'] as int),
+        estado: Value(r['estado'] as String),
+        fechaSolicitud: Value(
+          _parseDateTime(r['fecha_solicitud']) ?? DateTime.now().toUtc(),
+        ),
+        updatedAt: Value(
+          _parseDateTime(r['updated_at']) ?? DateTime.now().toUtc(),
+        ),
+      );
+
+  // ─── Movimientos de Puntos ───────────────────────────────────────────────
+
+  Future<void> syncMovimientos(String operadorId) async {
+    try {
+      final since = await _db.pointsDao.getLastCreatedAt(operadorId);
+      var query = _supabase
+          .from('movimientos_puntos')
+          .select()
+          .eq('operador_id', operadorId);
+
+      if (since != null) {
+        query = query.gt('created_at', since.toIso8601String());
+      }
+
+      final rows = await query.order('created_at');
+      if (rows.isEmpty) return;
+
+      final companions = rows.map(_movimientoCompanion).toList();
+      await _db.pointsDao.upsertAll(companions);
+      _logger.d(
+        'syncMovimientos: ${rows.length} movimientos sincronizados',
+      );
+    } on Exception catch (e) {
+      _logger.w('syncMovimientos falló', error: e);
+    }
+  }
+
+  MovimientosPuntosTableCompanion _movimientoCompanion(
+    Map<String, dynamic> r,
+  ) =>
+      MovimientosPuntosTableCompanion(
+        id: Value(r['id'] as String),
+        operadorId: Value(r['operador_id'] as String),
+        tipo: Value(r['tipo'] as String),
+        puntos: Value(r['puntos'] as int),
+        viajeId: Value(r['viaje_id'] as String?),
+        canjeId: Value(r['canje_id'] as String?),
+        descripcion: Value(r['descripcion'] as String?),
+        saldoDespues: Value(r['saldo_despues'] as int),
+        createdAt: Value(
+          _parseDateTime(r['created_at']) ?? DateTime.now().toUtc(),
+        ),
+      );
+
   // ─── Helpers ─────────────────────────────────────────────────────────────
 
   DateTime? _parseDateTime(Object? value) {

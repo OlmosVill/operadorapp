@@ -5,11 +5,9 @@ abstract final class AppTheme {
   static ThemeData get dark => ThemeData(
         colorScheme: const ColorScheme.dark(
           primary: AppColors.amber,
-          onPrimary: Colors.black,
           primaryContainer: Color(0xFF4A2800),
           onPrimaryContainer: AppColors.amberLight,
           secondary: AppColors.silver,
-          onSecondary: Colors.black,
           secondaryContainer: AppColors.asphaltCard,
           onSecondaryContainer: AppColors.textOnDark,
           surface: AppColors.asphaltSurface,
@@ -158,18 +156,14 @@ abstract final class AppTheme {
   static ThemeData get light => ThemeData(
         colorScheme: const ColorScheme.light(
           primary: AppColors.amberDark,
-          onPrimary: Colors.white,
           primaryContainer: Color(0xFFFFE0B2),
           onPrimaryContainer: Color(0xFF4A2800),
           secondary: Color(0xFF5A5A5A),
-          onSecondary: Colors.white,
           secondaryContainer: Color(0xFFE0E0E0),
           onSecondaryContainer: AppColors.textOnLight,
-          surface: AppColors.concreteCard,
           onSurface: AppColors.textOnLight,
           surfaceContainerHighest: AppColors.concrete,
           error: AppColors.error,
-          onError: Colors.white,
         ),
         scaffoldBackgroundColor: AppColors.concreteLight,
         appBarTheme: const AppBarTheme(

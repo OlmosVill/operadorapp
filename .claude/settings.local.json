@@ -8,7 +8,8 @@
       "Bash(dart pub *)",
       "Bash(findstr latlong2 *)",
       "Bash(dir *)",
-      "Bash(Get-ChildItem *)"
+      "Bash(Get-ChildItem *)",
+      "Bash(Select-Object Name)"
     ]
   }
 }

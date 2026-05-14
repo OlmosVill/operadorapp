@@ -38,10 +38,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           profileAsync.whenOrNull(
                 data: (profile) => Padding(
                   padding: const EdgeInsets.only(right: 16),
-                  child: LevelBadge(
-                    level: profile.level,
-                    size: 32,
-                    showLabel: false,
+                  child: GestureDetector(
+                    onTap: () => context.push('/profile'),
+                    child: LevelBadge(
+                      level: profile.level,
+                      size: 32,
+                      showLabel: false,
+                    ),
                   ),
                 ),
               ) ??
@@ -436,39 +439,44 @@ class _PointsBalanceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF4A2800), Color(0xFF2A1800)],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.amber.withAlpha(40)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.stars_rounded, color: AppColors.amber),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '$availablePoints pts disponibles',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: AppColors.amber,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                'Ve a Premios para canjear',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.amber.withAlpha(180),
-                ),
-              ),
-            ],
+    return GestureDetector(
+      onTap: () => context.push('/points'),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF4A2800), Color(0xFF2A1800)],
           ),
-        ],
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.amber.withAlpha(40)),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.stars_rounded, color: AppColors.amber),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$availablePoints pts disponibles',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: AppColors.amber,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    'Ver historial de puntos →',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.amber.withAlpha(180),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

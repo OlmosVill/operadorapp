@@ -100,7 +100,7 @@ Completa. 18/18 tests pasando.
 
 Archivos clave:
 - `lib/core/database/tables.dart` — 12 tablas Drift (OperadoresTable, ViajesTable, GpsPuntosTable, IncidenciasTable, AlertasTable, ReportesTable, PremiosCatalogoTable, PremiosCanjeadosTable, MovimientosPuntosTable, NotificacionesTable, PendingOpsTable, SyncMetadataTable)
-- `lib/core/database/app_database.dart` — AppDatabase con DAOs: ProfileDao, TripsDao, SyncDao
+- `lib/core/database/app_database.dart` — AppDatabase con DAOs: PointsDao, ProfileDao, RewardsDao, SyncDao, TripsDao
 - `lib/core/services/connectivity_service.dart` — ConnectivityService (connectivity_plus)
 - `lib/core/services/sync_service.dart` — pull incremental Supabase→Drift; parseo EWKB geography
 - `lib/features/profile/` — refactorizado a offline-first con StreamProvider que observa Drift
@@ -131,8 +131,40 @@ Archivos clave:
 - `lib/features/trips/presentation/screens/home_screen.dart` — `ConsumerStatefulWidget` con 3 vistas: `_ActiveTripView`, `_WelcomeBackView`, `_DashboardView`; animaciones flutter_animate
 - `lib/features/trips/presentation/widgets/active_trip_card.dart` — card de viaje activo con mapa miniatura, punto pulsante, stats (tiempo, KM, rendimiento)
 
-### 🔄 Próxima: Fase 5 — Catálogo de Premios + Canje
-Ver `docs/ROADMAP.md`. Requiere: PremiosCatálogo (tabla local Drift), pantalla de tienda, flujo de canje via Edge Function.
+### ✅ Fase 5.1 — Sistema de Puntos + Historial
+Completa. 24/24 tests pasando. 0 issues `flutter analyze`.
+
+Archivos clave:
+- `lib/core/database/daos/points_dao.dart` — `watchByOperador`, `getLastCreatedAt`, `upsertAll`
+- `lib/core/services/sync_service.dart` — `syncMovimientos()` pull incremental de `movimientos_puntos`
+- `lib/features/points/domain/entities/point_movement.dart` — `PointMovement` (Freezed), `MovementType` enum
+- `lib/features/points/data/repositories/points_repository_impl.dart` — patrón `async*`/`await for`
+- `lib/features/points/presentation/providers/points_provider.dart` — `movementsProvider` StreamProvider
+- `lib/features/points/presentation/screens/points_screen.dart` — balance, progreso de nivel, historial
+- `lib/features/points/presentation/widgets/movement_tile.dart` — tile con signo, color, ícono por tipo
+- `lib/core/router/app_router.dart` — ruta `/points` fuera del ShellRoute
+- `lib/features/trips/presentation/screens/home_screen.dart` — `_PointsBalanceCard` tappable → `/points`
+- `supabase/migrations/20240101000001_trigger_puntos_viaje.sql` — trigger `trg_viaje_completado`
+- `supabase/functions/calcular-puntos-viaje/index.ts` — Edge Function Deno (invocación manual/admin)
+
+### ✅ Fase 5.2 — Catálogo y Canje de Premios
+Completa. 29/29 tests pasando. 0 issues `flutter analyze`.
+
+Archivos clave:
+- `lib/core/database/daos/rewards_dao.dart` — `watchCatalogo`, `getLastUpdatedAt`, `upsertPremios`, `watchByOperador`, `upsertCanjes`
+- `lib/core/services/sync_service.dart` — `syncCatalogo()` + `syncCanjes()` añadidos
+- `lib/features/rewards/domain/entities/premio.dart` — `Premio`/`Canje` (Freezed), `PremioTipo`/`CanjeEstado` enums
+- `lib/features/rewards/data/repositories/rewards_repository_impl.dart` — patrón `async*`/`await for`; `canjearPremio` vía Edge Function
+- `lib/features/rewards/data/datasources/rewards_remote_datasource.dart` — llama Edge Function `canjear-premio`
+- `lib/features/rewards/presentation/providers/rewards_provider.dart` — `premiosProvider`, `canjesProvider`, `canjearUsecaseProvider`
+- `lib/features/rewards/presentation/screens/rewards_screen.dart` — catálogo grid + filtros + historial canjes
+- `lib/features/rewards/presentation/widgets/premio_card.dart` — card con estado (disponible/próximo/nivel insuficiente)
+- `lib/features/rewards/presentation/widgets/canje_sheet.dart` — bottom sheet de confirmación de canje
+- `supabase/functions/canjear-premio/index.ts` — Edge Function Deno; valida JWT, puntos, nivel y stock
+- `lib/core/router/app_router.dart` — ShellRoute: Home(0), Viajes(1), Premios(2), Settings(3); Perfil fuera del nav bar (accesible por LevelBadge en AppBar)
+
+### 🔄 Próxima: Fase 6
+Ver `docs/ROADMAP.md`.
 
 ---
 
@@ -228,7 +260,9 @@ GOOGLE_MAPS_API_KEY=
 
 13. **`StateNotifier` constructor fire-and-forget** — Llamar a `_load()` en el constructor de un `StateNotifier` sin `await` genera warning `discarded_futures`. Solución: `unawaited(_load())` con `import 'dart:async'`.
 
-14. **`latlong2` — el archivo de librería es `latlong.dart`, no `latlong2.dart`** — El paquete se llama `latlong2` pero su archivo interno es `lib/latlong.dart`. El import correcto es `import 'package:latlong2/latlong.dart'`. Usar `latlong2/latlong2.dart` produce `uri_does_not_exist`.
+14. **`Stream.handleError` con retorno no emite datos** — `stream.handleError((e) => Left(err))` ignora el valor de retorno (es un `void` handler). Para convertir errores de stream en eventos `Left`, usar el patrón `async*` / `await for` con try-catch: `yield Left(...)` dentro del catch.
+
+15. **`latlong2` — el archivo de librería es `latlong.dart`, no `latlong2.dart`** — El paquete se llama `latlong2` pero su archivo interno es `lib/latlong.dart`. El import correcto es `import 'package:latlong2/latlong.dart'`. Usar `latlong2/latlong2.dart` produce `uri_does_not_exist`.
 
 ---
 
@@ -249,15 +283,14 @@ VALUES ('<uuid>', '12345', 'Juan Demo', '2022-01-15');
 
 ---
 
-## Para la próxima sesión (Fase 5)
+## Para la próxima sesión (Fase 5.2 — Catálogo de Premios + Canje)
 
-- [ ] Sincronizar `premios_catalogo` en SyncService → tabla `PremiosCatalogoTable` local
+- [ ] `syncPremios()` en SyncService → tabla `PremiosCatalogoTable` local
 - [ ] `PremiosRepository` + `GetPremiosUseCase` + `CanjeUseCase` (canje vía Edge Function)
 - [ ] `RewardsScreen` — catálogo de premios con filtro por nivel y puntos disponibles
 - [ ] Integrar pestaña Premios en ShellRoute (índice 2, desplazando Settings al 3)
 - [ ] Historial de canjes en `PremiosCanjeadosTable`
-
-> **Pendiente de `dart run build_runner build`**: se reordenaron parámetros en `GpsPoint` y `SecurityAlert` (Freezed) — regenerar `.freezed.dart` antes del siguiente `flutter test`.
+- [ ] Edge Function `canjear-premio` (Deno) que valida puntos, descuenta y crea registro
 
 ---
 

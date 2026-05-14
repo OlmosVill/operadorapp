@@ -32,14 +32,14 @@ void main() {
           employeeNumber: tEmployeeNumber,
           password: tPassword,
         ),
-      ).thenAnswer((_) async => Right(tSession));
+      ).thenAnswer((_) async => const Right(tSession));
 
       final result = await sut(
         employeeNumber: tEmployeeNumber,
         password: tPassword,
       );
 
-      expect(result, Right<AppError, OperatorSession>(tSession));
+      expect(result, const Right<AppError, OperatorSession>(tSession));
       verify(
         () => mockRepo.login(
           employeeNumber: tEmployeeNumber,
@@ -114,7 +114,7 @@ void main() {
             employeeNumber: tEmployeeNumber,
             password: tPassword,
           ),
-        ).thenAnswer((_) async => Right(tSession));
+        ).thenAnswer((_) async => const Right(tSession));
 
         await sut(
           employeeNumber: '  $tEmployeeNumber  ',

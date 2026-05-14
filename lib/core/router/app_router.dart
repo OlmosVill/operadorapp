@@ -6,7 +6,9 @@ import 'package:operadorapp/features/auth/domain/entities/operator_session.dart'
 import 'package:operadorapp/features/auth/presentation/providers/auth_provider.dart';
 import 'package:operadorapp/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:operadorapp/features/auth/presentation/screens/login_screen.dart';
+import 'package:operadorapp/features/points/presentation/screens/points_screen.dart';
 import 'package:operadorapp/features/profile/presentation/screens/profile_screen.dart';
+import 'package:operadorapp/features/rewards/presentation/screens/rewards_screen.dart';
 import 'package:operadorapp/features/settings/presentation/screens/settings_screen.dart';
 import 'package:operadorapp/features/trips/presentation/screens/home_screen.dart';
 import 'package:operadorapp/features/trips/presentation/screens/trip_detail_screen.dart';
@@ -65,14 +67,22 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (_, __) => const TripsListScreen(),
           ),
           GoRoute(
-            path: '/profile',
-            builder: (_, __) => const ProfileScreen(),
+            path: '/rewards',
+            builder: (_, __) => const RewardsScreen(),
           ),
           GoRoute(
             path: '/settings',
             builder: (_, __) => const SettingsScreen(),
           ),
         ],
+      ),
+      GoRoute(
+        path: '/profile',
+        builder: (_, __) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/points',
+        builder: (_, __) => const PointsScreen(),
       ),
       GoRoute(
         path: '/trips/:id',
@@ -95,7 +105,7 @@ class _AppShell extends ConsumerWidget {
 
     final currentIndex = switch (true) {
       _ when location.startsWith('/trips') => 1,
-      _ when location.startsWith('/profile') => 2,
+      _ when location.startsWith('/rewards') => 2,
       _ when location.startsWith('/settings') => 3,
       _ => 0,
     };
@@ -111,7 +121,7 @@ class _AppShell extends ConsumerWidget {
             case 1:
               context.go('/trips');
             case 2:
-              context.go('/profile');
+              context.go('/rewards');
             case 3:
               context.go('/settings');
           }
@@ -128,9 +138,9 @@ class _AppShell extends ConsumerWidget {
             label: 'Viajes',
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outlined),
-            selectedIcon: Icon(Icons.person),
-            label: 'Perfil',
+            icon: Icon(Icons.redeem_outlined),
+            selectedIcon: Icon(Icons.redeem),
+            label: 'Premios',
           ),
           NavigationDestination(
             icon: Icon(Icons.settings_outlined),

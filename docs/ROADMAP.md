@@ -127,19 +127,36 @@ antes de ver una sola línea de código Dart.
 
 ---
 
-## Fase 5 — Sistema de Puntos + Niveles de Operador
+## Fase 5.1 — Sistema de Puntos + Niveles de Operador ✅
 
 **Objetivo:** El operador ve su balance, historial de puntos y progreso de nivel gamificado.
 
-- [ ] `PointsScreen` — balance actual, movimientos recientes
-- [ ] Historial paginado de `movimientos_puntos` por viaje
-- [ ] Badge de nivel con animación al subir de nivel
-- [ ] Efecto de "lluvia de puntos" al acreditar puntos nuevos
-- [ ] Detalle de cómo se calcularon los puntos de un viaje
-- [ ] Edge Function `calcular_puntos_viaje` probada e integrada
-- [ ] Trigger en Supabase que dispara el cálculo al cerrar viaje
+- [x] `PointsScreen` — balance actual, movimientos recientes
+- [x] Historial paginado de `movimientos_puntos` (stream reactivo offline-first)
+- [x] Barra de progreso de nivel con umbrales reales del seed
+- [x] Edge Function `calcular-puntos-viaje` (Deno) probada e integrada
+- [x] Trigger SQL `trg_viaje_completado` que dispara el cálculo al cerrar viaje
+- [x] `PointsDao` + `syncMovimientos` en SyncService
+- [x] `_PointsBalanceCard` en Home tappable → navega a `/points`
+- [x] 24/24 tests pasando · 0 issues en `flutter analyze`
 
-**Commit final:** `feat: fase 5 completa — puntos + niveles gamificados`
+**Commit final:** `feat: fase 5.1 completa — sistema de puntos + pantalla de historial`
+
+---
+
+## Fase 5.2 — Catálogo y Canje de Premios ✅
+
+**Objetivo:** El operador navega el catálogo de premios y puede canjear sus puntos.
+
+- [x] Sincronizar `premios_catalogo` en SyncService → `PremiosCatalogoTable` local
+- [x] `RewardsRepository` + `GetPremiosUsecase` + `CanjearUsecase` (vía Edge Function)
+- [x] `RewardsScreen` — catálogo con filtros (Todos/Disponibles/Mis Canjes)
+- [x] Integrar pestaña Premios en ShellRoute (índice 2, Settings al 3; Perfil fuera del nav bar)
+- [x] Historial de canjes en `PremiosCanjeadosTable`
+- [x] Edge Function `canjear-premio` (Deno) — valida puntos, nivel y stock
+- [x] 29/29 tests pasando · 0 issues en `flutter analyze`
+
+**Commit final:** `feat: fase 5.2 completa — catálogo de premios + canje`
 
 ---
 

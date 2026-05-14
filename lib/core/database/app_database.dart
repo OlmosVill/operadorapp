@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:operadorapp/core/database/daos/points_dao.dart';
 import 'package:operadorapp/core/database/daos/profile_dao.dart';
+import 'package:operadorapp/core/database/daos/rewards_dao.dart';
 import 'package:operadorapp/core/database/daos/sync_dao.dart';
 import 'package:operadorapp/core/database/daos/trips_dao.dart';
 import 'package:operadorapp/core/database/tables.dart';
@@ -27,9 +29,11 @@ part 'app_database.g.dart';
     SyncMetadataTable,
   ],
   daos: [
+    PointsDao,
     ProfileDao,
-    TripsDao,
+    RewardsDao,
     SyncDao,
+    TripsDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {

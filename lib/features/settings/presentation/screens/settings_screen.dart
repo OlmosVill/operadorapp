@@ -75,7 +75,7 @@ class SettingsScreen extends ConsumerWidget {
                   secondary: const Icon(Icons.notifications_outlined),
                 ),
                 const Divider(height: 1, indent: 16, endIndent: 16),
-                // TODO(fase-8): Activar cuando haya Apple Developer account + Mac.
+                // TODO(fase-8): Activar cuando haya Apple Developer account.
                 // Al habilitarse debe: registrar FCM/APNs token en Supabase,
                 // pedir permiso al sistema operativo (permission_handler),
                 // y suscribirse al topic del operador en Firebase.
