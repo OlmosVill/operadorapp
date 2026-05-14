@@ -5,18 +5,15 @@ import 'package:operadorapp/core/database/tables.dart';
 part 'profile_dao.g.dart';
 
 @DriftAccessor(tables: [OperadoresTable])
-class ProfileDao extends DatabaseAccessor<AppDatabase>
-    with _$ProfileDaoMixin {
+class ProfileDao extends DatabaseAccessor<AppDatabase> with _$ProfileDaoMixin {
   ProfileDao(AppDatabase db) : super(db);
 
   Future<OperadorRow?> getByAuthUserId(String authUserId) =>
-      (select(operadoresTable)
-            ..where((t) => t.authUserId.equals(authUserId)))
+      (select(operadoresTable)..where((t) => t.authUserId.equals(authUserId)))
           .getSingleOrNull();
 
   Stream<OperadorRow?> watchByAuthUserId(String authUserId) =>
-      (select(operadoresTable)
-            ..where((t) => t.authUserId.equals(authUserId)))
+      (select(operadoresTable)..where((t) => t.authUserId.equals(authUserId)))
           .watchSingleOrNull();
 
   Future<void> upsert(OperadoresTableCompanion data) =>

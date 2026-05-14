@@ -361,8 +361,8 @@ class _IncidentTile extends StatelessWidget {
       ),
       title: Text(
         incident.tipo,
-        style: theme.textTheme.bodyMedium
-            ?.copyWith(fontWeight: FontWeight.w600),
+        style:
+            theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
       ),
       subtitle: incident.descripcion != null
           ? Text(
@@ -383,8 +383,8 @@ class _IncidentTile extends StatelessWidget {
             Text(
               '${incident.impactoPuntos > 0 ? '+' : ''}'
               '${incident.impactoPuntos} pts',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: AppColors.error),
+              style:
+                  theme.textTheme.bodySmall?.copyWith(color: AppColors.error),
             ),
         ],
       ),
@@ -401,11 +401,11 @@ class _AlertTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final fmt = DateFormat('dd/MM · HH:mm', 'es_MX');
-    final subtitle = (alert.valorMedido != null &&
-            alert.umbralPermitido != null)
-        ? 'Medido: ${alert.valorMedido!.toStringAsFixed(1)} '
-            '/ Límite: ${alert.umbralPermitido!.toStringAsFixed(1)}'
-        : null;
+    final subtitle =
+        (alert.valorMedido != null && alert.umbralPermitido != null)
+            ? 'Medido: ${alert.valorMedido!.toStringAsFixed(1)} '
+                '/ Límite: ${alert.umbralPermitido!.toStringAsFixed(1)}'
+            : null;
 
     return ListTile(
       contentPadding: EdgeInsets.zero,
@@ -424,8 +424,8 @@ class _AlertTile extends StatelessWidget {
       ),
       title: Text(
         alert.tipo,
-        style: theme.textTheme.bodyMedium
-            ?.copyWith(fontWeight: FontWeight.w600),
+        style:
+            theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
       ),
       subtitle: subtitle != null ? Text(subtitle) : null,
       trailing: Column(
@@ -439,8 +439,8 @@ class _AlertTile extends StatelessWidget {
           if (alert.impactoPuntos != 0)
             Text(
               '${alert.impactoPuntos} pts',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: AppColors.error),
+              style:
+                  theme.textTheme.bodySmall?.copyWith(color: AppColors.error),
             ),
         ],
       ),

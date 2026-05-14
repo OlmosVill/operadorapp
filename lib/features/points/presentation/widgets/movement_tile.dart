@@ -14,8 +14,8 @@ class MovementTile extends StatelessWidget {
     final isCredit = movement.tipo.isCredit;
     final sign = isCredit ? '+' : '';
     final color = isCredit ? AppColors.amber : theme.colorScheme.error;
-    final dateStr = DateFormat('dd MMM yyyy', 'es_MX')
-        .format(movement.createdAt.toLocal());
+    final dateStr =
+        DateFormat('dd MMM yyyy', 'es_MX').format(movement.createdAt.toLocal());
 
     return ListTile(
       leading: CircleAvatar(

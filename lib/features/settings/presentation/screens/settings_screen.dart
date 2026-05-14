@@ -60,7 +60,6 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
           ),
-
           const SizedBox(height: 16),
           const _SectionHeader(title: 'Notificaciones'),
           Card(
@@ -91,11 +90,9 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
           ),
-
           const SizedBox(height: 16),
           const _SectionHeader(title: 'Sincronización'),
           _SyncStatusCard(),
-
           const SizedBox(height: 16),
           const _SectionHeader(title: 'Cuenta'),
           Card(
@@ -108,7 +105,6 @@ class SettingsScreen extends ConsumerWidget {
               onTap: () => _confirmLogout(context, ref),
             ),
           ),
-
           const SizedBox(height: 24),
           Center(
             child: Text(
@@ -159,9 +155,7 @@ class _SyncStatusCard extends ConsumerWidget {
     return Card(
       child: ListTile(
         leading: Icon(
-          isOnline
-              ? Icons.cloud_done_outlined
-              : Icons.cloud_off_outlined,
+          isOnline ? Icons.cloud_done_outlined : Icons.cloud_off_outlined,
           color: isOnline ? AppColors.success : AppColors.asphaltBorder,
         ),
         title: Text(isOnline ? 'Conectado' : 'Sin conexión'),

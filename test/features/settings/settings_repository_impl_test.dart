@@ -20,8 +20,7 @@ void main() {
     test(
       'devuelve valores por defecto cuando SharedPreferences está vacío',
       () async {
-        when(() => mockPrefs.getString(AppConstants.themeKey))
-            .thenReturn(null);
+        when(() => mockPrefs.getString(AppConstants.themeKey)).thenReturn(null);
         when(() => mockPrefs.getBool(AppConstants.pushNotifKey))
             .thenReturn(null);
         when(() => mockPrefs.getBool(AppConstants.inAppNotifKey))
@@ -36,10 +35,8 @@ void main() {
     );
 
     test('deserializa el themeMode guardado correctamente', () async {
-      when(() => mockPrefs.getString(AppConstants.themeKey))
-          .thenReturn('dark');
-      when(() => mockPrefs.getBool(AppConstants.pushNotifKey))
-          .thenReturn(true);
+      when(() => mockPrefs.getString(AppConstants.themeKey)).thenReturn('dark');
+      when(() => mockPrefs.getBool(AppConstants.pushNotifKey)).thenReturn(true);
       when(() => mockPrefs.getBool(AppConstants.inAppNotifKey))
           .thenReturn(true);
 

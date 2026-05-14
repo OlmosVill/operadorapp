@@ -5,9 +5,7 @@ import 'package:operadorapp/core/database/tables.dart';
 part 'points_dao.g.dart';
 
 @DriftAccessor(tables: [MovimientosPuntosTable])
-class PointsDao
-    extends DatabaseAccessor<AppDatabase>
-    with _$PointsDaoMixin {
+class PointsDao extends DatabaseAccessor<AppDatabase> with _$PointsDaoMixin {
   PointsDao(AppDatabase db) : super(db);
 
   // ─── Queries ──────────────────────────────────────────────────────────────

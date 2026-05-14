@@ -17,8 +17,7 @@ class TrucksHistoryScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Mis Tractos')),
       body: summariesAsync.when(
-        loading: () =>
-            const AppLoadingWidget(message: 'Cargando tractos...'),
+        loading: () => const AppLoadingWidget(message: 'Cargando tractos...'),
         error: (error, _) => AppErrorWidget(
           error: error,
           onRetry: () => ref.invalidate(truckSummariesProvider),
@@ -26,8 +25,7 @@ class TrucksHistoryScreen extends ConsumerWidget {
         data: (summaries) => summaries.isEmpty
             ? const _EmptyTrucks()
             : ListView.builder(
-                padding:
-                    const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                 itemCount: summaries.length,
                 itemBuilder: (_, i) => _TruckCard(
                   summary: summaries[i],
@@ -77,8 +75,7 @@ class _TruckCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             summary.numeroEconomico,
-                            style:
-                                theme.textTheme.titleMedium?.copyWith(
+                            style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -95,8 +92,7 @@ class _TruckCard extends StatelessWidget {
                             ),
                             child: Text(
                               'Actual',
-                              style: theme.textTheme.labelSmall
-                                  ?.copyWith(
+                              style: theme.textTheme.labelSmall?.copyWith(
                                 color: colorScheme.onPrimary,
                               ),
                             ),

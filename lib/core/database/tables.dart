@@ -14,15 +14,11 @@ class OperadoresTable extends Table {
   TextColumn get fechaIngreso => text()();
   TextColumn get base => text().nullable()();
   TextColumn get fotoPerfilUrl => text().nullable()();
-  TextColumn get nivelActual =>
-      text().withDefault(const Constant('plata'))();
+  TextColumn get nivelActual => text().withDefault(const Constant('plata'))();
   // Denormalized from puntos_operador — simpler for local reads
-  IntColumn get puntosGanados =>
-      integer().withDefault(const Constant(0))();
-  IntColumn get puntosCanjeados =>
-      integer().withDefault(const Constant(0))();
-  IntColumn get puntosDisponibles =>
-      integer().withDefault(const Constant(0))();
+  IntColumn get puntosGanados => integer().withDefault(const Constant(0))();
+  IntColumn get puntosCanjeados => integer().withDefault(const Constant(0))();
+  IntColumn get puntosDisponibles => integer().withDefault(const Constant(0))();
   DateTimeColumn get updatedAt => dateTime()();
 
   @override
@@ -48,11 +44,9 @@ class ViajesTable extends Table {
   RealColumn get kmRecorridos => real().nullable()();
   RealColumn get litrosDiesel => real().nullable()();
   RealColumn get rendimientoReal => real().nullable()();
-  TextColumn get estado =>
-      text().withDefault(const Constant('asignado'))();
+  TextColumn get estado => text().withDefault(const Constant('asignado'))();
   RealColumn get calificacion => real().nullable()();
-  IntColumn get puntosObtenidos =>
-      integer().withDefault(const Constant(0))();
+  IntColumn get puntosObtenidos => integer().withDefault(const Constant(0))();
   TextColumn get notas => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
@@ -91,8 +85,7 @@ class IncidenciasTable extends Table {
   RealColumn get lat => real().nullable()();
   RealColumn get lng => real().nullable()();
   DateTimeColumn get timestampIncidencia => dateTime()();
-  IntColumn get impactoPuntos =>
-      integer().withDefault(const Constant(0))();
+  IntColumn get impactoPuntos => integer().withDefault(const Constant(0))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -110,8 +103,7 @@ class AlertasTable extends Table {
   RealColumn get lat => real().nullable()();
   RealColumn get lng => real().nullable()();
   DateTimeColumn get timestampAlerta => dateTime()();
-  IntColumn get impactoPuntos =>
-      integer().withDefault(const Constant(0))();
+  IntColumn get impactoPuntos => integer().withDefault(const Constant(0))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -126,12 +118,10 @@ class ReportesTable extends Table {
   TextColumn get operadorId => text()();
   TextColumn get tractoId => text().nullable()();
   TextColumn get tipo => text()();
-  TextColumn get estado =>
-      text().withDefault(const Constant('abierto'))();
+  TextColumn get estado => text().withDefault(const Constant('abierto'))();
   TextColumn get descripcion => text()();
   // JSON-encoded list of photo URLs
-  TextColumn get fotosUrls =>
-      text().withDefault(const Constant('[]'))();
+  TextColumn get fotosUrls => text().withDefault(const Constant('[]'))();
   RealColumn get lat => real().nullable()();
   RealColumn get lng => real().nullable()();
   DateTimeColumn get fechaReporte => dateTime()();
@@ -153,8 +143,7 @@ class PremiosCatalogoTable extends Table {
   TextColumn get nivelMinimo => text().nullable()();
   TextColumn get imagenUrl => text().nullable()();
   IntColumn get stock => integer().nullable()();
-  BoolColumn get activo =>
-      boolean().withDefault(const Constant(true))();
+  BoolColumn get activo => boolean().withDefault(const Constant(true))();
   IntColumn get orden => integer().nullable()();
   DateTimeColumn get updatedAt => dateTime()();
 
@@ -205,8 +194,7 @@ class NotificacionesTable extends Table {
   TextColumn get titulo => text()();
   TextColumn get mensaje => text()();
   TextColumn get tipo => text()();
-  BoolColumn get leida =>
-      boolean().withDefault(const Constant(false))();
+  BoolColumn get leida => boolean().withDefault(const Constant(false))();
   // JSON extra data
   TextColumn get datos => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
@@ -226,8 +214,7 @@ class TractosTable extends Table {
   IntColumn get anio => integer().nullable()();
   TextColumn get placa => text().nullable()();
   RealColumn get rendimientoEsperado => real().nullable()();
-  BoolColumn get activo =>
-      boolean().withDefault(const Constant(true))();
+  BoolColumn get activo => boolean().withDefault(const Constant(true))();
   DateTimeColumn get updatedAt => dateTime()();
 
   @override
@@ -243,13 +230,10 @@ class HistorialTractosTable extends Table {
   TextColumn get tractoId => text()();
   DateTimeColumn get fechaInicio => dateTime()();
   DateTimeColumn get fechaFin => dateTime().nullable()();
-  RealColumn get kmRecorridos =>
-      real().withDefault(const Constant(0))();
-  IntColumn get viajesRealizados =>
-      integer().withDefault(const Constant(0))();
+  RealColumn get kmRecorridos => real().withDefault(const Constant(0))();
+  IntColumn get viajesRealizados => integer().withDefault(const Constant(0))();
   RealColumn get calificacionPromedio => real().nullable()();
-  BoolColumn get esActual =>
-      boolean().withDefault(const Constant(false))();
+  BoolColumn get esActual => boolean().withDefault(const Constant(false))();
   DateTimeColumn get updatedAt => dateTime()();
 
   @override
@@ -263,8 +247,7 @@ class PendingOpsTable extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get operationType => text()();
   TextColumn get payload => text()();
-  IntColumn get retryCount =>
-      integer().withDefault(const Constant(0))();
+  IntColumn get retryCount => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get lastAttemptAt => dateTime().nullable()();
   TextColumn get errorMessage => text().nullable()();

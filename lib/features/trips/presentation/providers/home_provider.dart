@@ -76,8 +76,7 @@ final homeStateProvider = Provider<HomeState>((ref) {
   // Case B: returning user
   if (isReturning && trips.isNotEmpty) {
     final recentTrips = trips.take(3).toList();
-    final recentPoints =
-        recentTrips.fold(0, (s, t) => s + t.puntosObtenidos);
+    final recentPoints = recentTrips.fold(0, (s, t) => s + t.puntosObtenidos);
     return HomeStateReturning(
       recentTrips: recentTrips,
       recentPoints: recentPoints,

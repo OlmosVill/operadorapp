@@ -39,7 +39,6 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   }
 }
 
-final settingsProvider =
-    StateNotifierProvider<SettingsNotifier, AppSettings>(
+final settingsProvider = StateNotifierProvider<SettingsNotifier, AppSettings>(
   (ref) => SettingsNotifier(ref.read(settingsRepositoryProvider)),
 );

@@ -45,8 +45,7 @@ class TripsListScreen extends ConsumerWidget {
   }
 
   Future<void> _syncTrips(WidgetRef ref) async {
-    final operadorId =
-        ref.read(authStateProvider).value?.operatorId ?? '';
+    final operadorId = ref.read(authStateProvider).value?.operatorId ?? '';
     if (operadorId.isNotEmpty) {
       await ref.read(syncServiceProvider).syncTrips(operadorId);
     }

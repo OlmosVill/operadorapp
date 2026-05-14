@@ -6,8 +6,7 @@ import 'package:operadorapp/features/points/data/datasources/points_local_dataso
 import 'package:operadorapp/features/points/data/repositories/points_repository_impl.dart';
 import 'package:operadorapp/features/points/domain/entities/point_movement.dart';
 
-class MockPointsLocalDatasource extends Mock
-    implements PointsLocalDatasource {}
+class MockPointsLocalDatasource extends Mock implements PointsLocalDatasource {}
 
 void main() {
   late PointsRepositoryImpl sut;

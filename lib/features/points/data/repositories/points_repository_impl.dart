@@ -14,8 +14,7 @@ class PointsRepositoryImpl implements PointsRepository {
     String operadorId,
   ) async* {
     try {
-      await for (final movements
-          in _local.watchMovimientos(operadorId)) {
+      await for (final movements in _local.watchMovimientos(operadorId)) {
         yield Right(movements);
       }
     } on Object catch (e) {

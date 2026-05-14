@@ -40,10 +40,7 @@ final tripsProvider = StreamProvider<List<Trip>>((ref) {
 
   if (operadorId.isEmpty) return const Stream.empty();
 
-  return ref
-      .read(getTripsUseCaseProvider)
-      .call(operadorId: operadorId)
-      .map(
+  return ref.read(getTripsUseCaseProvider).call(operadorId: operadorId).map(
         (result) => result.fold(
           (error) => throw _toException(error),
           (trips) => trips,

@@ -77,11 +77,10 @@ class TripsDao extends DatabaseAccessor<AppDatabase> with _$TripsDaoMixin {
 
   // ─── Alertas ─────────────────────────────────────────────────────────────
 
-  Future<List<AlertaRow>> getAlertas(String viajeId) =>
-      (select(alertasTable)
-            ..where((t) => t.viajeId.equals(viajeId))
-            ..orderBy([(t) => OrderingTerm.asc(t.timestampAlerta)]))
-          .get();
+  Future<List<AlertaRow>> getAlertas(String viajeId) => (select(alertasTable)
+        ..where((t) => t.viajeId.equals(viajeId))
+        ..orderBy([(t) => OrderingTerm.asc(t.timestampAlerta)]))
+      .get();
 
   Future<void> upsertAlertas(List<AlertasTableCompanion> rows) => batch(
         (b) => b.insertAllOnConflictUpdate(alertasTable, rows),
@@ -90,9 +89,7 @@ class TripsDao extends DatabaseAccessor<AppDatabase> with _$TripsDaoMixin {
   // ─── Reportes ────────────────────────────────────────────────────────────
 
   Future<List<ReporteRow>> getReportesByViaje(String viajeId) =>
-      (select(reportesTable)
-            ..where((t) => t.viajeId.equals(viajeId)))
-          .get();
+      (select(reportesTable)..where((t) => t.viajeId.equals(viajeId))).get();
 
   Future<void> upsertReportes(List<ReportesTableCompanion> rows) => batch(
         (b) => b.insertAllOnConflictUpdate(reportesTable, rows),

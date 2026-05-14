@@ -48,10 +48,8 @@ class TrucksRepositoryImpl implements TrucksRepository {
   ) async {
     try {
       final viajes = await _dao.getViajesByTracto(tractoId, operadorId);
-      final vals = viajes
-          .map((v) => v.rendimientoReal)
-          .whereType<double>()
-          .toList();
+      final vals =
+          viajes.map((v) => v.rendimientoReal).whereType<double>().toList();
       if (vals.isEmpty) {
         return const Right<AppError, double?>(null);
       }

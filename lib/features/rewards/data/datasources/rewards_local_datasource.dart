@@ -8,18 +8,16 @@ class RewardsLocalDatasource {
 
   final AppDatabase _db;
 
-  Stream<List<Premio>> watchCatalogo() =>
-      _db.rewardsDao.watchCatalogo().map(
-            (rows) => rows.map(_premioFromRow).toList(),
-          );
+  Stream<List<Premio>> watchCatalogo() => _db.rewardsDao.watchCatalogo().map(
+        (rows) => rows.map(_premioFromRow).toList(),
+      );
 
   Stream<List<Canje>> watchCanjes(String operadorId) =>
       _db.rewardsDao.watchByOperador(operadorId).map(
             (rows) => rows.map(_canjeFromRow).toList(),
           );
 
-  Future<void> upsertCanje(Canje canje) =>
-      _db.rewardsDao.upsertCanjes([
+  Future<void> upsertCanje(Canje canje) => _db.rewardsDao.upsertCanjes([
         PremiosCanjeadosTableCompanion(
           id: Value(canje.id),
           operadorId: Value(canje.operadorId),

@@ -78,9 +78,7 @@ class _PulsingDot extends StatelessWidget {
         color: AppColors.success,
         shape: BoxShape.circle,
       ),
-    )
-        .animate(onPlay: (c) => c.repeat(reverse: true))
-        .scale(
+    ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(
           begin: const Offset(0.6, 0.6),
           end: const Offset(1.4, 1.4),
           duration: 800.ms,
@@ -223,8 +221,8 @@ class _StatTile extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           value,
-          style: theme.textTheme.bodySmall
-              ?.copyWith(fontWeight: FontWeight.w600),
+          style:
+              theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
           overflow: TextOverflow.ellipsis,
         ),
       ],

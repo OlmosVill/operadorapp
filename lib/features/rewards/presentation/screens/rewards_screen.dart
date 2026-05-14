@@ -46,9 +46,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
             child: _FilterTabs(
               selected: _tabIndex,
               onSelected: (i) => setState(() => _tabIndex = i),
-            )
-                .animate()
-                .fadeIn(duration: 400.ms, delay: 100.ms),
+            ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
           ),
           if (_tabIndex == 2)
             _CanjesSliver()
@@ -162,8 +160,7 @@ class _CatalogSliver extends ConsumerWidget {
                   (p) =>
                       (profile?.availablePoints ?? 0) >= p.costoPuntos &&
                       (p.nivelMinimo == null ||
-                          (profile?.level.index ?? 0) >=
-                              p.nivelMinimo!.index),
+                          (profile?.level.index ?? 0) >= p.nivelMinimo!.index),
                 )
                 .toList()
             : premios;
@@ -181,8 +178,7 @@ class _CatalogSliver extends ConsumerWidget {
         return SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           sliver: SliverGrid.builder(
-            gridDelegate:
-                const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
@@ -227,12 +223,11 @@ class _CanjesSliver extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           sliver: SliverList.builder(
             itemCount: canjes.length,
-            itemBuilder: (_, i) => _CanjeTile(canje: canjes[i])
-                .animate()
-                .fadeIn(
-                  duration: 300.ms,
-                  delay: Duration(milliseconds: 40 * i),
-                ),
+            itemBuilder: (_, i) =>
+                _CanjeTile(canje: canjes[i]).animate().fadeIn(
+                      duration: 300.ms,
+                      delay: Duration(milliseconds: 40 * i),
+                    ),
           ),
         );
       },
@@ -270,8 +265,7 @@ class _CanjeTile extends StatelessWidget {
           backgroundColor: color.withAlpha(25),
           side: BorderSide.none,
           padding: EdgeInsets.zero,
-          labelPadding:
-              const EdgeInsets.symmetric(horizontal: 6),
+          labelPadding: const EdgeInsets.symmetric(horizontal: 6),
         ),
       ),
     );

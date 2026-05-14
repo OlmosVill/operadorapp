@@ -28,9 +28,7 @@ class RewardsRemoteDatasource {
         premioId: r['premio_id'] as String,
         puntosCanjeados: r['puntos_canjeados'] as int,
         estado: CanjeEstadoX.fromString(r['estado'] as String),
-        fechaSolicitud:
-            DateTime.parse(r['fecha_solicitud'] as String).toUtc(),
-        updatedAt:
-            DateTime.parse(r['updated_at'] as String).toUtc(),
+        fechaSolicitud: DateTime.parse(r['fecha_solicitud'] as String).toUtc(),
+        updatedAt: DateTime.parse(r['updated_at'] as String).toUtc(),
       );
 }

@@ -41,26 +41,20 @@ void main() {
       );
     });
 
-    test(
-        'filtra por nivel e incluye premios sin nivelMinimo',
-        () {
-      final result =
-          filterAndSortPremios(premios, OperatorLevel.plata);
+    test('filtra por nivel e incluye premios sin nivelMinimo', () {
+      final result = filterAndSortPremios(premios, OperatorLevel.plata);
 
       // p1 (plata) + p3 (null nivelMinimo) = 2 resultados
       expect(result.length, 2);
       expect(
         result.every(
-          (p) =>
-              p.nivelMinimo == null ||
-              p.nivelMinimo == OperatorLevel.plata,
+          (p) => p.nivelMinimo == null || p.nivelMinimo == OperatorLevel.plata,
         ),
         isTrue,
       );
     });
 
-    test('devuelve todos los premios cuando el filtro es null',
-        () {
+    test('devuelve todos los premios cuando el filtro es null', () {
       final result = filterAndSortPremios(premios, null);
 
       expect(result.length, premios.length);

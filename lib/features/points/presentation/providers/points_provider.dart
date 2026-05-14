@@ -28,10 +28,7 @@ final movementsProvider = StreamProvider<List<PointMovement>>((ref) {
     return const Stream.empty();
   }
 
-  return ref
-      .watch(_watchMovementsProvider)
-      .call(operadorId)
-      .map(
+  return ref.watch(_watchMovementsProvider).call(operadorId).map(
         (e) => e.fold(
           (err) => throw Exception(err.toString()),
           (v) => v,

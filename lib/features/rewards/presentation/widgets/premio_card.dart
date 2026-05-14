@@ -55,13 +55,11 @@ class PremioCard extends ConsumerWidget {
                         const SizedBox(width: 2),
                         Text(
                           '${premio.costoPuntos} pts',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                color: AppColors.amber,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: AppColors.amber,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                       ],
                     ),

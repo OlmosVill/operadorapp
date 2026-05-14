@@ -21,8 +21,7 @@ final class GoogleMapAdapter implements MapAdapter {
       );
     }
 
-    final gPoints =
-        points.map((p) => gmaps.LatLng(p.lat, p.lng)).toList();
+    final gPoints = points.map((p) => gmaps.LatLng(p.lat, p.lng)).toList();
     final center = gmaps.LatLng(
       points.map((p) => p.lat).reduce((a, b) => a + b) / points.length,
       points.map((p) => p.lng).reduce((a, b) => a + b) / points.length,

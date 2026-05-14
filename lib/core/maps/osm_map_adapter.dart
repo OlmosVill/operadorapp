@@ -25,8 +25,7 @@ final class OsmMapAdapter implements MapAdapter {
     final latLngs = points.map((p) => LatLng(p.lat, p.lng)).toList();
     final center = LatLng(
       latLngs.map((p) => p.latitude).reduce((a, b) => a + b) / latLngs.length,
-      latLngs.map((p) => p.longitude).reduce((a, b) => a + b) /
-          latLngs.length,
+      latLngs.map((p) => p.longitude).reduce((a, b) => a + b) / latLngs.length,
     );
 
     final mapOptions = latLngs.length >= 2
@@ -50,8 +49,7 @@ final class OsmMapAdapter implements MapAdapter {
           options: mapOptions,
           children: [
             TileLayer(
-              urlTemplate:
-                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
               userAgentPackageName: 'com.example.operadorapp',
             ),
             PolylineLayer(

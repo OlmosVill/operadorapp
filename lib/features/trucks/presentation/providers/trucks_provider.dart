@@ -20,8 +20,7 @@ final truckSummariesProvider = StreamProvider<List<TruckSummary>>((ref) {
 
 // FutureProvider.family produce un tipo no obvio; explícito sería verboso.
 // ignore: specify_nonobvious_property_types
-final truckReportsProvider =
-    FutureProvider.family<List<TruckReport>, String>(
+final truckReportsProvider = FutureProvider.family<List<TruckReport>, String>(
   (ref, tractoId) async {
     final result =
         await ref.watch(trucksRepositoryProvider).getReportes(tractoId);

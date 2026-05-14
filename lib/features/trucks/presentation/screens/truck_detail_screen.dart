@@ -40,13 +40,8 @@ class TruckDetailScreen extends ConsumerWidget {
                     '${summary.marca}'
                     '${summary.modelo != null ? ' ${summary.modelo}' : ''}'
                     '${summary.anio != null ? ' · ${summary.anio}' : ''}',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                   ),
                   const SizedBox(height: 12),
@@ -233,9 +228,7 @@ class _RendimientoSection extends StatelessWidget {
             label: 'Real promedio',
             valor: real,
             max: esperado,
-            color: real >= esperado
-                ? Colors.green
-                : theme.colorScheme.error,
+            color: real >= esperado ? Colors.green : theme.colorScheme.error,
           ),
           const SizedBox(height: 8),
           Text(
@@ -243,9 +236,7 @@ class _RendimientoSection extends StatelessWidget {
                 ? '✓ Por encima del esperado'
                 : '✗ Por debajo del esperado',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: real >= esperado
-                  ? Colors.green
-                  : theme.colorScheme.error,
+              color: real >= esperado ? Colors.green : theme.colorScheme.error,
             ),
           ),
         ] else if (esperado == null && real == null) ...[
@@ -294,8 +285,7 @@ class _RendimientoBar extends StatelessWidget {
               value: pct,
               minHeight: 10,
               valueColor: AlwaysStoppedAnimation<Color>(color),
-              backgroundColor:
-                  theme.colorScheme.surfaceContainerHighest,
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
             ),
           ),
         ),
@@ -331,8 +321,7 @@ class _ReportesSection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         reportsAsync.when(
-          loading: () =>
-              const Center(child: CircularProgressIndicator()),
+          loading: () => const Center(child: CircularProgressIndicator()),
           error: (_, __) => Text(
             'Error al cargar reportes',
             style: theme.textTheme.bodySmall?.copyWith(
@@ -348,12 +337,10 @@ class _ReportesSection extends StatelessWidget {
                 ),
               );
             }
-            final activos = reports
-                .where((r) => r.estado != 'cerrado')
-                .toList();
-            final cerrados = reports
-                .where((r) => r.estado == 'cerrado')
-                .toList();
+            final activos =
+                reports.where((r) => r.estado != 'cerrado').toList();
+            final cerrados =
+                reports.where((r) => r.estado == 'cerrado').toList();
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -363,8 +350,7 @@ class _ReportesSection extends StatelessWidget {
                     reports: activos,
                     color: theme.colorScheme.error,
                   ),
-                  if (cerrados.isNotEmpty)
-                    const SizedBox(height: 12),
+                  if (cerrados.isNotEmpty) const SizedBox(height: 12),
                 ],
                 if (cerrados.isNotEmpty)
                   _ReporteGroup(

@@ -12,8 +12,7 @@ part 'trucks_dao.g.dart';
     ReportesTable,
   ],
 )
-class TrucksDao extends DatabaseAccessor<AppDatabase>
-    with _$TrucksDaoMixin {
+class TrucksDao extends DatabaseAccessor<AppDatabase> with _$TrucksDaoMixin {
   TrucksDao(AppDatabase db) : super(db);
 
   // ─── Historial + Tracto (join) ───────────────────────────────────────────
@@ -53,8 +52,7 @@ class TrucksDao extends DatabaseAccessor<AppDatabase>
       (select(viajesTable)
             ..where(
               (t) =>
-                  t.tractoId.equals(tractoId) &
-                  t.operadorId.equals(operadorId),
+                  t.tractoId.equals(tractoId) & t.operadorId.equals(operadorId),
             )
             ..orderBy([(t) => OrderingTerm.desc(t.fechaInicio)]))
           .get();

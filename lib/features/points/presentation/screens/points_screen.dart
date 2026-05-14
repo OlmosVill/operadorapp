@@ -241,16 +241,14 @@ class _LevelProgressSection extends StatelessWidget {
     final level = profile.level;
     final nextLevel = level.next;
     final threshold = _levelThresholds[level];
-    final nextThreshold = nextLevel != null
-        ? _levelThresholds[nextLevel]
-        : null;
+    final nextThreshold =
+        nextLevel != null ? _levelThresholds[nextLevel] : null;
 
     final rangeMin = threshold?.$1 ?? 0;
     final rangeMax = nextThreshold?.$1;
 
     final progress = rangeMax != null
-        ? ((profile.availablePoints - rangeMin) /
-                (rangeMax - rangeMin))
+        ? ((profile.availablePoints - rangeMin) / (rangeMax - rangeMin))
             .clamp(0.0, 1.0)
         : 1.0;
 
@@ -293,8 +291,7 @@ class _LevelProgressSection extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 8,
-              backgroundColor:
-                  theme.colorScheme.onSurface.withAlpha(20),
+              backgroundColor: theme.colorScheme.onSurface.withAlpha(20),
               color: AppColors.amber,
             ),
           ),

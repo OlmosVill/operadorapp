@@ -13,10 +13,9 @@ final class DriftProfileLocalDatasource implements ProfileLocalDatasource {
   final AppDatabase _db;
 
   @override
-  Stream<OperatorProfile?> watchProfile(String authUserId) =>
-      _db.profileDao
-          .watchByAuthUserId(authUserId)
-          .map((row) => row == null ? null : _rowToProfile(row));
+  Stream<OperatorProfile?> watchProfile(String authUserId) => _db.profileDao
+      .watchByAuthUserId(authUserId)
+      .map((row) => row == null ? null : _rowToProfile(row));
 
   @override
   Future<OperatorProfile?> getProfile(String authUserId) async {

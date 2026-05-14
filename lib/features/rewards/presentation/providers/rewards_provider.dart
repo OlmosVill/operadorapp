@@ -36,10 +36,7 @@ final canjearUsecaseProvider = Provider<CanjearUsecase>(
 // ─── Catálogo ───────────────────────────────────────────────────────────────
 
 final premiosProvider = StreamProvider<List<Premio>>((ref) {
-  return ref
-      .watch(_getPremiosProvider)
-      .call()
-      .map(
+  return ref.watch(_getPremiosProvider).call().map(
         (e) => e.fold(
           (err) => throw Exception(err.toString()),
           (v) => v,
@@ -55,10 +52,7 @@ final canjesProvider = StreamProvider<List<Canje>>((ref) {
     return const Stream.empty();
   }
 
-  return ref
-      .watch(_rewardsRepoProvider)
-      .watchCanjes(operadorId)
-      .map(
+  return ref.watch(_rewardsRepoProvider).watchCanjes(operadorId).map(
         (e) => e.fold(
           (err) => throw Exception(err.toString()),
           (v) => v,

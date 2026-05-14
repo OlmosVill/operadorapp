@@ -26,8 +26,7 @@ class RoadmapMilestone extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final reached = availablePoints >= premio.costoPuntos;
-    final progress =
-        (availablePoints / premio.costoPuntos).clamp(0.0, 1.0);
+    final progress = (availablePoints / premio.costoPuntos).clamp(0.0, 1.0);
     final (color, icon) = _tipoAssets(premio.tipo);
     final canCanje = reached &&
         (premio.nivelMinimo == null ||
@@ -70,8 +69,7 @@ class RoadmapMilestone extends StatelessWidget {
     );
   }
 
-  static (Color, IconData) _tipoAssets(PremioTipo tipo) =>
-      switch (tipo) {
+  static (Color, IconData) _tipoAssets(PremioTipo tipo) => switch (tipo) {
         PremioTipo.tarjetaRegalo => (
             Colors.green,
             Icons.card_giftcard_rounded,
@@ -114,8 +112,7 @@ class _TrackColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final trackColor =
-        reached ? color : Colors.grey.shade300;
+    final trackColor = reached ? color : Colors.grey.shade300;
 
     return SizedBox(
       width: 40,
@@ -164,9 +161,7 @@ class _NodeCircle extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: reached ? color : Colors.transparent,
-        border: reached
-            ? null
-            : Border.all(color: color, width: 2),
+        border: reached ? null : Border.all(color: color, width: 2),
         boxShadow: reached
             ? [
                 BoxShadow(
@@ -185,9 +180,7 @@ class _NodeCircle extends StatelessWidget {
     );
 
     if (isTarget) {
-      return circle
-          .animate(onPlay: (c) => c.repeat(reverse: true))
-          .scale(
+      return circle.animate(onPlay: (c) => c.repeat(reverse: true)).scale(
             begin: const Offset(0.88, 0.88),
             end: const Offset(1.12, 1.12),
             duration: 900.ms,
@@ -274,9 +267,7 @@ class _MilestoneCard extends StatelessWidget {
                       ? '¡Alcanzado!'
                       : 'Faltan ${remaining > 0 ? remaining : 0} pts',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: reached
-                        ? Colors.green
-                        : AppColors.textSecondaryDark,
+                    color: reached ? Colors.green : AppColors.textSecondaryDark,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

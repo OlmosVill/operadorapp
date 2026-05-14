@@ -46,14 +46,10 @@ class SyncService {
           fechaIngreso: Value(dateOnly),
           base: Value(data['base'] as String?),
           fotoPerfilUrl: Value(data['foto_perfil_url'] as String?),
-          nivelActual:
-              Value(data['nivel_actual'] as String? ?? 'plata'),
-          puntosGanados:
-              Value(puntos?['puntos_ganados'] as int? ?? 0),
-          puntosCanjeados:
-              Value(puntos?['puntos_canjeados'] as int? ?? 0),
-          puntosDisponibles:
-              Value(puntos?['puntos_disponibles'] as int? ?? 0),
+          nivelActual: Value(data['nivel_actual'] as String? ?? 'plata'),
+          puntosGanados: Value(puntos?['puntos_ganados'] as int? ?? 0),
+          puntosCanjeados: Value(puntos?['puntos_canjeados'] as int? ?? 0),
+          puntosDisponibles: Value(puntos?['puntos_disponibles'] as int? ?? 0),
           updatedAt: Value(DateTime.now().toUtc()),
         ),
       );
@@ -70,10 +66,8 @@ class SyncService {
   Future<void> syncTrips(String operadorId) async {
     try {
       final since = await _db.tripsDao.getLastUpdatedAt(operadorId);
-      var query = _supabase
-          .from('viajes')
-          .select()
-          .eq('operador_id', operadorId);
+      var query =
+          _supabase.from('viajes').select().eq('operador_id', operadorId);
 
       if (since != null) {
         query = query.gt('updated_at', since.toIso8601String());
@@ -96,18 +90,13 @@ class SyncService {
           destinoLng: Value(_parseCoordLng(r['destino_coords'])),
           fechaInicio: Value(_parseDateTime(r['fecha_inicio'])),
           fechaFin: Value(_parseDateTime(r['fecha_fin'])),
-          kmEsperados:
-              Value(_parseDouble(r['km_esperados'])),
-          kmRecorridos:
-              Value(_parseDouble(r['km_recorridos'])),
-          litrosDiesel:
-              Value(_parseDouble(r['litros_diesel'])),
-          rendimientoReal:
-              Value(_parseDouble(r['rendimiento_real'])),
+          kmEsperados: Value(_parseDouble(r['km_esperados'])),
+          kmRecorridos: Value(_parseDouble(r['km_recorridos'])),
+          litrosDiesel: Value(_parseDouble(r['litros_diesel'])),
+          rendimientoReal: Value(_parseDouble(r['rendimiento_real'])),
           estado: Value(r['estado'] as String? ?? 'asignado'),
           calificacion: Value(_parseDouble(r['calificacion'])),
-          puntosObtenidos:
-              Value(r['puntos_obtenidos'] as int? ?? 0),
+          puntosObtenidos: Value(r['puntos_obtenidos'] as int? ?? 0),
           notas: Value(r['notas'] as String?),
           createdAt: Value(
             _parseDateTime(r['created_at']) ?? DateTime.now().toUtc(),
@@ -242,10 +231,8 @@ class SyncService {
 
   Future<void> _syncReportes(String viajeId) async {
     try {
-      final rows = await _supabase
-          .from('reportes')
-          .select()
-          .eq('viaje_id', viajeId);
+      final rows =
+          await _supabase.from('reportes').select().eq('viaje_id', viajeId);
 
       if (rows.isEmpty) return;
 
@@ -280,10 +267,8 @@ class SyncService {
   Future<void> syncCatalogo() async {
     try {
       final since = await _db.rewardsDao.getLastUpdatedAt();
-      var query = _supabase
-          .from('premios_catalogo')
-          .select()
-          .eq('activo', true);
+      var query =
+          _supabase.from('premios_catalogo').select().eq('activo', true);
 
       if (since != null) {
         query = query.gt('updated_at', since.toIso8601String());
@@ -421,8 +406,7 @@ class SyncService {
 
   Future<void> syncHistorialTractos(String operadorId) async {
     try {
-      final since =
-          await _db.trucksDao.getLastHistorialUpdatedAt(operadorId);
+      final since = await _db.trucksDao.getLastHistorialUpdatedAt(operadorId);
       var query = _supabase
           .from('historial_tractos_operador')
           .select()
@@ -468,8 +452,7 @@ class SyncService {
         modelo: Value(r['modelo'] as String?),
         anio: Value(r['anio'] as int?),
         placa: Value(r['placa'] as String?),
-        rendimientoEsperado:
-            Value(_parseDouble(r['rendimiento_esperado'])),
+        rendimientoEsperado: Value(_parseDouble(r['rendimiento_esperado'])),
         activo: Value(r['activo'] as bool? ?? true),
         updatedAt: Value(
           _parseDateTime(r['updated_at']) ?? DateTime.now().toUtc(),
@@ -487,11 +470,9 @@ class SyncService {
           _parseDateTime(r['fecha_inicio']) ?? DateTime.now().toUtc(),
         ),
         fechaFin: Value(_parseDateTime(r['fecha_fin'])),
-        kmRecorridos:
-            Value(_parseDouble(r['km_recorridos']) ?? 0),
+        kmRecorridos: Value(_parseDouble(r['km_recorridos']) ?? 0),
         viajesRealizados: Value(r['viajes_realizados'] as int? ?? 0),
-        calificacionPromedio:
-            Value(_parseDouble(r['calificacion_promedio'])),
+        calificacionPromedio: Value(_parseDouble(r['calificacion_promedio'])),
         esActual: Value(r['activo'] as bool? ?? false),
         updatedAt: Value(
           _parseDateTime(r['updated_at']) ?? DateTime.now().toUtc(),

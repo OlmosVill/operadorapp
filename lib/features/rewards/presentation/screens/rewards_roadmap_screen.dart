@@ -14,14 +14,12 @@ List<Premio> filterAndSortPremios(
   OperatorLevel? levelFilter,
 ) {
   return (levelFilter == null
-          ? List<Premio>.of(premios)
-          : premios
-              .where(
-                (p) =>
-                    p.nivelMinimo == null ||
-                    p.nivelMinimo == levelFilter,
-              )
-              .toList())
+      ? List<Premio>.of(premios)
+      : premios
+          .where(
+            (p) => p.nivelMinimo == null || p.nivelMinimo == levelFilter,
+          )
+          .toList())
     ..sort((a, b) => a.costoPuntos.compareTo(b.costoPuntos));
 }
 
@@ -33,8 +31,7 @@ class RewardsRoadmapScreen extends ConsumerStatefulWidget {
       _RewardsRoadmapScreenState();
 }
 
-class _RewardsRoadmapScreenState
-    extends ConsumerState<RewardsRoadmapScreen> {
+class _RewardsRoadmapScreenState extends ConsumerState<RewardsRoadmapScreen> {
   OperatorLevel? _levelFilter;
 
   @override
@@ -47,30 +44,30 @@ class _RewardsRoadmapScreenState
     return Scaffold(
       appBar: AppBar(title: const Text('Roadmap de Premios')),
       body: premiosAsync.when(
-        loading: () =>
-            const AppLoadingWidget(message: 'Cargando...'),
+        loading: () => const AppLoadingWidget(message: 'Cargando...'),
         error: (_, __) => const Center(
           child: Text('Error al cargar premios'),
         ),
         data: (premios) {
-          final milestones =
-              filterAndSortPremios(premios, _levelFilter);
-          final targetIndex = milestones
-              .indexWhere((p) => available < p.costoPuntos);
+          final milestones = filterAndSortPremios(premios, _levelFilter);
+          final targetIndex =
+              milestones.indexWhere((p) => available < p.costoPuntos);
 
           return Column(
             children: [
               _LevelFilterBar(
                 selected: _levelFilter,
-                onChanged: (l) =>
-                    setState(() => _levelFilter = l),
+                onChanged: (l) => setState(() => _levelFilter = l),
               ),
               Expanded(
                 child: milestones.isEmpty
                     ? const _EmptyRoadmap()
                     : ListView.builder(
                         padding: const EdgeInsets.fromLTRB(
-                          20, 16, 20, 40,
+                          20,
+                          16,
+                          20,
+                          40,
                         ),
                         itemCount: milestones.length,
                         itemBuilder: (_, i) => RoadmapMilestone(
@@ -83,8 +80,7 @@ class _RewardsRoadmapScreenState
                             .animate()
                             .fadeIn(
                               duration: 300.ms,
-                              delay:
-                                  Duration(milliseconds: 60 * i),
+                              delay: Duration(milliseconds: 60 * i),
                             )
                             .slideX(begin: -0.04, end: 0),
                       ),
@@ -126,8 +122,7 @@ class _LevelFilterBar extends StatelessWidget {
               child: FilterChip(
                 label: Text(level.displayName),
                 selected: selected == level,
-                onSelected: (_) =>
-                    onChanged(selected == level ? null : level),
+                onSelected: (_) => onChanged(selected == level ? null : level),
               ),
             ),
           ),

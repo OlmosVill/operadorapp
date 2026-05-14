@@ -5,18 +5,15 @@ import 'package:operadorapp/core/database/tables.dart';
 part 'rewards_dao.g.dart';
 
 @DriftAccessor(tables: [PremiosCatalogoTable, PremiosCanjeadosTable])
-class RewardsDao
-    extends DatabaseAccessor<AppDatabase>
-    with _$RewardsDaoMixin {
+class RewardsDao extends DatabaseAccessor<AppDatabase> with _$RewardsDaoMixin {
   RewardsDao(AppDatabase db) : super(db);
 
   // ─── Catálogo ─────────────────────────────────────────────────────────────
 
-  Stream<List<PremioRow>> watchCatalogo() =>
-      (select(premiosCatalogoTable)
-            ..where((t) => t.activo.equals(true))
-            ..orderBy([(t) => OrderingTerm.asc(t.orden)]))
-          .watch();
+  Stream<List<PremioRow>> watchCatalogo() => (select(premiosCatalogoTable)
+        ..where((t) => t.activo.equals(true))
+        ..orderBy([(t) => OrderingTerm.asc(t.orden)]))
+      .watch();
 
   Future<DateTime?> getLastUpdatedAt() async {
     final query = select(premiosCatalogoTable)
