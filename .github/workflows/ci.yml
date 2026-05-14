@@ -35,6 +35,13 @@ jobs:
       - name: Verificar formato
         run: dart format --set-exit-if-changed .
 
+      - name: Crear .env de prueba
+        run: |
+          echo "SUPABASE_URL=http://localhost:54321" > .env
+          echo "SUPABASE_ANON_KEY=test-anon-key" >> .env
+          echo "MAP_PROVIDER=osm" >> .env
+          echo "GOOGLE_MAPS_API_KEY=" >> .env
+
       - name: Análisis estático
         run: flutter analyze --no-pub
 
