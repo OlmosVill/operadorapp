@@ -18,7 +18,16 @@ class TripsListScreen extends ConsumerWidget {
     final tripsAsync = ref.watch(tripsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis Viajes')),
+      appBar: AppBar(
+        title: const Text('Mis Viajes'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.local_shipping_outlined),
+            tooltip: 'Mis Tractos',
+            onPressed: () => context.push('/trucks'),
+          ),
+        ],
+      ),
       body: tripsAsync.when(
         loading: () => const AppLoadingWidget(message: 'Cargando viajes...'),
         error: (error, _) => AppErrorWidget(

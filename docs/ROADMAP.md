@@ -180,14 +180,19 @@ antes de ver una sola línea de código Dart.
 
 ---
 
-## Fase 7 — Historial de Tractos
+## Fase 7 — Historial de Tractos ✅
 
 **Objetivo:** El operador ve cada tracto que ha manejado y sus stats por unidad.
 
-- [ ] `TrucksHistoryScreen` — lista de tractos con resumen visual
-- [ ] `TruckDetailScreen` — km totales, viajes, calificación promedio
-- [ ] Reportes positivos y negativos por tracto
-- [ ] Comparativa de rendimiento por tracto (gráfica simple)
+- [x] `TrucksHistoryScreen` — lista de tractos con resumen visual
+- [x] `TruckDetailScreen` — km totales, viajes, calificación promedio
+- [x] Reportes activos y resueltos por tracto (agrupados por estado)
+- [x] Comparativa de rendimiento: real vs esperado con barras de progreso
+- [x] `TractosTable` + `HistorialTractosTable` en Drift (schemaVersion → 2)
+- [x] `TrucksDao` con join historial↔tracto + queries de viajes y reportes
+- [x] `syncTractos()` + `syncHistorialTractos()` + `syncReportesOperador()` en SyncService
+- [x] Accesible desde `TripsListScreen` vía ícono en AppBar → `/trucks`
+- [x] `/trucks` + `/trucks/:id` en GoRouter (standalone, sin nav bar)
 
 **Commit final:** `feat: fase 7 completa — historial de tractos`
 

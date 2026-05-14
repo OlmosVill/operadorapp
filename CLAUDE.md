@@ -99,8 +99,8 @@ Archivos clave:
 Completa. 18/18 tests pasando.
 
 Archivos clave:
-- `lib/core/database/tables.dart` — 12 tablas Drift (OperadoresTable, ViajesTable, GpsPuntosTable, IncidenciasTable, AlertasTable, ReportesTable, PremiosCatalogoTable, PremiosCanjeadosTable, MovimientosPuntosTable, NotificacionesTable, PendingOpsTable, SyncMetadataTable)
-- `lib/core/database/app_database.dart` — AppDatabase con DAOs: PointsDao, ProfileDao, RewardsDao, SyncDao, TripsDao
+- `lib/core/database/tables.dart` — 14 tablas Drift (+ TractosTable, HistorialTractosTable en Fase 7)
+- `lib/core/database/app_database.dart` — AppDatabase con DAOs: PointsDao, ProfileDao, RewardsDao, SyncDao, TripsDao, TrucksDao; schemaVersion = 2
 - `lib/core/services/connectivity_service.dart` — ConnectivityService (connectivity_plus)
 - `lib/core/services/sync_service.dart` — pull incremental Supabase→Drift; parseo EWKB geography
 - `lib/features/profile/` — refactorizado a offline-first con StreamProvider que observa Drift
@@ -172,7 +172,23 @@ Archivos clave:
 - `lib/core/router/app_router.dart` — ruta `/rewards/roadmap` standalone
 - `lib/features/rewards/presentation/screens/rewards_screen.dart` — botón mapa en AppBar → `/rewards/roadmap`
 
-### 🔄 Próxima: Fase 7 — Historial de Tractos
+### ✅ Fase 7 — Historial de Tractos
+Completa. Tests pasando. 0 issues `flutter analyze` esperados.
+
+Archivos clave:
+- `lib/core/database/tables.dart` — 14 tablas (+ `TractosTable`, `HistorialTractosTable`); `schemaVersion` → 2
+- `lib/core/database/daos/trucks_dao.dart` — join historial↔tracto, viajes por tracto, reportes por tracto
+- `lib/core/services/sync_service.dart` — `syncTractos()`, `syncHistorialTractos()`, `syncReportesOperador()` añadidos
+- `lib/features/trucks/domain/entities/truck.dart` — `TruckSummary` + `TruckReport` (Freezed sealed)
+- `lib/features/trucks/domain/repositories/trucks_repository.dart` — interface
+- `lib/features/trucks/data/repositories/trucks_repository_impl.dart` — patrón `async*`/`await for`; rendimiento promedio calculado de viajes
+- `lib/features/trucks/presentation/providers/trucks_provider.dart` — `truckSummariesProvider`, `truckReportsProvider`, `truckRendimientoProvider`
+- `lib/features/trucks/presentation/screens/trucks_history_screen.dart` — lista de tractos con stats, animaciones flutter_animate
+- `lib/features/trucks/presentation/screens/truck_detail_screen.dart` — stats, comparativa de rendimiento, reportes agrupados
+- `lib/core/router/app_router.dart` — rutas `/trucks` y `/trucks/:id` standalone
+- `lib/features/trips/presentation/screens/trips_list_screen.dart` — botón ícono tracto en AppBar → `/trucks`
+
+### 🔄 Próxima: Fase 8 — Notificaciones In-App + Preparación Push
 Ver `docs/ROADMAP.md`.
 
 ---

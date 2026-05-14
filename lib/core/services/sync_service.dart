@@ -400,6 +400,125 @@ class SyncService {
         ),
       );
 
+  // ─── Tractos ─────────────────────────────────────────────────────────────
+
+  Future<void> syncTractos() async {
+    try {
+      final since = await _db.trucksDao.getLastTractoUpdatedAt();
+      var query = _supabase.from('tractos').select().eq('activo', true);
+      if (since != null) {
+        query = query.gt('updated_at', since.toIso8601String());
+      }
+      final rows = await query.order('updated_at');
+      if (rows.isEmpty) return;
+      final companions = rows.map(_tractoCompanion).toList();
+      await _db.trucksDao.upsertTractos(companions);
+      _logger.d('syncTractos: ${rows.length} tractos sincronizados');
+    } on Exception catch (e) {
+      _logger.w('syncTractos falló', error: e);
+    }
+  }
+
+  Future<void> syncHistorialTractos(String operadorId) async {
+    try {
+      final since =
+          await _db.trucksDao.getLastHistorialUpdatedAt(operadorId);
+      var query = _supabase
+          .from('historial_tractos_operador')
+          .select()
+          .eq('operador_id', operadorId);
+      if (since != null) {
+        query = query.gt('updated_at', since.toIso8601String());
+      }
+      final rows = await query.order('updated_at');
+      if (rows.isEmpty) return;
+      final companions = rows.map(_historialCompanion).toList();
+      await _db.trucksDao.upsertHistorial(companions);
+      _logger.d(
+        'syncHistorialTractos: ${rows.length} registros sincronizados',
+      );
+    } on Exception catch (e) {
+      _logger.w('syncHistorialTractos falló', error: e);
+    }
+  }
+
+  Future<void> syncReportesOperador(String operadorId) async {
+    try {
+      final rows = await _supabase
+          .from('reportes')
+          .select()
+          .eq('operador_id', operadorId)
+          .order('fecha_reporte');
+      if (rows.isEmpty) return;
+      final companions = rows.map(_reporteCompanion).toList();
+      await _db.tripsDao.upsertReportes(companions);
+      _logger.d(
+        'syncReportesOperador: ${rows.length} reportes sincronizados',
+      );
+    } on Exception catch (e) {
+      _logger.w('syncReportesOperador falló', error: e);
+    }
+  }
+
+  TractosTableCompanion _tractoCompanion(Map<String, dynamic> r) =>
+      TractosTableCompanion(
+        id: Value(r['id'] as String),
+        numeroEconomico: Value(r['numero_economico'] as String),
+        marca: Value(r['marca'] as String?),
+        modelo: Value(r['modelo'] as String?),
+        anio: Value(r['anio'] as int?),
+        placa: Value(r['placa'] as String?),
+        rendimientoEsperado:
+            Value(_parseDouble(r['rendimiento_esperado'])),
+        activo: Value(r['activo'] as bool? ?? true),
+        updatedAt: Value(
+          _parseDateTime(r['updated_at']) ?? DateTime.now().toUtc(),
+        ),
+      );
+
+  HistorialTractosTableCompanion _historialCompanion(
+    Map<String, dynamic> r,
+  ) =>
+      HistorialTractosTableCompanion(
+        id: Value(r['id'] as String),
+        operadorId: Value(r['operador_id'] as String),
+        tractoId: Value(r['tracto_id'] as String),
+        fechaInicio: Value(
+          _parseDateTime(r['fecha_inicio']) ?? DateTime.now().toUtc(),
+        ),
+        fechaFin: Value(_parseDateTime(r['fecha_fin'])),
+        kmRecorridos:
+            Value(_parseDouble(r['km_recorridos']) ?? 0),
+        viajesRealizados: Value(r['viajes_realizados'] as int? ?? 0),
+        calificacionPromedio:
+            Value(_parseDouble(r['calificacion_promedio'])),
+        esActual: Value(r['activo'] as bool? ?? false),
+        updatedAt: Value(
+          _parseDateTime(r['updated_at']) ?? DateTime.now().toUtc(),
+        ),
+      );
+
+  ReportesTableCompanion _reporteCompanion(Map<String, dynamic> r) {
+    final coords = _parseGeography(r['coordenada']);
+    return ReportesTableCompanion(
+      id: Value(r['id'] as String),
+      viajeId: Value(r['viaje_id'] as String?),
+      operadorId: Value(r['operador_id'] as String),
+      tractoId: Value(r['tracto_id'] as String?),
+      tipo: Value(r['tipo'] as String),
+      estado: Value(r['estado'] as String? ?? 'abierto'),
+      descripcion: Value(r['descripcion'] as String),
+      lat: Value(coords?.$1),
+      lng: Value(coords?.$2),
+      fechaReporte: Value(
+        _parseDateTime(r['fecha_reporte']) ?? DateTime.now().toUtc(),
+      ),
+      updatedAt: Value(
+        _parseDateTime(r['updated_at']) ?? DateTime.now().toUtc(),
+      ),
+    );
+  }
+
   // ─── Helpers ─────────────────────────────────────────────────────────────
 
   DateTime? _parseDateTime(Object? value) {

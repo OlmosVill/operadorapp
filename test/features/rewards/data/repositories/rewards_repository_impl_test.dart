@@ -38,6 +38,10 @@ void main() {
     updatedAt: DateTime(2025, 6),
   );
 
+  setUpAll(() {
+    registerFallbackValue(tCanje);
+  });
+
   setUp(() {
     mockLocal = MockRewardsLocal();
     mockRemote = MockRewardsRemote();

@@ -14,6 +14,8 @@ import 'package:operadorapp/features/settings/presentation/screens/settings_scre
 import 'package:operadorapp/features/trips/presentation/screens/home_screen.dart';
 import 'package:operadorapp/features/trips/presentation/screens/trip_detail_screen.dart';
 import 'package:operadorapp/features/trips/presentation/screens/trips_list_screen.dart';
+import 'package:operadorapp/features/trucks/presentation/screens/truck_detail_screen.dart';
+import 'package:operadorapp/features/trucks/presentation/screens/trucks_history_screen.dart';
 
 // Notifier que escucha cambios de auth y notifica al router
 class _RouterNotifier extends ChangeNotifier {
@@ -93,6 +95,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/trips/:id',
         builder: (_, state) => TripDetailScreen(
           tripId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: '/trucks',
+        builder: (_, __) => const TrucksHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/trucks/:id',
+        builder: (_, state) => TruckDetailScreen(
+          tractoId: state.pathParameters['id']!,
         ),
       ),
     ],

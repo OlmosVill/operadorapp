@@ -215,6 +215,47 @@ class NotificacionesTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+// ─── Tractos ─────────────────────────────────────────────────────────────────
+
+@DataClassName('TractoRow')
+class TractosTable extends Table {
+  TextColumn get id => text()();
+  TextColumn get numeroEconomico => text()();
+  TextColumn get marca => text().nullable()();
+  TextColumn get modelo => text().nullable()();
+  IntColumn get anio => integer().nullable()();
+  TextColumn get placa => text().nullable()();
+  RealColumn get rendimientoEsperado => real().nullable()();
+  BoolColumn get activo =>
+      boolean().withDefault(const Constant(true))();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+// ─── Historial de Tractos ────────────────────────────────────────────────────
+
+@DataClassName('HistorialTractoRow')
+class HistorialTractosTable extends Table {
+  TextColumn get id => text()();
+  TextColumn get operadorId => text()();
+  TextColumn get tractoId => text()();
+  DateTimeColumn get fechaInicio => dateTime()();
+  DateTimeColumn get fechaFin => dateTime().nullable()();
+  RealColumn get kmRecorridos =>
+      real().withDefault(const Constant(0))();
+  IntColumn get viajesRealizados =>
+      integer().withDefault(const Constant(0))();
+  RealColumn get calificacionPromedio => real().nullable()();
+  BoolColumn get esActual =>
+      boolean().withDefault(const Constant(false))();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 // ─── Operaciones Pendientes (local-only) ────────────────────────────────────
 
 @DataClassName('PendingOpRow')

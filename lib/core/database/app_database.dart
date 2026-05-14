@@ -7,6 +7,7 @@ import 'package:operadorapp/core/database/daos/profile_dao.dart';
 import 'package:operadorapp/core/database/daos/rewards_dao.dart';
 import 'package:operadorapp/core/database/daos/sync_dao.dart';
 import 'package:operadorapp/core/database/daos/trips_dao.dart';
+import 'package:operadorapp/core/database/daos/trucks_dao.dart';
 import 'package:operadorapp/core/database/tables.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -27,6 +28,8 @@ part 'app_database.g.dart';
     NotificacionesTable,
     PendingOpsTable,
     SyncMetadataTable,
+    TractosTable,
+    HistorialTractosTable,
   ],
   daos: [
     PointsDao,
@@ -34,17 +37,24 @@ part 'app_database.g.dart';
     RewardsDao,
     SyncDao,
     TripsDao,
+    TrucksDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) => m.createAll(),
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.createTable(tractosTable);
+            await m.createTable(historialTractosTable);
+          }
+        },
       );
 }
 
