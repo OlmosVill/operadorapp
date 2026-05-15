@@ -22,6 +22,7 @@ final _rewardsRepoProvider = Provider<RewardsRepositoryImpl>(
   (ref) => RewardsRepositoryImpl(
     ref.watch(_rewardsLocalProvider),
     ref.watch(_rewardsRemoteProvider),
+    ref.watch(syncServiceProvider),
   ),
 );
 

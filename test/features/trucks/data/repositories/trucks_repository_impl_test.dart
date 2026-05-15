@@ -2,8 +2,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:operadorapp/core/database/app_database.dart';
 import 'package:operadorapp/core/database/daos/trucks_dao.dart';
+import 'package:operadorapp/core/services/sync_service.dart';
 import 'package:operadorapp/features/trucks/data/repositories/trucks_repository_impl.dart';
 import 'package:operadorapp/features/trucks/domain/entities/truck.dart';
+
+// ─── Fake SyncService ─────────────────────────────────────────────────────────
+
+class _FakeSyncService extends Fake implements SyncService {
+  @override
+  Future<void> syncTractos() async {}
+
+  @override
+  Future<void> syncHistorialTractos(String operadorId) async {}
+}
 
 // ─── Fake DAO ────────────────────────────────────────────────────────────────
 
@@ -114,7 +125,7 @@ void main() {
 
   setUp(() {
     dao = _FakeTrucksDao();
-    repo = TrucksRepositoryImpl(dao);
+    repo = TrucksRepositoryImpl(dao, _FakeSyncService());
   });
 
   group('TrucksRepositoryImpl.watchByOperador', () {

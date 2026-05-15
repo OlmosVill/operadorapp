@@ -13,7 +13,10 @@ final _pointsLocalProvider = Provider<PointsLocalDatasource>(
 );
 
 final _pointsRepoProvider = Provider<PointsRepositoryImpl>(
-  (ref) => PointsRepositoryImpl(ref.watch(_pointsLocalProvider)),
+  (ref) => PointsRepositoryImpl(
+    ref.watch(_pointsLocalProvider),
+    ref.watch(syncServiceProvider),
+  ),
 );
 
 final _watchMovementsProvider = Provider<WatchMovementsUsecase>(

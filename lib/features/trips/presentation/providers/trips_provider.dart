@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:operadorapp/core/errors/app_error.dart';
 import 'package:operadorapp/core/providers/core_providers.dart';
-import 'package:operadorapp/features/auth/presentation/providers/auth_provider.dart';
+import 'package:operadorapp/features/profile/presentation/providers/profile_provider.dart';
 import 'package:operadorapp/features/trips/data/datasources/trips_local_datasource.dart';
 import 'package:operadorapp/features/trips/data/repositories/trips_repository_impl.dart';
 import 'package:operadorapp/features/trips/domain/entities/trip.dart';
@@ -35,10 +35,9 @@ final getTripDetailUseCaseProvider = Provider<GetTripDetailUseCase>(
 // ─── Lista de viajes reactiva ───────────────────────────────────────────────
 
 final tripsProvider = StreamProvider<List<Trip>>((ref) {
-  final authAsync = ref.watch(authStateProvider);
-  final operadorId = authAsync.value?.operatorId ?? '';
+  final operadorId = ref.watch(profileProvider).value?.id;
 
-  if (operadorId.isEmpty) return const Stream.empty();
+  if (operadorId == null || operadorId.isEmpty) return const Stream.empty();
 
   return ref.read(getTripsUseCaseProvider).call(operadorId: operadorId).map(
         (result) => result.fold(

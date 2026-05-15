@@ -9,7 +9,13 @@
       "Bash(findstr latlong2 *)",
       "Bash(dir *)",
       "Bash(Get-ChildItem *)",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "WebSearch",
+      "WebFetch(domain:help.rive.app)",
+      "WebFetch(domain:pub.dev)",
+      "WebFetch(domain:rive.app)",
+      "WebFetch(domain:uianimation.medium.com)",
+      "WebFetch(domain:dev.to)"
     ]
   }
 }

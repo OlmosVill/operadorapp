@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:operadorapp/core/providers/core_providers.dart';
-import 'package:operadorapp/features/auth/presentation/providers/auth_provider.dart';
+import 'package:operadorapp/features/profile/presentation/providers/profile_provider.dart';
 import 'package:operadorapp/features/trips/domain/entities/trip.dart';
 import 'package:operadorapp/features/trips/presentation/providers/trips_provider.dart';
 import 'package:operadorapp/features/trips/presentation/widgets/trip_card.dart';
@@ -45,7 +45,7 @@ class TripsListScreen extends ConsumerWidget {
   }
 
   Future<void> _syncTrips(WidgetRef ref) async {
-    final operadorId = ref.read(authStateProvider).value?.operatorId ?? '';
+    final operadorId = ref.read(profileProvider).value?.id ?? '';
     if (operadorId.isNotEmpty) {
       await ref.read(syncServiceProvider).syncTrips(operadorId);
     }

@@ -289,6 +289,10 @@ GOOGLE_MAPS_API_KEY=
 
 15. **`latlong2` — el archivo de librería es `latlong.dart`, no `latlong2.dart`** — El paquete se llama `latlong2` pero su archivo interno es `lib/latlong.dart`. El import correcto es `import 'package:latlong2/latlong.dart'`. Usar `latlong2/latlong2.dart` produce `uri_does_not_exist`.
 
+16. **`auth_user_id` ≠ `operadores.id`** — `OperatorSession.operatorId` guarda el UUID de Supabase Auth (`auth_user_id`). Las FKs de `viajes`, `movimientos_puntos`, `historial_tractos_operador` y demás tablas referencian `operadores.id` (el PK propio de la tabla). Nunca pasar `authStateProvider.value?.operatorId` a queries o sync que involucren esas tablas. Siempre usar `profileProvider.value?.id`.
+
+17. **Repositorios que no disparan sync quedan con tablas locales vacías** — Cualquier `XxxRepositoryImpl` que solo lea de Drift sin llamar al `SyncService` correspondiente mostrará datos vacíos aunque Supabase tenga registros. El patrón correcto al inicio de cada stream watch es `unawaited(_sync.syncXxx(operadorId))`, igual que `TripsRepositoryImpl`. Afectó a `PointsRepositoryImpl`, `RewardsRepositoryImpl` y `TrucksRepositoryImpl`.
+
 ---
 
 ## Crear usuario de prueba (Fase 1)

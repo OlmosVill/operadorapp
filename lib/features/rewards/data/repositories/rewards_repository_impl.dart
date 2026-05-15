@@ -1,18 +1,23 @@
+import 'dart:async';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:operadorapp/core/errors/app_error.dart';
+import 'package:operadorapp/core/services/sync_service.dart';
 import 'package:operadorapp/features/rewards/data/datasources/rewards_local_datasource.dart';
 import 'package:operadorapp/features/rewards/data/datasources/rewards_remote_datasource.dart';
 import 'package:operadorapp/features/rewards/domain/entities/premio.dart';
 import 'package:operadorapp/features/rewards/domain/repositories/rewards_repository.dart';
 
 class RewardsRepositoryImpl implements RewardsRepository {
-  const RewardsRepositoryImpl(this._local, this._remote);
+  const RewardsRepositoryImpl(this._local, this._remote, this._sync);
 
   final RewardsLocalDatasource _local;
   final RewardsRemoteDatasource _remote;
+  final SyncService _sync;
 
   @override
   Stream<Either<AppError, List<Premio>>> watchCatalogo() async* {
+    unawaited(_sync.syncCatalogo());
     try {
       await for (final premios in _local.watchCatalogo()) {
         yield Right<AppError, List<Premio>>(premios);
@@ -26,6 +31,7 @@ class RewardsRepositoryImpl implements RewardsRepository {
   Stream<Either<AppError, List<Canje>>> watchCanjes(
     String operadorId,
   ) async* {
+    unawaited(_sync.syncCanjes(operadorId));
     try {
       await for (final canjes in _local.watchCanjes(operadorId)) {
         yield Right<AppError, List<Canje>>(canjes);

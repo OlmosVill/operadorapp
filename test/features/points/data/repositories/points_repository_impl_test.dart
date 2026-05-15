@@ -2,15 +2,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:operadorapp/core/errors/app_error.dart';
+import 'package:operadorapp/core/services/sync_service.dart';
 import 'package:operadorapp/features/points/data/datasources/points_local_datasource.dart';
 import 'package:operadorapp/features/points/data/repositories/points_repository_impl.dart';
 import 'package:operadorapp/features/points/domain/entities/point_movement.dart';
 
 class MockPointsLocalDatasource extends Mock implements PointsLocalDatasource {}
 
+class MockSyncService extends Mock implements SyncService {}
+
 void main() {
   late PointsRepositoryImpl sut;
   late MockPointsLocalDatasource mockLocal;
+  late MockSyncService mockSync;
 
   const tOperadorId = 'operador-uuid-001';
 
@@ -27,7 +31,10 @@ void main() {
 
   setUp(() {
     mockLocal = MockPointsLocalDatasource();
-    sut = PointsRepositoryImpl(mockLocal);
+    mockSync = MockSyncService();
+    when(() => mockSync.syncMovimientos(any()))
+        .thenAnswer((_) async {});
+    sut = PointsRepositoryImpl(mockLocal, mockSync);
   });
 
   group('PointsRepositoryImpl.watchMovimientos —', () {

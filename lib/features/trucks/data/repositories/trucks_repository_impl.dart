@@ -1,19 +1,25 @@
+import 'dart:async';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:operadorapp/core/database/app_database.dart';
 import 'package:operadorapp/core/database/daos/trucks_dao.dart';
 import 'package:operadorapp/core/errors/app_error.dart';
+import 'package:operadorapp/core/services/sync_service.dart';
 import 'package:operadorapp/features/trucks/domain/entities/truck.dart';
 import 'package:operadorapp/features/trucks/domain/repositories/trucks_repository.dart';
 
 class TrucksRepositoryImpl implements TrucksRepository {
-  const TrucksRepositoryImpl(this._dao);
+  const TrucksRepositoryImpl(this._dao, this._sync);
 
   final TrucksDao _dao;
+  final SyncService _sync;
 
   @override
   Stream<Either<AppError, List<TruckSummary>>> watchByOperador(
     String operadorId,
   ) async* {
+    unawaited(_sync.syncTractos());
+    unawaited(_sync.syncHistorialTractos(operadorId));
     try {
       await for (final pairs in _dao.watchByOperador(operadorId)) {
         yield Right<AppError, List<TruckSummary>>(

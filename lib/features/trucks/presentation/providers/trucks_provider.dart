@@ -6,7 +6,10 @@ import 'package:operadorapp/features/trucks/domain/entities/truck.dart';
 import 'package:operadorapp/features/trucks/domain/repositories/trucks_repository.dart';
 
 final trucksRepositoryProvider = Provider<TrucksRepository>((ref) {
-  return TrucksRepositoryImpl(ref.watch(appDatabaseProvider).trucksDao);
+  return TrucksRepositoryImpl(
+    ref.watch(appDatabaseProvider).trucksDao,
+    ref.watch(syncServiceProvider),
+  );
 });
 
 final truckSummariesProvider = StreamProvider<List<TruckSummary>>((ref) {

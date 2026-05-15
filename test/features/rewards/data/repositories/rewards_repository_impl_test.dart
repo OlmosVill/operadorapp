@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:operadorapp/core/errors/app_error.dart';
+import 'package:operadorapp/core/services/sync_service.dart';
 import 'package:operadorapp/features/rewards/data/datasources/rewards_local_datasource.dart';
 import 'package:operadorapp/features/rewards/data/datasources/rewards_remote_datasource.dart';
 import 'package:operadorapp/features/rewards/data/repositories/rewards_repository_impl.dart';
@@ -11,10 +12,13 @@ class MockRewardsLocal extends Mock implements RewardsLocalDatasource {}
 
 class MockRewardsRemote extends Mock implements RewardsRemoteDatasource {}
 
+class MockSyncService extends Mock implements SyncService {}
+
 void main() {
   late RewardsRepositoryImpl sut;
   late MockRewardsLocal mockLocal;
   late MockRewardsRemote mockRemote;
+  late MockSyncService mockSync;
 
   const tOperadorId = 'operador-uuid-001';
 
@@ -45,7 +49,10 @@ void main() {
   setUp(() {
     mockLocal = MockRewardsLocal();
     mockRemote = MockRewardsRemote();
-    sut = RewardsRepositoryImpl(mockLocal, mockRemote);
+    mockSync = MockSyncService();
+    when(() => mockSync.syncCatalogo()).thenAnswer((_) async {});
+    when(() => mockSync.syncCanjes(any())).thenAnswer((_) async {});
+    sut = RewardsRepositoryImpl(mockLocal, mockRemote, mockSync);
   });
 
   group('RewardsRepositoryImpl.watchCatalogo —', () {
