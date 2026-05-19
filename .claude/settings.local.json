@@ -15,7 +15,16 @@
       "WebFetch(domain:pub.dev)",
       "WebFetch(domain:rive.app)",
       "WebFetch(domain:uianimation.medium.com)",
-      "WebFetch(domain:dev.to)"
+      "WebFetch(domain:dev.to)",
+      "Skill(ui-ux-pro-max)",
+      "Bash(python3 *)",
+      "Bash(grep -v \"^$\")",
+      "Bash(python *)",
+      "Bash(where python3 *)",
+      "Bash(where python *)",
+      "Bash(py --version)",
+      "Bash(C:\\\\Users\\\\IO\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\python3.exe *)",
+      "PowerShell(& \"C:\\\\Users\\\\IO\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\python3.exe\" \"C:\\\\Users\\\\IO\\\\.claude\\\\plugins\\\\cache\\\\ui-ux-pro-max-skill\\\\ui-ux-pro-max\\\\2.5.0\\\\.claude\\\\skills\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"logistics trucking fleet industrial bold professional dark\" --design-system -p \"OperadorApp\" 2>&1)"
     ]
   }
 }

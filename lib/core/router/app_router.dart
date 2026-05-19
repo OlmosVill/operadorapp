@@ -84,7 +84,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, __) => const ProfileScreen(),
       ),
       GoRoute(
-        path: '/rewards/roadmap',
+        path: '/rewards/catalog',
         builder: (_, __) => const RewardsRoadmapScreen(),
       ),
       GoRoute(

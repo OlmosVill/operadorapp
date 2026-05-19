@@ -1,14 +1,53 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:operadorapp/core/theme/app_colors.dart';
+import 'package:operadorapp/features/profile/domain/entities/operator_profile.dart';
 import 'package:operadorapp/features/profile/presentation/providers/profile_provider.dart';
 import 'package:operadorapp/features/rewards/domain/entities/premio.dart';
 import 'package:operadorapp/features/rewards/presentation/providers/rewards_provider.dart';
-import 'package:operadorapp/features/rewards/presentation/widgets/premio_card.dart';
+import 'package:operadorapp/features/rewards/presentation/widgets/roadmap_milestone.dart';
 import 'package:operadorapp/shared/widgets/app_loading_widget.dart';
+
+// ─── Road item types ─────────────────────────────────────────────────────────
+
+sealed class _RoadItem {
+  const _RoadItem();
+}
+
+class _LevelBannerItem extends _RoadItem {
+  const _LevelBannerItem(this.level);
+  final OperatorLevel level;
+}
+
+class _MilestoneItem extends _RoadItem {
+  const _MilestoneItem({
+    required this.premio,
+    required this.isLeft,
+    required this.isUnlocked,
+    required this.isTarget,
+  });
+  final Premio premio;
+  final bool isLeft;
+  final bool isUnlocked;
+  final bool isTarget;
+}
+
+class _PositionMarkerItem extends _RoadItem {
+  const _PositionMarkerItem(this.availablePoints);
+  final int availablePoints;
+}
+
+// Estimated item heights used for auto-scroll offset calculation.
+double _itemHeight(_RoadItem item) => switch (item) {
+      _LevelBannerItem _ => 72.0,
+      _PositionMarkerItem _ => 88.0,
+      _MilestoneItem _ => 180.0,
+    };
+
+// ─── Screen ──────────────────────────────────────────────────────────────────
 
 class RewardsScreen extends ConsumerStatefulWidget {
   const RewardsScreen({super.key});
@@ -18,273 +57,227 @@ class RewardsScreen extends ConsumerStatefulWidget {
 }
 
 class _RewardsScreenState extends ConsumerState<RewardsScreen> {
-  // 0 = Todos, 1 = Disponibles, 2 = Mis Canjes
-  int _tabIndex = 0;
+  final _scrollController = ScrollController();
+  bool _scrolled = false;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  List<_RoadItem> _buildItems(List<Premio> sorted, int available) {
+    final items = <_RoadItem>[];
+    OperatorLevel? lastLevel;
+    var milestoneCount = 0;
+    var markerAdded = false;
+
+    for (var i = 0; i < sorted.length; i++) {
+      final premio = sorted[i];
+      final isUnlocked = available >= premio.costoPuntos;
+      final isTarget = !markerAdded && !isUnlocked;
+
+      final level = premio.nivelMinimo ?? OperatorLevel.plata;
+
+      if (level != lastLevel) {
+        items.add(_LevelBannerItem(level));
+        lastLevel = level;
+      }
+
+      if (!isUnlocked && !markerAdded) {
+        items.add(_PositionMarkerItem(available));
+        markerAdded = true;
+      }
+
+      items.add(
+        _MilestoneItem(
+          premio: premio,
+          isLeft: milestoneCount.isEven,
+          isUnlocked: isUnlocked,
+          isTarget: isTarget,
+        ),
+      );
+      milestoneCount++;
+    }
+
+    if (!markerAdded) items.add(_PositionMarkerItem(available));
+
+    return items;
+  }
+
+  void _scrollToMarker(List<_RoadItem> items, int markerIndex) {
+    if (_scrolled || markerIndex == -1) return;
+    _scrolled = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
+      // With reverse:true, item[0] is at the bottom. Accumulating heights
+      // from index 0 to markerIndex gives the distance from the bottom
+      // content edge to the marker, used to center it in the viewport.
+      var distFromBottom = 0.0;
+      for (var i = 0; i < markerIndex; i++) {
+        distFromBottom += _itemHeight(items[i]);
+      }
+      final viewport = _scrollController.position.viewportDimension;
+      final maxExtent = _scrollController.position.maxScrollExtent;
+      final target = (distFromBottom - viewport * 0.6).clamp(0.0, maxExtent);
+      unawaited(
+        _scrollController.animateTo(
+          target,
+          duration: const Duration(milliseconds: 900),
+          curve: Curves.easeOutCubic,
+        ),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar.medium(
-            title: const Text('Premios'),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.map_outlined),
-                tooltip: 'Roadmap',
-                onPressed: () => context.push('/rewards/roadmap'),
-              ),
-            ],
-          ),
-          SliverToBoxAdapter(
-            child: _BalanceCard()
-                .animate()
-                .fadeIn(duration: 400.ms)
-                .slideY(begin: -0.1, end: 0),
-          ),
-          SliverToBoxAdapter(
-            child: _FilterTabs(
-              selected: _tabIndex,
-              onSelected: (i) => setState(() => _tabIndex = i),
-            ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
-          ),
-          if (_tabIndex == 2)
-            _CanjesSliver()
-          else
-            _CatalogSliver(showOnlyAvailable: _tabIndex == 1),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Balance card ────────────────────────────────────────────────────────────
-
-class _BalanceCard extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
+    final premiosAsync = ref.watch(premiosProvider);
     final profile = ref.watch(profileProvider).value;
-    final points = profile?.availablePoints ?? 0;
+    final available = profile?.availablePoints ?? 0;
+    final operatorLevel = profile?.level ?? OperatorLevel.plata;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      child: Card(
-        color: AppColors.amber,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          child: Row(
-            children: [
-              const Icon(Icons.stars_rounded, color: Colors.white, size: 32),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Puntos disponibles',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white70,
-                        ),
-                  ),
-                  Text(
-                    '$points pts',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ],
-              ),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Premios'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.grid_view_rounded),
+            tooltip: 'Catálogo',
+            onPressed: () => context.push('/rewards/catalog'),
           ),
-        ),
+        ],
       ),
-    );
-  }
-}
-
-// ─── Filter tabs ─────────────────────────────────────────────────────────────
-
-class _FilterTabs extends StatelessWidget {
-  const _FilterTabs({required this.selected, required this.onSelected});
-
-  final int selected;
-  final ValueChanged<int> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Wrap(
-        spacing: 8,
+      body: Column(
         children: [
-          _chip(context, 0, 'Todos'),
-          _chip(context, 1, 'Disponibles'),
-          _chip(context, 2, 'Mis Canjes'),
+          _PointsHeader(available: available, level: operatorLevel),
+          Expanded(
+            child: premiosAsync.when(
+              loading: () =>
+                  const AppLoadingWidget(message: 'Cargando premios...'),
+              error: (_, __) =>
+                  const Center(child: Text('Error al cargar premios')),
+              data: (premios) {
+                final sorted = List<Premio>.of(premios)
+                  ..sort((a, b) => a.costoPuntos.compareTo(b.costoPuntos));
+
+                if (sorted.isEmpty) return const _EmptyRoad();
+
+                final items = _buildItems(sorted, available);
+                final markerIndex = items.indexWhere(
+                  (item) => item is _PositionMarkerItem,
+                );
+                _scrollToMarker(items, markerIndex);
+
+                return ListView.builder(
+                  controller: _scrollController,
+                  // reverse: true → item[0] at bottom, scrolling UP reveals
+                  // higher-indexed items (higher pts = future prizes).
+                  reverse: true,
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    return switch (item) {
+                      _LevelBannerItem(:final level) =>
+                        TrophyLevelBanner(level: level),
+                      _PositionMarkerItem(:final availablePoints) =>
+                        TrophyPositionMarker(
+                          availablePoints: availablePoints,
+                        ),
+                      _MilestoneItem(
+                        :final premio,
+                        :final isLeft,
+                        :final isUnlocked,
+                        :final isTarget,
+                      ) =>
+                        TrophyMilestone(
+                          premio: premio,
+                          availablePoints: available,
+                          operatorLevel: operatorLevel,
+                          isLeft: isLeft,
+                          isUnlocked: isUnlocked,
+                          isTarget: isTarget,
+                        ),
+                    };
+                  },
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
   }
-
-  Widget _chip(BuildContext context, int index, String label) {
-    return FilterChip(
-      label: Text(label),
-      selected: selected == index,
-      onSelected: (_) => onSelected(index),
-    );
-  }
 }
 
-// ─── Catalog grid ────────────────────────────────────────────────────────────
+// ─── Points header ───────────────────────────────────────────────────────────
 
-class _CatalogSliver extends ConsumerWidget {
-  const _CatalogSliver({required this.showOnlyAvailable});
+class _PointsHeader extends StatelessWidget {
+  const _PointsHeader({required this.available, required this.level});
 
-  final bool showOnlyAvailable;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final async = ref.watch(premiosProvider);
-
-    return async.when(
-      loading: () => const SliverFillRemaining(
-        child: AppLoadingWidget(message: 'Cargando premios...'),
-      ),
-      error: (_, __) => const SliverFillRemaining(
-        child: Center(child: Text('Error al cargar premios')),
-      ),
-      data: (premios) {
-        final profile = ref.watch(profileProvider).value;
-        final filtered = showOnlyAvailable
-            ? premios
-                .where(
-                  (p) =>
-                      (profile?.availablePoints ?? 0) >= p.costoPuntos &&
-                      (p.nivelMinimo == null ||
-                          (profile?.level.index ?? 0) >= p.nivelMinimo!.index),
-                )
-                .toList()
-            : premios;
-
-        if (filtered.isEmpty) {
-          return SliverFillRemaining(
-            child: _EmptyState(
-              message: showOnlyAvailable
-                  ? 'Acumula más puntos para desbloquear premios'
-                  : 'No hay premios disponibles',
-            ),
-          );
-        }
-
-        return SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          sliver: SliverGrid.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 0.72,
-            ),
-            itemCount: filtered.length,
-            itemBuilder: (_, i) => PremioCard(premio: filtered[i])
-                .animate()
-                .fadeIn(
-                  duration: 350.ms,
-                  delay: Duration(milliseconds: 50 * i),
-                )
-                .slideY(begin: 0.1, end: 0),
-          ),
-        );
-      },
-    );
-  }
-}
-
-// ─── Canjes list ─────────────────────────────────────────────────────────────
-
-class _CanjesSliver extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final async = ref.watch(canjesProvider);
-
-    return async.when(
-      loading: () => const SliverFillRemaining(
-        child: AppLoadingWidget(message: 'Cargando canjes...'),
-      ),
-      error: (_, __) => const SliverFillRemaining(
-        child: Center(child: Text('Error al cargar canjes')),
-      ),
-      data: (canjes) {
-        if (canjes.isEmpty) {
-          return const SliverFillRemaining(
-            child: _EmptyState(message: 'Aún no tienes canjes registrados'),
-          );
-        }
-        return SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          sliver: SliverList.builder(
-            itemCount: canjes.length,
-            itemBuilder: (_, i) =>
-                _CanjeTile(canje: canjes[i]).animate().fadeIn(
-                      duration: 300.ms,
-                      delay: Duration(milliseconds: 40 * i),
-                    ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _CanjeTile extends StatelessWidget {
-  const _CanjeTile({required this.canje});
-
-  final Canje canje;
+  final int available;
+  final OperatorLevel level;
 
   @override
   Widget build(BuildContext context) {
-    final color = _estadoColor(canje.estado);
-    final fmt = DateFormat('dd MMM yyyy', 'es_MX');
+    final theme = Theme.of(context);
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: color.withAlpha(30),
-          child: Icon(Icons.redeem_rounded, color: color, size: 20),
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+      decoration: BoxDecoration(
+        color: AppColors.amber.withAlpha(14),
+        border: Border(
+          bottom: BorderSide(color: AppColors.amber.withAlpha(40)),
         ),
-        title: Text(
-          '${canje.puntosCanjeados} pts canjeados',
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(fmt.format(canje.fechaSolicitud.toLocal())),
-        trailing: Chip(
-          label: Text(
-            canje.estado.displayName,
-            style: TextStyle(fontSize: 11, color: color),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.stars_rounded, color: AppColors.amber, size: 28),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$available pts disponibles',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.amber,
+                  ),
+                ),
+                Text(
+                  level.displayName,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.textSecondaryDark,
+                  ),
+                ),
+              ],
+            ),
           ),
-          backgroundColor: color.withAlpha(25),
-          side: BorderSide.none,
-          padding: EdgeInsets.zero,
-          labelPadding: const EdgeInsets.symmetric(horizontal: 6),
-        ),
+          const Icon(
+            Icons.keyboard_arrow_up_rounded,
+            color: AppColors.textSecondaryDark,
+            size: 18,
+          ),
+          Text(
+            'Sube para ver más',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppColors.textSecondaryDark,
+              fontSize: 10,
+            ),
+          ),
+        ],
       ),
     );
   }
-
-  Color _estadoColor(CanjeEstado estado) => switch (estado) {
-        CanjeEstado.solicitado => AppColors.amber,
-        CanjeEstado.aprobado => Colors.green,
-        CanjeEstado.rechazado => Colors.red,
-        CanjeEstado.entregado => Colors.blue,
-      };
 }
 
 // ─── Empty state ─────────────────────────────────────────────────────────────
 
-class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.message});
-
-  final String message;
+class _EmptyRoad extends StatelessWidget {
+  const _EmptyRoad();
 
   @override
   Widget build(BuildContext context) {
@@ -292,18 +285,14 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.redeem_outlined,
-            size: 64,
-            color: AppColors.textSecondaryDark,
-          ),
+          const Icon(Icons.map_outlined, size: 64, color: Colors.grey),
           const SizedBox(height: 16),
           Text(
-            message,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondaryDark,
-                ),
-            textAlign: TextAlign.center,
+            'No hay premios disponibles',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: Colors.grey),
           ),
         ],
       ),

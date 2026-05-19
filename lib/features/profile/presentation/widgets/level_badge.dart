@@ -22,24 +22,38 @@ class LevelBadge extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: size,
-          height: size,
+          width: size + 10,
+          height: size + 10,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: gradient,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: color.withAlpha(60),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            border: Border.all(
+              color: color.withAlpha(90),
+              width: 2,
+            ),
           ),
-          child: Icon(icon, color: Colors.white, size: size * 0.45),
+          child: Center(
+            child: Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: gradient,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withAlpha(80),
+                    blurRadius: 16,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Icon(icon, color: Colors.white, size: size * 0.45),
+            ),
+          ),
         ),
         if (showLabel) ...[
           const SizedBox(height: 6),

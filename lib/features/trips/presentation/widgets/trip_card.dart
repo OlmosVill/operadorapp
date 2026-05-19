@@ -23,7 +23,7 @@ class TripCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(10),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(

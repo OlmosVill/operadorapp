@@ -364,27 +364,42 @@ class _StatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: theme.colorScheme.primary, size: 18),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: theme.textTheme.titleSmall
-                  ?.copyWith(fontWeight: FontWeight.bold),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(icon, color: theme.colorScheme.primary, size: 20),
+                const SizedBox(height: 6),
+                Text(
+                  value,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withAlpha(120),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha(120),
-              ),
+          ),
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(
+              width: 3,
+              color: theme.colorScheme.primary,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -400,29 +415,43 @@ class _StreakCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            const Icon(
-              Icons.local_fire_department_rounded,
-              color: AppColors.amber,
-              size: 28,
+            Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: AppColors.amber.withAlpha(20),
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.amber.withAlpha(80)),
+              ),
+              child: const Icon(
+                Icons.local_fire_department_rounded,
+                color: AppColors.amber,
+                size: 24,
+              ),
             ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$streak ${streak == 1 ? 'día' : 'días'} consecutivos',
-                  style: theme.textTheme.titleSmall
-                      ?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '¡Sigue así!',
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: AppColors.textSecondaryDark),
-                ),
-              ],
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$streak ${streak == 1 ? 'día' : 'días'} consecutivos',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.amber,
+                    ),
+                  ),
+                  Text(
+                    '¡Sigue así, sin parar!',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondaryDark,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -448,7 +477,7 @@ class _PointsBalanceCard extends StatelessWidget {
           gradient: const LinearGradient(
             colors: [Color(0xFF4A2800), Color(0xFF2A1800)],
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(color: AppColors.amber.withAlpha(40)),
         ),
         child: Row(
@@ -520,7 +549,7 @@ class _NoTripPlaceholder extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppColors.asphaltCard,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: AppColors.asphaltBorder),
       ),
       child: Column(

@@ -26,7 +26,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _onLogin() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-
     await ref.read(loginNotifierProvider.notifier).login(
           employeeNumber: _employeeController.text,
           password: _passwordController.text,
@@ -37,7 +36,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final loginState = ref.watch(loginNotifierProvider);
 
-    // Mostrar error como SnackBar
     ref.listen<AsyncValue<void>>(loginNotifierProvider, (_, next) {
       if (next is AsyncError) {
         ScaffoldMessenger.of(context)
@@ -55,54 +53,78 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       backgroundColor: AppColors.asphalt,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 28),
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 60),
+                const SizedBox(height: 56),
 
-                // Logo / ícono
+                // Brand mark — truck icon with amber glow ring
                 Center(
                   child: Container(
-                    width: 72,
-                    height: 72,
+                    width: 88,
+                    height: 88,
                     decoration: BoxDecoration(
                       color: AppColors.amber.withAlpha(20),
-                      borderRadius: BorderRadius.circular(20),
+                      shape: BoxShape.circle,
                       border: Border.all(
-                        color: AppColors.amber.withAlpha(60),
+                        color: AppColors.amber.withAlpha(80),
+                        width: 2,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.amber.withAlpha(50),
+                          blurRadius: 28,
+                          spreadRadius: 4,
+                        ),
+                      ],
                     ),
                     child: const Icon(
                       Icons.local_shipping_rounded,
                       color: AppColors.amber,
-                      size: 40,
+                      size: 42,
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 20),
 
-                Text(
-                  'Bienvenido',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: AppColors.textOnDark,
-                        fontWeight: FontWeight.bold,
-                      ),
+                const Center(
+                  child: Text(
+                    'OPERADORAPP',
+                    style: TextStyle(
+                      color: AppColors.textOnDark,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 3.5,
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Ingresa tus datos para continuar',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondaryDark,
-                      ),
+
+                const SizedBox(height: 10),
+
+                // Amber rule
+                Center(
+                  child: Container(
+                    width: 48,
+                    height: 2,
+                    color: AppColors.amber,
+                  ),
                 ),
 
                 const SizedBox(height: 40),
 
-                // Número de empleado
+                Text(
+                  'Iniciar sesión',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: AppColors.textSecondaryDark,
+                      ),
+                ),
+
+                const SizedBox(height: 16),
+
                 TextFormField(
                   controller: _employeeController,
                   keyboardType: TextInputType.number,
@@ -120,9 +142,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   },
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
 
-                // Contraseña
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
@@ -139,7 +160,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             : Icons.visibility_off_outlined,
                       ),
                       onPressed: () {
-                        setState(() => _obscurePassword = !_obscurePassword);
+                        setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        );
                       },
                     ),
                   ),
@@ -151,10 +174,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   },
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
 
-                // Botón de login
-                ElevatedButton(
+                FilledButton(
                   onPressed: loginState.isLoading ? null : _onLogin,
                   child: loginState.isLoading
                       ? const SizedBox(
@@ -165,12 +187,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             color: Colors.black54,
                           ),
                         )
-                      : const Text('Ingresar'),
+                      : const Text(
+                          'ACCEDER',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 2,
+                          ),
+                        ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
 
-                // Olvidé mi contraseña
                 Center(
                   child: TextButton(
                     onPressed: () => context.go('/login/forgot-password'),
@@ -178,14 +206,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 48),
 
-                // Nota de versión
                 Center(
                   child: Text(
                     'OperadorApp v1.0',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppColors.asphaltBorder,
+                          letterSpacing: 0.5,
                         ),
                   ),
                 ),

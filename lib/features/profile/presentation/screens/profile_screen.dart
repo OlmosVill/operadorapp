@@ -80,31 +80,52 @@ class _ProfileHeader extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Foto de perfil
-          CircleAvatar(
-            radius: 44,
-            backgroundColor: AppColors.asphaltCard,
-            backgroundImage: profile.profilePhotoUrl != null
-                ? CachedNetworkImageProvider(profile.profilePhotoUrl!)
-                : null,
-            child: profile.profilePhotoUrl == null
-                ? Text(
-                    profile.fullName.isNotEmpty
-                        ? profile.fullName[0].toUpperCase()
-                        : '?',
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.amber,
-                    ),
-                  )
-                : null,
+          // Foto de perfil con anillo amber
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.amber.withAlpha(200),
+                width: 2.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.amber.withAlpha(50),
+                  blurRadius: 16,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(3),
+              child: CircleAvatar(
+                radius: 44,
+                backgroundColor: AppColors.asphaltCard,
+                backgroundImage: profile.profilePhotoUrl != null
+                    ? CachedNetworkImageProvider(
+                        profile.profilePhotoUrl!,
+                      )
+                    : null,
+                child: profile.profilePhotoUrl == null
+                    ? Text(
+                        profile.fullName.isNotEmpty
+                            ? profile.fullName[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.amber,
+                        ),
+                      )
+                    : null,
+              ),
+            ),
           ),
           const SizedBox(height: 12),
           Text(
             profile.fullName,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
                 ),
           ),
           Text(
@@ -198,29 +219,41 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(icon, color: color, size: 22),
+                const SizedBox(height: 8),
+                Text(
+                  value,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
                     color: color,
                   ),
-            ),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                ),
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(
                     color: AppColors.textSecondaryDark,
                   ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(width: 4, color: color),
+          ),
+        ],
       ),
     );
   }
