@@ -500,6 +500,54 @@ class SyncService {
     );
   }
 
+  // ─── Ranking ─────────────────────────────────────────────────────────────
+
+  // El servidor calcula posiciones y delta contra el último snapshot; aquí
+  // solo se cachea el resultado para lectura offline.
+  Future<void> syncRanking(String periodo) async {
+    try {
+      final result = await _supabase.rpc<dynamic>(
+        'fn_ranking_operadores',
+        params: {'p_periodo': periodo},
+      );
+
+      final rows = (result as List<dynamic>? ?? const [])
+          .cast<Map<String, dynamic>>()
+          .toList();
+      if (rows.isEmpty) return;
+
+      final now = DateTime.now().toUtc();
+      final companions =
+          rows.map((r) => _rankingCompanion(r, periodo, now)).toList();
+
+      await _db.rankingDao.replacePeriodo(periodo, companions);
+      await _db.syncDao.setLastSyncAt('ranking_$periodo', now);
+      _logger.d('syncRanking($periodo): ${rows.length} operadores');
+    } on Exception catch (e) {
+      _logger.w('syncRanking($periodo) falló', error: e);
+    }
+  }
+
+  RankingTableCompanion _rankingCompanion(
+    Map<String, dynamic> r,
+    String periodo,
+    DateTime syncedAt,
+  ) =>
+      RankingTableCompanion(
+        periodo: Value(periodo),
+        operadorId: Value(r['operador_id'] as String),
+        numeroEmpleado: Value(r['numero_empleado'] as String? ?? ''),
+        nombreCompleto: Value(r['nombre_completo'] as String? ?? ''),
+        fotoPerfilUrl: Value(r['foto_perfil_url'] as String?),
+        nivel: Value(r['nivel'] as String? ?? 'plata'),
+        puntos: Value(r['puntos'] as int? ?? 0),
+        calificacion: Value(_parseDouble(r['calificacion'])),
+        viajesCompletados: Value(r['viajes_completados'] as int? ?? 0),
+        posicion: Value(r['posicion'] as int? ?? 0),
+        posicionAnterior: Value(r['posicion_anterior'] as int?),
+        updatedAt: Value(syncedAt),
+      );
+
   // ─── Helpers ─────────────────────────────────────────────────────────────
 
   DateTime? _parseDateTime(Object? value) {

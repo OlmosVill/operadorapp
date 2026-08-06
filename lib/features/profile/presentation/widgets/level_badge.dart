@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:operadorapp/core/theme/app_colors.dart';
 import 'package:operadorapp/features/profile/domain/entities/operator_profile.dart';
 
+/// Color de marca del nivel. Única fuente: la usan el badge, el chip del
+/// ranking y la barra del resumen de regreso.
+Color levelColor(OperatorLevel level) => LevelBadge._levelAssets(level).$1;
+
 class LevelBadge extends StatelessWidget {
   const LevelBadge({
     required this.level,

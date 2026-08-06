@@ -6,7 +6,7 @@ import 'package:operadorapp/core/services/sync_service.dart';
 import 'package:operadorapp/features/trucks/data/repositories/trucks_repository_impl.dart';
 import 'package:operadorapp/features/trucks/domain/entities/truck.dart';
 
-// ─── Fake SyncService ─────────────────────────────────────────────────────────
+// ─── Fake SyncService ────────────────────────────────────────────────────────
 
 class _FakeSyncService extends Fake implements SyncService {
   @override

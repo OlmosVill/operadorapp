@@ -120,3 +120,202 @@ INSERT INTO premios_catalogo (nombre, descripcion, tipo, costo_puntos, nivel_min
 -- (no se pueden insertar directamente en auth.users desde seed.sql)
 -- Usar la UI de Supabase Studio en localhost:54323 > Authentication
 -- o el script de setup en docs/DATABASE.md para crear operadores de prueba.
+
+-- =============================================================================
+-- Ranking — operadores DEMO
+-- Sin auth_user_id: no pueden iniciar sesión y RLS los mantiene invisibles en
+-- consultas individuales. Solo aparecen a través de fn_ranking_operadores.
+-- =============================================================================
+
+INSERT INTO operadores (id, numero_empleado, nombre_completo, fecha_ingreso, base) VALUES
+    ('a0000000-0000-4000-8000-000000000001', '90001', '[DEMO] Ricardo Salgado Mena',   '2018-02-12', 'Monterrey'),
+    ('a0000000-0000-4000-8000-000000000002', '90002', '[DEMO] Martín Ochoa Valdés',    '2019-06-03', 'Monterrey'),
+    ('a0000000-0000-4000-8000-000000000003', '90003', '[DEMO] Alonso Reyes Guzmán',    '2020-01-20', 'Querétaro'),
+    ('a0000000-0000-4000-8000-000000000004', '90004', '[DEMO] Fernanda Ríos Camacho',  '2020-09-14', 'Querétaro'),
+    ('a0000000-0000-4000-8000-000000000005', '90005', '[DEMO] Ismael Cordero Nava',    '2021-04-05', 'Guadalajara'),
+    ('a0000000-0000-4000-8000-000000000006', '90006', '[DEMO] Ana Lucía Bermúdez',     '2022-07-18', 'Guadalajara');
+
+-- Puntos acumulados (fn_actualizar_puntos_operador deriva nivel y saldos).
+--
+-- Las fechas se anclan al INICIO DEL MES en curso, no a NOW() - n días: con
+-- offsets relativos a hoy, un reset corrido el día 3 del mes empujaba los
+-- movimientos "del mes" al mes anterior y el ranking mensual salía en ceros.
+-- dias negativos = meses anteriores. El LEAST evita fechas futuras.
+INSERT INTO movimientos_puntos (operador_id, tipo, puntos, descripcion, saldo_despues, created_at)
+SELECT
+    m.operador_id, 'ganado_viaje'::tipo_movimiento_enum, m.puntos, m.descripcion, m.saldo,
+    LEAST(
+        date_trunc('month', NOW()) + (m.dias || ' days')::INTERVAL,
+        NOW() - INTERVAL '2 hours'
+    )
+FROM (VALUES
+    ('a0000000-0000-4000-8000-000000000001'::UUID, 41200, '[DEMO] Acumulado histórico', 41200, -170),
+    ('a0000000-0000-4000-8000-000000000001'::UUID,  3800, '[DEMO] Viajes del mes',      45000,    2),
+    ('a0000000-0000-4000-8000-000000000002'::UUID, 26500, '[DEMO] Acumulado histórico', 26500, -160),
+    ('a0000000-0000-4000-8000-000000000002'::UUID,  5100, '[DEMO] Viajes del mes',      31600,    3),
+    ('a0000000-0000-4000-8000-000000000003'::UUID, 17800, '[DEMO] Acumulado histórico', 17800, -150),
+    ('a0000000-0000-4000-8000-000000000003'::UUID,  1200, '[DEMO] Viajes del mes',      19000,    1),
+    ('a0000000-0000-4000-8000-000000000004'::UUID, 11400, '[DEMO] Acumulado histórico', 11400, -140),
+    ('a0000000-0000-4000-8000-000000000004'::UUID,  4300, '[DEMO] Viajes del mes',      15700,    3),
+    ('a0000000-0000-4000-8000-000000000005'::UUID,  7900, '[DEMO] Acumulado histórico',  7900, -130),
+    ('a0000000-0000-4000-8000-000000000005'::UUID,   600, '[DEMO] Viajes del mes',       8500,    0),
+    ('a0000000-0000-4000-8000-000000000006'::UUID,  3100, '[DEMO] Acumulado histórico',  3100, -120),
+    ('a0000000-0000-4000-8000-000000000006'::UUID,  2400, '[DEMO] Viajes del mes',       5500,    1)
+) AS m(operador_id, puntos, descripcion, saldo, dias);
+
+-- Viajes completados: alimentan la calificación promedio del ranking.
+-- Se insertan ya en estado 'completado'; trg_viaje_completado es AFTER UPDATE,
+-- así que no se duplican los puntos de arriba.
+-- Mismo anclaje al inicio del mes: cada operador tiene un viaje dentro del mes
+-- en curso para que el periodo 'mensual' muestre calificación.
+INSERT INTO viajes (operador_id, tracto_id, origen, destino, estado, km_recorridos, calificacion, fecha_inicio, fecha_fin)
+SELECT
+    v.operador_id,
+    (SELECT id FROM tractos WHERE numero_economico = v.tracto),
+    v.origen, v.destino, 'completado', v.km, v.calif,
+    v.fin - INTERVAL '11 hours',
+    v.fin
+FROM (
+    SELECT
+        t.operador_id, t.tracto, t.origen, t.destino, t.km, t.calif,
+        LEAST(
+            date_trunc('month', NOW()) + (t.dias || ' days')::INTERVAL,
+            NOW() - INTERVAL '2 hours'
+        ) AS fin
+    FROM (VALUES
+        ('a0000000-0000-4000-8000-000000000001'::UUID, 'T-001', 'Monterrey',   'CDMX',        920.0, 9.6,   3),
+        ('a0000000-0000-4000-8000-000000000001'::UUID, 'T-001', 'CDMX',        'Monterrey',   915.0, 9.4, -25),
+        ('a0000000-0000-4000-8000-000000000002'::UUID, 'T-002', 'Monterrey',   'Saltillo',    290.0, 9.1,   2),
+        ('a0000000-0000-4000-8000-000000000002'::UUID, 'T-002', 'Saltillo',    'Torreón',     320.0, 8.8, -20),
+        ('a0000000-0000-4000-8000-000000000003'::UUID, 'T-003', 'Querétaro',   'Guadalajara', 380.0, 8.5,   1),
+        ('a0000000-0000-4000-8000-000000000003'::UUID, 'T-003', 'Guadalajara', 'Querétaro',   378.0, 8.2, -30),
+        ('a0000000-0000-4000-8000-000000000004'::UUID, 'T-004', 'Querétaro',   'CDMX',        215.0, 8.9,   3),
+        ('a0000000-0000-4000-8000-000000000004'::UUID, 'T-004', 'CDMX',        'Puebla',      135.0, 9.2, -18),
+        ('a0000000-0000-4000-8000-000000000005'::UUID, 'T-005', 'Guadalajara', 'Colima',      215.0, 7.6,   0),
+        ('a0000000-0000-4000-8000-000000000005'::UUID, 'T-005', 'Colima',      'Guadalajara', 218.0, 7.9, -22),
+        ('a0000000-0000-4000-8000-000000000006'::UUID, 'T-005', 'Guadalajara', 'León',        210.0, 8.0,   1),
+        ('a0000000-0000-4000-8000-000000000006'::UUID, 'T-005', 'León',        'Guadalajara', 212.0, 8.3, -15)
+    ) AS t(operador_id, tracto, origen, destino, km, calif, dias)
+) AS v;
+
+-- =============================================================================
+-- Operador de prueba CON LOGIN — solo desarrollo local
+--
+-- Credenciales:  número de empleado 12345  /  contraseña 123456
+--
+-- `supabase db reset` también vacía auth.users, así que sin este bloque cada
+-- reset dejaba la app con sesión cacheada apuntando a un operador inexistente
+-- (syncProfile → PGRST116 "0 rows"). Las columnas de token van en cadena vacía
+-- a propósito: GoTrue las escanea en `string` de Go y con NULL el login
+-- devuelve "Database error querying schema".
+-- =============================================================================
+
+INSERT INTO auth.users (
+    instance_id, id, aud, role, email, encrypted_password,
+    email_confirmed_at, created_at, updated_at,
+    raw_app_meta_data, raw_user_meta_data,
+    confirmation_token, recovery_token, email_change,
+    email_change_token_new, email_change_token_current,
+    phone_change, phone_change_token, reauthentication_token
+) VALUES (
+    '00000000-0000-0000-0000-000000000000',
+    'b0000000-0000-4000-8000-000000000001',
+    'authenticated', 'authenticated',
+    '12345@operadorapp.internal',
+    extensions.crypt('123456', extensions.gen_salt('bf')),
+    NOW(), NOW(), NOW(),
+    '{"provider":"email","providers":["email"]}'::jsonb,
+    '{}'::jsonb,
+    '', '', '', '', '', '', '', ''
+);
+
+INSERT INTO auth.identities (
+    provider_id, user_id, identity_data, provider,
+    last_sign_in_at, created_at, updated_at
+) VALUES (
+    'b0000000-0000-4000-8000-000000000001',
+    'b0000000-0000-4000-8000-000000000001',
+    jsonb_build_object(
+        'sub', 'b0000000-0000-4000-8000-000000000001',
+        'email', '12345@operadorapp.internal',
+        'email_verified', true,
+        'phone_verified', false
+    ),
+    'email', NOW(), NOW(), NOW()
+);
+
+-- trg_new_operador crea automáticamente puntos_operador y configuracion_operador
+INSERT INTO operadores (id, auth_user_id, numero_empleado, nombre_completo, fecha_ingreso, base) VALUES (
+    'a0000000-0000-4000-8000-0000000000ff',
+    'b0000000-0000-4000-8000-000000000001',
+    '12345', '[DEMO] Juan Demo', '2022-01-15', 'Monterrey'
+);
+
+INSERT INTO movimientos_puntos (operador_id, tipo, puntos, descripcion, saldo_despues, created_at)
+SELECT
+    'a0000000-0000-4000-8000-0000000000ff', 'ganado_viaje'::tipo_movimiento_enum,
+    m.puntos, m.descripcion, m.saldo,
+    LEAST(
+        date_trunc('month', NOW()) + (m.dias || ' days')::INTERVAL,
+        NOW() - INTERVAL '2 hours'
+    )
+FROM (VALUES
+    (16900, '[DEMO] Acumulado histórico', 16900, -145),
+    ( 2600, '[DEMO] Viajes del mes',      19500,    2)
+) AS m(puntos, descripcion, saldo, dias);
+
+INSERT INTO viajes (operador_id, tracto_id, origen, destino, estado, km_recorridos, km_esperados, litros_diesel, rendimiento_real, calificacion, fecha_inicio, fecha_fin)
+SELECT
+    'a0000000-0000-4000-8000-0000000000ff',
+    (SELECT id FROM tractos WHERE numero_economico = 'T-003'),
+    v.origen, v.destino, 'completado', v.km, v.km, v.litros,
+    ROUND(v.km / v.litros, 2), v.calif,
+    v.fin - INTERVAL '10 hours',
+    v.fin
+FROM (
+    SELECT
+        t.origen, t.destino, t.km, t.litros, t.calif,
+        LEAST(
+            date_trunc('month', NOW()) + (t.dias || ' days')::INTERVAL,
+            NOW() - INTERVAL '2 hours'
+        ) AS fin
+    FROM (VALUES
+        ('Monterrey',   'Guadalajara', 720.0, 165.0, 8.7,   2),
+        ('Guadalajara', 'CDMX',        540.0, 128.0, 9.0, -12),
+        ('CDMX',        'Monterrey',   910.0, 210.0, 8.4, -24)
+    ) AS t(origen, destino, km, litros, calif, dias)
+) AS v;
+
+INSERT INTO historial_tractos_operador (operador_id, tracto_id, fecha_inicio, km_recorridos, viajes_realizados, calificacion_promedio, activo)
+VALUES (
+    'a0000000-0000-4000-8000-0000000000ff',
+    (SELECT id FROM tractos WHERE numero_economico = 'T-003'),
+    CURRENT_DATE - 120, 2170.0, 3, 8.70, true
+);
+
+-- Recalcular saldos y nivel de cada operador DEMO
+DO $$
+DECLARE r RECORD;
+BEGIN
+    FOR r IN SELECT DISTINCT operador_id FROM movimientos_puntos LOOP
+        PERFORM fn_actualizar_puntos_operador(r.operador_id);
+    END LOOP;
+END $$;
+
+-- Snapshot "de ayer": da contenido a las flechas de subida/bajada del ranking.
+-- Las posiciones aquí son intencionalmente distintas a las actuales.
+INSERT INTO ranking_snapshots (periodo, operador_id, posicion, puntos, capturado_el) VALUES
+    ('global',  'a0000000-0000-4000-8000-000000000001', 1, 41200, CURRENT_DATE - 1),
+    ('global',  'a0000000-0000-4000-8000-000000000002', 4, 26500, CURRENT_DATE - 1),
+    ('global',  'a0000000-0000-4000-8000-000000000003', 2, 17800, CURRENT_DATE - 1),
+    ('global',  'a0000000-0000-4000-8000-000000000004', 6, 11400, CURRENT_DATE - 1),
+    ('global',  'a0000000-0000-4000-8000-000000000005', 5,  7900, CURRENT_DATE - 1),
+    ('global',  'a0000000-0000-4000-8000-000000000006', 7,  3100, CURRENT_DATE - 1),
+    ('mensual', 'a0000000-0000-4000-8000-000000000001', 3,  3800, CURRENT_DATE - 1),
+    ('mensual', 'a0000000-0000-4000-8000-000000000002', 1,  5100, CURRENT_DATE - 1),
+    ('mensual', 'a0000000-0000-4000-8000-000000000003', 4,  1200, CURRENT_DATE - 1),
+    ('mensual', 'a0000000-0000-4000-8000-000000000004', 2,  4300, CURRENT_DATE - 1),
+    ('mensual', 'a0000000-0000-4000-8000-000000000005', 5,   600, CURRENT_DATE - 1),
+    ('mensual', 'a0000000-0000-4000-8000-000000000006', 6,  2400, CURRENT_DATE - 1),
+    ('global',  'a0000000-0000-4000-8000-0000000000ff', 5, 16900, CURRENT_DATE - 1),
+    ('mensual', 'a0000000-0000-4000-8000-0000000000ff', 7,  2600, CURRENT_DATE - 1);

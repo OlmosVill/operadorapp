@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +8,8 @@ import 'package:operadorapp/core/theme/app_colors.dart';
 import 'package:operadorapp/features/profile/domain/entities/operator_profile.dart';
 import 'package:operadorapp/features/profile/presentation/providers/profile_provider.dart';
 import 'package:operadorapp/features/profile/presentation/widgets/level_badge.dart';
+import 'package:operadorapp/features/summary/presentation/providers/return_summary_provider.dart';
+import 'package:operadorapp/features/summary/presentation/widgets/return_summary_dialog.dart';
 import 'package:operadorapp/features/trips/domain/entities/trip.dart';
 import 'package:operadorapp/features/trips/presentation/providers/home_provider.dart';
 import 'package:operadorapp/features/trips/presentation/widgets/active_trip_card.dart';
@@ -19,11 +23,62 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     updateHomLastSeen(ref);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Al irse a segundo plano se fija el punto de comparación del próximo
+    // resumen: lo que el operador ya vio no debe volver a anunciarse.
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      unawaited(saveReturnSnapshot(ref));
+    }
+  }
+
+  /// Evita reprogramar el callback una vez que el resumen ya se resolvió.
+  var _summaryHandled = false;
+
+  /// Programa la revisión del resumen para DESPUÉS del frame.
+  ///
+  /// Nada de esto puede correr dentro de `build`: marcar el resumen como visto
+  /// escribe en un provider, y Riverpod aborta el build con una excepción si se
+  /// modifica estado mientras se construye el árbol.
+  void _scheduleSummaryCheck() {
+    if (_summaryHandled) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted || _summaryHandled) return;
+
+      if (ref.read(returnSummaryShownProvider)) {
+        _summaryHandled = true;
+        return;
+      }
+
+      // Viajes y ranking llegan asíncronos: si todavía no hay resumen se
+      // reintenta en el próximo build, sin marcar nada.
+      final summary = ref.read(returnSummaryProvider);
+      if (summary == null) return;
+
+      _summaryHandled = true;
+      ref.read(returnSummaryShownProvider.notifier).state = true;
+
+      await showReturnSummaryDialog(context, summary);
+      if (!mounted) return;
+      await saveReturnSnapshot(ref);
+    });
   }
 
   @override
@@ -31,10 +86,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final profileAsync = ref.watch(profileProvider);
     final homeState = ref.watch(homeStateProvider);
 
+    // Se reprograma en cada build porque los viajes y el ranking llegan de
+    // forma asíncrona: el resumen sólo está completo cuando Drift ya emitió.
+    _scheduleSummaryCheck();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('OperadorApp'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.leaderboard_outlined),
+            tooltip: 'Ranking',
+            onPressed: () => context.push('/ranking'),
+          ),
           profileAsync.whenOrNull(
                 data: (profile) => Padding(
                   padding: const EdgeInsets.only(right: 16),

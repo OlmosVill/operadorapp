@@ -240,6 +240,30 @@ class HistorialTractosTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+// ─── Ranking de Operadores ───────────────────────────────────────────────────
+
+// Caché local del leaderboard. Las posiciones las calcula el servidor
+// (fn_ranking_operadores); aquí solo se guardan para lectura offline.
+@DataClassName('RankingRow')
+class RankingTable extends Table {
+  TextColumn get periodo => text()();
+  TextColumn get operadorId => text()();
+  TextColumn get numeroEmpleado => text()();
+  TextColumn get nombreCompleto => text()();
+  TextColumn get fotoPerfilUrl => text().nullable()();
+  TextColumn get nivel => text().withDefault(const Constant('plata'))();
+  IntColumn get puntos => integer().withDefault(const Constant(0))();
+  RealColumn get calificacion => real().nullable()();
+  IntColumn get viajesCompletados => integer().withDefault(const Constant(0))();
+  IntColumn get posicion => integer()();
+  // null = sin snapshot previo (operador nuevo en el ranking)
+  IntColumn get posicionAnterior => integer().nullable()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {periodo, operadorId};
+}
+
 // ─── Operaciones Pendientes (local-only) ────────────────────────────────────
 
 @DataClassName('PendingOpRow')

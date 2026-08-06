@@ -24,7 +24,31 @@
       "Bash(where python *)",
       "Bash(py --version)",
       "Bash(C:\\\\Users\\\\IO\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\python3.exe *)",
-      "PowerShell(& \"C:\\\\Users\\\\IO\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\python3.exe\" \"C:\\\\Users\\\\IO\\\\.claude\\\\plugins\\\\cache\\\\ui-ux-pro-max-skill\\\\ui-ux-pro-max\\\\2.5.0\\\\.claude\\\\skills\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"logistics trucking fleet industrial bold professional dark\" --design-system -p \"OperadorApp\" 2>&1)"
+      "PowerShell(& \"C:\\\\Users\\\\IO\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\python3.exe\" \"C:\\\\Users\\\\IO\\\\.claude\\\\plugins\\\\cache\\\\ui-ux-pro-max-skill\\\\ui-ux-pro-max\\\\2.5.0\\\\.claude\\\\skills\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"logistics trucking fleet industrial bold professional dark\" --design-system -p \"OperadorApp\" 2>&1)",
+      "Bash(xargs awk 'length > 80 {print FILENAME\":\"FNR\" \\(\"length\"\\)\"}')",
+      "Bash(awk 'NR>500 && length > 80 {print FILENAME\":\"FNR\" \\(\"length\"\\)\"}' lib/core/services/sync_service.dart)",
+      "Bash(awk 'NR==27' lib/core/database/daos/ranking_dao.dart)",
+      "Bash(xargs awk 'length\\($0\\) > 80 && $0 !~ /^import|^export|─/ {print FILENAME\":\"FNR\": \"$0}')",
+      "Bash(awk 'NR==5' lib/features/ranking/presentation/widgets/rank_change_indicator.dart)",
+      "Bash(awk 'NR==9' test/features/trucks/data/repositories/trucks_repository_impl_test.dart)",
+      "Bash(supabase status *)",
+      "Bash(docker exec *)",
+      "Bash(supabase db *)",
+      "Bash(grep -v '^$')",
+      "Bash(npx supabase *)",
+      "Bash(echo \"exit=$?\")",
+      "Read(//tmp/**)",
+      "Bash(npx astro *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -N --max-time 180 \"http://localhost:4321/api/seed?numOperadores=6&numTractos=4&numViajes=25&diasHistorico=90\")",
+      "Bash(curl -s -N --max-time 240 \"http://localhost:4321/api/seed?numOperadores=6&numTractos=4&numViajes=25&diasHistorico=90\")",
+      "Bash(curl -s -N --max-time 120 \"http://localhost:4321/api/truncate\")",
+      "Bash(curl -s -N --max-time 240 \"http://localhost:4321/api/seed?numOperadores=6&numTractos=4&numViajes=30&diasHistorico=90\")",
+      "Bash(curl -s -N --max-time 300 \"http://localhost:4321/api/seed?numOperadores=8&numTractos=4&numViajes=25&diasHistorico=90\")",
+      "Bash(curl -s -N --max-time 300 \"http://localhost:4321/api/seed?numOperadores=5&numTractos=3&numViajes=20&diasHistorico=90\")"
+    ],
+    "additionalDirectories": [
+      "D:\\dev\\operadorapp-admin"
     ]
   }
 }

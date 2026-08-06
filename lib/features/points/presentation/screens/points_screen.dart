@@ -1,23 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:operadorapp/core/theme/app_colors.dart';
 import 'package:operadorapp/features/points/domain/entities/point_movement.dart';
 import 'package:operadorapp/features/points/presentation/providers/points_provider.dart';
 import 'package:operadorapp/features/points/presentation/widgets/movement_tile.dart';
+import 'package:operadorapp/features/profile/domain/entities/level_thresholds.dart';
 import 'package:operadorapp/features/profile/domain/entities/operator_profile.dart';
 import 'package:operadorapp/features/profile/presentation/providers/profile_provider.dart';
 import 'package:operadorapp/features/profile/presentation/widgets/level_badge.dart';
 import 'package:operadorapp/shared/widgets/app_loading_widget.dart';
-
-// Umbrales de nivel alineados con seed.sql
-const _levelThresholds = <OperatorLevel, (int, int?)>{
-  OperatorLevel.plata: (0, 4999),
-  OperatorLevel.oro: (5000, 14999),
-  OperatorLevel.platino: (15000, 29999),
-  OperatorLevel.esmeralda: (30000, 59999),
-  OperatorLevel.diamante: (60000, null),
-};
 
 class PointsScreen extends ConsumerWidget {
   const PointsScreen({super.key});
@@ -28,7 +21,16 @@ class PointsScreen extends ConsumerWidget {
     final movementsAsync = ref.watch(movementsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis Puntos')),
+      appBar: AppBar(
+        title: const Text('Mis Puntos'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.leaderboard_outlined),
+            tooltip: 'Ranking',
+            onPressed: () => context.push('/ranking'),
+          ),
+        ],
+      ),
       body: profileAsync.when(
         loading: () => const AppLoadingWidget(message: 'Cargando...'),
         error: (_, __) => const SizedBox.shrink(),
@@ -240,17 +242,11 @@ class _LevelProgressSection extends StatelessWidget {
     final theme = Theme.of(context);
     final level = profile.level;
     final nextLevel = level.next;
-    final threshold = _levelThresholds[level];
-    final nextThreshold =
-        nextLevel != null ? _levelThresholds[nextLevel] : null;
+    final rangeMax = nextLevelPoints(level);
 
-    final rangeMin = threshold?.$1 ?? 0;
-    final rangeMax = nextThreshold?.$1;
-
-    final progress = rangeMax != null
-        ? ((profile.availablePoints - rangeMin) / (rangeMax - rangeMin))
-            .clamp(0.0, 1.0)
-        : 1.0;
+    // El nivel lo decide el servidor con los puntos GANADOS acumulados; usar
+    // los disponibles hacía "bajar de nivel" en la UI tras cada canje.
+    final progress = levelProgress(profile.totalPoints, level);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -298,7 +294,7 @@ class _LevelProgressSection extends StatelessWidget {
           if (rangeMax != null) ...[
             const SizedBox(height: 6),
             Text(
-              '${profile.availablePoints} / $rangeMax pts',
+              '${profile.totalPoints} / $rangeMax pts',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withAlpha(150),
               ),

@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:operadorapp/core/database/daos/points_dao.dart';
 import 'package:operadorapp/core/database/daos/profile_dao.dart';
+import 'package:operadorapp/core/database/daos/ranking_dao.dart';
 import 'package:operadorapp/core/database/daos/rewards_dao.dart';
 import 'package:operadorapp/core/database/daos/sync_dao.dart';
 import 'package:operadorapp/core/database/daos/trips_dao.dart';
@@ -30,10 +31,12 @@ part 'app_database.g.dart';
     SyncMetadataTable,
     TractosTable,
     HistorialTractosTable,
+    RankingTable,
   ],
   daos: [
     PointsDao,
     ProfileDao,
+    RankingDao,
     RewardsDao,
     SyncDao,
     TripsDao,
@@ -44,7 +47,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -53,6 +56,9 @@ class AppDatabase extends _$AppDatabase {
           if (from < 2) {
             await m.createTable(tractosTable);
             await m.createTable(historialTractosTable);
+          }
+          if (from < 3) {
+            await m.createTable(rankingTable);
           }
         },
       );

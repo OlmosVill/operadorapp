@@ -244,6 +244,25 @@ antes de ver una sola línea de código Dart.
 
 ---
 
+## Extra — Ranking entre Operadores ✅
+
+**Objetivo:** tabla de posiciones entre operadores activos, con nivel, calificación promedio
+y movimiento de lugares respecto al último corte. Construida fuera de orden, a petición del
+usuario (no confundir con la Fase 9 de este documento).
+
+- [x] Migración `20240101000004_ranking_operadores.sql` — `ranking_snapshots` + RPC `fn_ranking_operadores`
+- [x] `fn_capturar_snapshot_ranking(periodo)` para el corte diario (SECURITY DEFINER, solo service_role)
+- [x] Tabla Drift `RankingTable` + `RankingDao` (caché offline, `schemaVersion` → 3)
+- [x] `SyncService.syncRanking(periodo)` vía RPC
+- [x] `RankingScreen` — podio top-3, tabla, barra fija "Tu lugar", filtro Histórico / Este mes
+- [x] `RankChangeIndicator` — ▲ n / ▼ n / — según el delta contra el snapshot
+- [x] Operadores DEMO + snapshot de ayer en `seed.sql`
+- [ ] Programar el corte diario en producción (pg_cron o job externo)
+
+**Commit sugerido:** `feat: ranking entre operadores con movimiento de lugares`
+
+---
+
 ## Backlog futuro (post-MVP)
 
 - Panel administrativo web para RH (gestión de premios, canjes, reportes)

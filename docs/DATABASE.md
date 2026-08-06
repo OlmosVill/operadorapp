@@ -17,6 +17,7 @@ erDiagram
     operadores ||--o{ operador_devices : "registra"
     operadores ||--|| configuracion_operador : "configura"
     operadores ||--|| puntos_operador : "tiene saldo"
+    operadores ||--o{ ranking_snapshots : "corte de posición"
     operadores }o--|| niveles_operador : "pertenece"
 
     tractos ||--o{ viajes : "transporta en"
@@ -106,6 +107,26 @@ Sincronizada con la BD para que persista entre dispositivos.
 ### `notificaciones_in_app`
 Las crea el backend (triggers o Edge Functions). La app las muestra como banners.
 Supabase Realtime notifica al cliente en tiempo real cuando se inserta una fila.
+
+### `ranking_snapshots`
+Cortes históricos de la tabla de posiciones, uno por `(periodo, operador, fecha)`.
+Existe para una sola cosa: calcular el movimiento de lugares (▲/▼/—) que muestra la app.
+
+`fn_ranking_operadores(periodo)` calcula el ranking vivo y lo cruza contra el último corte
+anterior a hoy para devolver `posicion_anterior`. **El delta no se calcula en el cliente**:
+si cada dispositivo comparara contra su propia caché, dos operadores verían flechas distintas
+para el mismo movimiento.
+
+`fn_capturar_snapshot_ranking(periodo)` graba el corte del día. Hay que programarla una vez
+al día en producción (pg_cron o job externo con la service key); sin ella no hay corte previo
+y todos los operadores muestran guion.
+
+| Función | Permisos | Para qué |
+|---|---|---|
+| `fn_ranking_operadores(p_periodo)` | `authenticated` | Ranking vivo + `posicion_anterior`. `SECURITY DEFINER` porque RLS restringe `operadores` a la fila propia; expone solo columnas públicas del leaderboard |
+| `fn_capturar_snapshot_ranking(p_periodo)` | `service_role` | Graba el corte diario. Tarea de backend, nunca del cliente |
+
+Periodos: `global` (histórico) y `mensual` (desde el inicio del mes calendario en curso).
 
 ---
 

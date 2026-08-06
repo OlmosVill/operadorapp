@@ -188,8 +188,100 @@ Archivos clave:
 - `lib/core/router/app_router.dart` — rutas `/trucks` y `/trucks/:id` standalone
 - `lib/features/trips/presentation/screens/trips_list_screen.dart` — botón ícono tracto en AppBar → `/trucks`
 
+### ✅ Extra — Ranking entre Operadores
+Construida fuera de orden (antes que Fase 8), a petición del usuario. No corresponde
+a la "Fase 9" de `docs/ROADMAP.md` (esa es tests + CI/CD).
+
+Tabla de posiciones entre todos los operadores activos, con nivel, calificación promedio
+y movimiento de lugares (▲ n / ▼ n / — ) respecto al último corte.
+
+Archivos clave:
+- `supabase/migrations/20240101000004_ranking_operadores.sql` — tabla `ranking_snapshots`,
+  RPC `fn_ranking_operadores(p_periodo)` (SECURITY DEFINER) y `fn_capturar_snapshot_ranking(p_periodo)`
+- `supabase/seed.sql` — 6 operadores DEMO sin `auth_user_id` + snapshot de ayer para que las flechas tengan contenido
+- `lib/core/database/tables.dart` — `RankingTable` (PK compuesta `{periodo, operadorId}`); `schemaVersion` → 3
+- `lib/core/database/daos/ranking_dao.dart` — `watchByPeriodo`, `replacePeriodo` (borra+inserta, las posiciones se recorren)
+- `lib/core/services/sync_service.dart` — `syncRanking(periodo)` vía `supabase.rpc`
+- `lib/features/ranking/domain/entities/ranking_entry.dart` — `RankingEntry` (Freezed),
+  `RankingPeriodo` (global/mensual), `RankingTrend` (subio/bajo/igual/nuevo)
+- `lib/features/ranking/data/repositories/ranking_repository_impl.dart` — patrón `async*`/`await for`
+- `lib/features/ranking/presentation/providers/ranking_provider.dart` — `rankingProvider`,
+  `rankingPeriodoProvider` (StateProvider legacy), `myRankingEntryProvider`
+- `lib/features/ranking/presentation/screens/ranking_screen.dart` — podio top-3, tabla, barra fija "Tu lugar"
+- `lib/features/ranking/presentation/widgets/rank_change_indicator.dart` — la flecha ▲ n / ▼ n / —
+- `lib/core/router/app_router.dart` — ruta `/ranking` standalone
+- Accesos: ícono de leaderboard en el AppBar de Home y de `PointsScreen`
+
+**Pendiente operativo**: programar `SELECT fn_capturar_snapshot_ranking('global');` y `('mensual')`
+una vez al día (pg_cron o job externo con la service key). Sin el snapshot diario todos los
+operadores muestran guion, porque no hay corte previo contra el cual comparar.
+
+### ✅ Extra — Resumen de Regreso (popup animado)
+**Verificado en emulador el 2026-08-06: el popup sale correctamente.**
+
+Cuando el operador vuelve a abrir la app después de que se le cerraron viajes, un popup le
+resume qué pasó: puntos ganados con contador animado, viajes completados, lugares que subió
+o bajó en el ranking, y la barra de nivel llenándose desde donde estaba.
+
+Si hubo cambio de nivel la barra corre en **dos fases**: llena la del nivel viejo hasta el
+tope, cambia badge y color, y arranca de cero en el nuevo. Con una sola animación se vería
+como si el progreso hubiera retrocedido.
+
+Archivos clave:
+- `lib/features/profile/domain/entities/level_thresholds.dart` — umbrales compartidos
+  (`levelProgress`, `nextLevelPoints`, `levelForPoints`)
+- `lib/features/summary/domain/entities/return_summary.dart` — `ReturnSummary` (Freezed)
+  con `pointsEarned`, `rankDelta`, `leveledUp`, `hasContent`
+- `lib/features/summary/data/datasources/return_snapshot_store.dart` — snapshot en SharedPreferences
+- `lib/features/summary/presentation/providers/return_summary_provider.dart` —
+  `returnSummaryProvider`, `returnSummaryShownProvider`, `saveReturnSnapshot`
+- `lib/features/summary/presentation/widgets/return_summary_dialog.dart` — el popup
+- `lib/features/trips/presentation/screens/home_screen.dart` — dispara el popup y guarda
+  el snapshot en `didChangeAppLifecycleState`
+
+**Cómo decide qué mostrar**: compara contra el snapshot guardado al cerrar la app (puntos
+acumulados, nivel, posición), no contra una ventana de tiempo fija. Da igual si estuvo fuera
+dos horas o dos semanas, o si se le juntaron varios viajes.
+
+**Se muestra una sola vez por sesión** (`returnSummaryShownProvider`) y sólo si hay algo que
+contar (`hasContent`). El snapshot se reescribe al cerrar el popup y al pasar a segundo plano.
+
+**Cómo forzarlo para probar** (requiere el admin en `localhost:4321` y `supabase start`):
+1. Abrir la app y mandarla a segundo plano con el botón home — ahí se guarda el snapshot.
+   Si se mata la app a la fuerza el snapshot no se guarda y el resumen compara contra un
+   punto más viejo: sigue saliendo, pero con más cosas de las esperadas.
+2. En el admin: Viajes → Nuevo viaje, elegir el operador `12345`, crear y luego "Cerrar viaje".
+3. Volver a la app.
+
+Pendientes menores de esta feature (nada bloqueante):
+- `HomeStateReturning` en `home_provider.dart` quedó como código muerto: el popup cubre mejor
+  ese caso. Está intacto por si se quiere reutilizar la vista; si no, se puede retirar junto
+  con `updateHomLastSeen` y la clave `home_last_seen_ms`.
+- El popup no muestra canjes ni notificaciones recibidas durante la ausencia. Se puede sumar
+  cuando exista la Fase 8.
+
 ### 🔄 Próxima: Fase 8 — Notificaciones In-App + Preparación Push
 Ver `docs/ROADMAP.md`.
+
+---
+
+## Proyecto hermano — `operadorapp-admin`
+
+Panel admin en Astro + React (`D:\dev\operadorapp-admin`) que comparte esta misma BD Supabase local.
+Sirve para sembrar escenarios completos y simular operaciones (cerrar viajes, aprobar canjes, ajustar puntos).
+
+| Concepto | Dónde vive |
+|---|---|
+| Migraciones, `seed.sql`, Edge Functions | Este repo (fuente de verdad) |
+| `docs/DATABASE.md` | Este repo; el admin tiene una copia de referencia que no se edita allí |
+| Tipos TypeScript del admin | `src/types/database.ts` — regenerar con `npm run gen:types` |
+
+**Al cambiar el esquema hay que actualizar el admin**: regenerar tipos y revisar el seeder,
+el truncado y export/import, que enumeran tablas explícitamente.
+
+El truncado del admin **preserva el operador `12345`** (el login de la app). Sin esa excepción,
+cada truncado dejaba la sesión cacheada apuntando a un operador inexistente y había que correr
+`supabase db reset` para volver a entrar.
 
 ---
 
@@ -291,7 +383,36 @@ GOOGLE_MAPS_API_KEY=
 
 16. **`auth_user_id` ≠ `operadores.id`** — `OperatorSession.operatorId` guarda el UUID de Supabase Auth (`auth_user_id`). Las FKs de `viajes`, `movimientos_puntos`, `historial_tractos_operador` y demás tablas referencian `operadores.id` (el PK propio de la tabla). Nunca pasar `authStateProvider.value?.operatorId` a queries o sync que involucren esas tablas. Siempre usar `profileProvider.value?.id`.
 
-17. **Repositorios que no disparan sync quedan con tablas locales vacías** — Cualquier `XxxRepositoryImpl` que solo lea de Drift sin llamar al `SyncService` correspondiente mostrará datos vacíos aunque Supabase tenga registros. El patrón correcto al inicio de cada stream watch es `unawaited(_sync.syncXxx(operadorId))`, igual que `TripsRepositoryImpl`. Afectó a `PointsRepositoryImpl`, `RewardsRepositoryImpl` y `TrucksRepositoryImpl`.
+17. **RLS impide leer otros operadores** — `operador_select_own` restringe `operadores` a la fila
+propia, así que cualquier pantalla comparativa (ranking, promedios de flota) necesita una función
+`SECURITY DEFINER` que exponga solo las columnas públicas. Nunca aflojar la policy para lograrlo.
+
+18. **El delta de posiciones no se calcula en el cliente** — Si cada dispositivo comparara contra
+su propia caché, dos operadores verían flechas distintas para el mismo movimiento. El servidor
+compara contra `ranking_snapshots` (último corte anterior a hoy) y devuelve `posicion_anterior`.
+
+19. **El nivel lo define `puntos_ganados`, no `puntos_disponibles`** — `fn_actualizar_puntos_operador()`
+calcula el nivel con el acumulado histórico. Cualquier barra de progreso debe usar
+`OperatorProfile.totalPoints`; con `availablePoints` un canje hace "bajar de nivel" en la UI
+mientras el servidor mantiene el nivel. Umbrales compartidos en `level_thresholds.dart`.
+
+20. **Escribir un timestamp en `initState` antes de leerlo lo deja inservible** —
+`updateHomLastSeen` guardaba "ahora" en `initState`, y `homeStateProvider` leía ese mismo valor
+al construir: la diferencia daba siempre 0 y `HomeStateReturning` nunca se activaba. El
+`ReturnSnapshotStore` evita la trampa capturando el valor anterior una sola vez, al construirse.
+
+21. **`format()` de PostgreSQL no acepta especificadores printf** — Solo entiende `%s`, `%I`,
+`%L` y `%%`. Un `%.1f` falla con *unrecognized format() type specifier "."*. El redondeo va
+fuera: `format('%s km', ROUND(v_km))`. Este bug en `fn_calcular_puntos_viaje()` hacía abortar
+CUALQUIER `UPDATE viajes SET estado='completado'`, así que el ciclo viaje completado → puntos
+→ notificación nunca llegó a correr. Corregido en `20240101000005`.
+
+22. **Escribir en un provider dentro de `build()` revienta la pantalla** — Riverpod aborta el
+build si se modifica estado mientras se construye el árbol, y en la app se veía como un flash
+rojo que desaparecía solo (al siguiente build la bandera ya estaba puesta y no se reescribía).
+Todo lo que mute estado va en `addPostFrameCallback`, nunca en `build`.
+
+23. **Repositorios que no disparan sync quedan con tablas locales vacías** — Cualquier `XxxRepositoryImpl` que solo lea de Drift sin llamar al `SyncService` correspondiente mostrará datos vacíos aunque Supabase tenga registros. El patrón correcto al inicio de cada stream watch es `unawaited(_sync.syncXxx(operadorId))`, igual que `TripsRepositoryImpl`. Afectó a `PointsRepositoryImpl`, `RewardsRepositoryImpl` y `TrucksRepositoryImpl`.
 
 ---
 
@@ -314,6 +435,33 @@ VALUES ('<uuid>', '12345', 'Juan Demo', '2022-01-15');
 
 ## Para la siguiente sesión (Fase 8 — Notificaciones In-App + Preparación Push)
 
+### Dónde quedó todo (última sesión: 2026-08-06)
+
+Estado verificado end-to-end: `flutter analyze` en 0 issues, **68 tests pasando**, BD local
+sembrada y app corriendo en emulador.
+
+| Área | Estado |
+|---|---|
+| Ranking entre operadores | Funcionando, con flechas ▲/▼/— |
+| Resumen de regreso | Funcionando, verificado en emulador |
+| Cerrar viaje desde el admin | Funcionando; acredita puntos y genera notificación |
+| Migraciones | 6 archivos, la última es `20240101000005` |
+
+Sin trabajo a medias. Se puede arrancar Fase 8 en limpio.
+
+**Cuenta de prueba**: `12345` / `123456`. La crea `seed.sql`, sobrevive al truncado del admin
+y se recrea en cada `supabase db reset`.
+
+**Ojo con el estado de la BD local**: el operador `12345` quedó en nivel **oro** con ~5589
+puntos ganados tras las pruebas de cierre de viajes. Si se quiere un punto de partida limpio,
+`supabase db reset`.
+
+**Pendiente operativo, no de código**: programar `fn_capturar_snapshot_ranking('global')` y
+`('mensual')` una vez al día en producción (pg_cron o job externo con la service key). En local
+el seed ya deja un corte de ayer, por eso se ven flechas.
+
+### Trabajo de Fase 8
+
 - [ ] `NotificationsScreen` — lista de notificaciones con indicador de no leídas
 - [ ] Supabase Realtime conectado a `notificaciones_in_app` (tabla ya en BD + Realtime habilitado en migración)
 - [ ] Banner overlay con `flutter_animate` (slide desde arriba, auto-dismiss 4s)
@@ -328,6 +476,16 @@ Contexto importante para Fase 8:
 - El trigger `fn_acreditar_puntos_viaje` ya inserta notificaciones al acreditar puntos
 - El trigger `fn_on_canje_aprobado` ya inserta notificación al aprobar canjes
 - Falta: leer esas notificaciones en la app y mostrarlas como banners/pantalla
+
+**Ya hay notificaciones reales que leer**: la BD local tiene 12 sin leer, generadas por los
+triggers al cerrar viajes desde el admin. Sirven para probar la pantalla sin sembrar a mano:
+```sql
+SELECT titulo, cuerpo, leida FROM notificaciones_in_app ORDER BY created_at DESC;
+```
+
+La tabla usa `cuerpo`, no `mensaje` — la tabla Drift `NotificacionesTable` la mapea como
+`mensaje`, hay que respetar esa diferencia al escribir el sync. `lib/features/notifications/`
+ya existe con la estructura de carpetas vacía (solo `.gitkeep`).
 
 ---
 
