@@ -65,32 +65,43 @@ class TrucksDao extends DatabaseAccessor<AppDatabase> with _$TrucksDaoMixin {
             ..orderBy([(t) => OrderingTerm.desc(t.fechaReporte)]))
           .get();
 
-  // ─── Upserts ─────────────────────────────────────────────────────────────
+  // ─── Reemplazos ──────────────────────────────────────────────────────────
 
-  Future<void> upsertTractos(List<TractosTableCompanion> rows) =>
-      batch((b) => b.insertAllOnConflictUpdate(tractosTable, rows));
+  /// Deja los tractos locales iguales a los que ve el operador.
+  ///
+  /// No lleva filtro por operador porque la RLS ya limita `tractos` a los
+  /// suyos (los de sus viajes y su historial), así que la tabla local se
+  /// reemplaza entera. Sin esto quedan tractos de bases anteriores con `id`
+  /// muertos, y el historial los muestra sin marca ni modelo.
+  Future<void> replaceTractos(List<TractosTableCompanion> rows) =>
+      transaction(() async {
+        final ids = rows.map((r) => r.id.value).toList();
+        final stale = delete(tractosTable);
+        // `NOT IN ()` no es SQL válido: sin filas, se borra todo.
+        if (ids.isNotEmpty) {
+          stale.where((t) => t.id.isNotIn(ids));
+        }
+        await stale.go();
+        if (rows.isEmpty) return;
+        await batch((b) => b.insertAllOnConflictUpdate(tractosTable, rows));
+      });
 
-  Future<void> upsertHistorial(
+  /// Deja el historial local del operador igual al del servidor.
+  Future<void> replaceHistorial(
+    String operadorId,
     List<HistorialTractosTableCompanion> rows,
   ) =>
-      batch(
-        (b) => b.insertAllOnConflictUpdate(historialTractosTable, rows),
-      );
-
-  Future<DateTime?> getLastHistorialUpdatedAt(String operadorId) async {
-    final query = select(historialTractosTable)
-      ..where((t) => t.operadorId.equals(operadorId))
-      ..orderBy([(t) => OrderingTerm.desc(t.updatedAt)])
-      ..limit(1);
-    final row = await query.getSingleOrNull();
-    return row?.updatedAt;
-  }
-
-  Future<DateTime?> getLastTractoUpdatedAt() async {
-    final query = select(tractosTable)
-      ..orderBy([(t) => OrderingTerm.desc(t.updatedAt)])
-      ..limit(1);
-    final row = await query.getSingleOrNull();
-    return row?.updatedAt;
-  }
+      transaction(() async {
+        final ids = rows.map((r) => r.id.value).toList();
+        final stale = delete(historialTractosTable)
+          ..where((t) => t.operadorId.equals(operadorId));
+        if (ids.isNotEmpty) {
+          stale.where((t) => t.id.isNotIn(ids));
+        }
+        await stale.go();
+        if (rows.isEmpty) return;
+        await batch(
+          (b) => b.insertAllOnConflictUpdate(historialTractosTable, rows),
+        );
+      });
 }

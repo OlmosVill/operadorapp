@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap">
+<style>
+body{margin:0;background:#d7d3d3;font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#8f0000;text-decoration:none}a:hover{color:#b00000}
+::selection{background:#ffc2c2;color:#201e1d}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:34px 20px;box-sizing:border-box">
+<x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="412px" height="880px" hint-size="428px,896px">
+<div data-screen-label="Perfil operador" style="position:relative;height:100%;background:#f3f2f2;color:#201e1d;display:flex;flex-direction:column;overflow:hidden">
+<div style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column">
+
+<div style="padding:20px 20px 16px;border-bottom:2px solid #201e1d">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+<div style="display:flex;flex-direction:column;gap:6px">
+<span style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#7d7979">Operador · Emp. 12345</span>
+<h1 style="margin:0;font-size:29px;font-weight:800;line-height:1.02;letter-spacing:-.02em;text-wrap:balance">{{ nombre }}</h1>
+<span style="font-size:12px;font-weight:500;color:#605d5d">Base Monterrey · 4 años 6 meses</span>
+</div>
+<div style="flex:none;width:56px;height:56px;background:#c80000;color:#fff;display:flex;align-items:flex-end;justify-content:flex-start;padding:6px;box-sizing:border-box;font-size:22px;font-weight:900;letter-spacing:-.02em">{{ iniciales }}</div>
+</div>
+</div>
+
+<div style="background:#c80000;color:#fff;padding:18px 20px 16px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+<span style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.85">Nivel actual</span>
+<span style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.85">{{ nivelOrden }} de 5</span>
+</div>
+<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:2px">
+<span style="display:flex;align-items:center;gap:12px">
+<span style="flex:none;width:44px;height:44px;border:2px solid #fff;background:{{ nivelColor }}"></span>
+<span style="font-size:52px;font-weight:900;line-height:1;letter-spacing:-.03em;text-transform:uppercase">{{ nivel }}</span>
+</span>
+<span style="font-size:13px;font-weight:600;padding-bottom:7px;text-align:right;max-width:150px;line-height:1.25">{{ nivelNota }}</span>
+</div>
+<div style="margin-top:16px;height:10px;background:rgba(255,255,255,.3)">
+<div style="height:100%;background:#fff;transition:width .8s cubic-bezier(.2,.8,.2,1);width:{{ progresoPct }}"></div>
+</div>
+<div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;font-weight:700;letter-spacing:.04em">
+<span>{{ puntosGanadosFmt }} / {{ umbralSiguienteFmt }} PTS</span>
+<span>FALTAN {{ faltanFmt }}</span>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid #201e1d">
+<div style="padding:16px 20px;border-right:2px solid #201e1d;display:flex;flex-direction:column;gap:4px">
+<span style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#7d7979">Disponibles</span>
+<span style="font-size:30px;font-weight:900;line-height:1.05;letter-spacing:-.02em">{{ disponiblesFmt }}</span>
+<span style="font-size:11px;font-weight:600;color:#605d5d">pts para canjear</span>
+</div>
+<div style="padding:16px 20px;display:flex;flex-direction:column;gap:4px">
+<span style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#7d7979">Ganados</span>
+<span style="font-size:30px;font-weight:900;line-height:1.05;letter-spacing:-.02em;color:#605d5d">{{ puntosGanadosFmt }}</span>
+<span style="font-size:11px;font-weight:600;color:#605d5d">históricos totales</span>
+</div>
+</div>
+
+<div style="padding:15px 20px 4px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:9px">
+<h2 style="margin:0;font-size:15px;font-weight:800;letter-spacing:.1em;text-transform:uppercase">Premios a tu alcance</h2>
+<a href="#" style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Ver todos</a>
+</div>
+<sc-for list="{{ premios }}" as="p" hint-placeholder-count="3">
+<div style="display:flex;align-items:center;gap:14px;padding:11px 0;border-top:1px solid rgba(32,30,29,.4)">
+<div style="flex:1;display:flex;flex-direction:column;gap:3px;min-width:0">
+<span style="font-size:15px;font-weight:700;line-height:1.2;color:{{ p.colorTitulo }}">{{ p.nombre }}</span>
+<span style="font-size:12px;font-weight:600;letter-spacing:.04em;color:#7d7979">{{ p.meta }}</span>
+</div>
+<button type="button" onClick="{{ p.onClick }}" style="flex:none;font-family:inherit;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:12px 14px;min-height:44px;border:2px solid #201e1d;text-align:left;background:{{ p.btnBg }};color:{{ p.btnFg }};border-color:{{ p.btnBorder }};cursor:{{ p.btnCursor }}" style-hover="opacity:.82">{{ p.btnLabel }}</button>
+</div>
+</sc-for>
+</div>
+
+<div style="padding:15px 20px 12px;margin-top:4px;border-top:2px solid #201e1d">
+<h2 style="margin:0 0 8px;font-size:15px;font-weight:800;letter-spacing:.1em;text-transform:uppercase">Mis datos</h2>
+<div style="display:flex;flex-direction:column">
+<div style="display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid rgba(32,30,29,.4)"><span style="font-size:13px;font-weight:600;color:#605d5d">Tracto asignado</span><span style="font-size:13px;font-weight:700">T-003 Freightliner Cascadia</span></div>
+<div style="display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid rgba(32,30,29,.4)"><span style="font-size:13px;font-weight:600;color:#605d5d">Rendimiento promedio</span><span style="font-size:13px;font-weight:700">4.6 km/l</span></div>
+<div style="display:flex;justify-content:space-between;gap:12px;padding:8px 0"><span style="font-size:13px;font-weight:600;color:#605d5d">Viajes completados</span><span style="font-size:13px;font-weight:700">184</span></div>
+</div>
+</div>
+
+<div style="flex:1;min-height:16px"></div>
+</div>
+
+<div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);background:#f3f2f2;border-top:2px solid #201e1d">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+<button type="button" onClick="{{ t.onClick }}" style="font-family:inherit;background:transparent;border:none;border-top:3px solid transparent;padding:14px 4px 16px;min-height:52px;cursor:pointer;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;border-top-color:{{ t.rule }};color:{{ t.color }}" style-hover="background:#eae9e9">{{ t.label }}</button>
+</sc-for>
+</div>
+
+<sc-if value="{{ hojaAbierta }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ cerrarHoja }}" style="position:absolute;inset:0;background:rgba(32,30,29,.55);display:flex;align-items:flex-end;animation:fadeIn .2s ease both;z-index:5">
+<div onClick="{{ stop }}" style="width:100%;background:#f3f2f2;border-top:2px solid #201e1d;padding:20px;box-sizing:border-box;animation:sheetUp .28s cubic-bezier(.2,.8,.2,1) both">
+<span style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#7d7979">{{ hojaKicker }}</span>
+<h3 style="margin:6px 0 0;font-size:24px;font-weight:900;line-height:1.1;letter-spacing:-.02em">{{ hojaTitulo }}</h3>
+<p style="margin:10px 0 0;font-size:14px;font-weight:500;line-height:1.45;color:#444141;text-wrap:pretty">{{ hojaTexto }}</p>
+<div style="margin-top:16px;border-top:2px solid #201e1d;display:flex;justify-content:space-between;gap:12px;padding-top:12px">
+<span style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#605d5d">Saldo después</span>
+<span style="font-size:14px;font-weight:800">{{ hojaSaldo }}</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:18px">
+<button type="button" onClick="{{ confirmarCanje }}" style="width:100%;font-family:inherit;font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:16px;min-height:52px;border:none;background:#c80000;color:#fff;cursor:pointer;text-align:left" style-hover="background:#b00000" style-active="background:#8f0000">{{ hojaCta }}</button>
+<button type="button" onClick="{{ cerrarHoja }}" style="width:100%;font-family:inherit;font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:16px;min-height:52px;background:transparent;border:2px solid #201e1d;color:#201e1d;cursor:pointer;text-align:left" style-hover="background:#eae9e9">Cancelar</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:500,&quot;height&quot;:960},&quot;nombre&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Juan Ramírez Solís&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;nivel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;plata&quot;,&quot;oro&quot;,&quot;platino&quot;,&quot;esmeralda&quot;,&quot;diamante&quot;],&quot;default&quot;:&quot;oro&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;puntosGanados&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:11240,&quot;min&quot;:0,&quot;max&quot;:90000,&quot;step&quot;:100,&quot;tsType&quot;:&quot;number&quot;},&quot;puntosDisponibles&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:8740,&quot;min&quot;:0,&quot;max&quot;:90000,&quot;step&quot;:100,&quot;tsType&quot;:&quot;number&quot;}}">
+// color_hex de niveles_operador (supabase/seed.sql) — placeholder de la insignia
+const NIVELES = [
+  { key: 'plata', nombre: 'Plata', min: 0, orden: 1, color: '#C0C0C0' },
+  { key: 'oro', nombre: 'Oro', min: 5000, orden: 2, color: '#FFD700' },
+  { key: 'platino', nombre: 'Platino', min: 15000, orden: 3, color: '#E5E4E2' },
+  { key: 'esmeralda', nombre: 'Esmeralda', min: 30000, orden: 4, color: '#50C878' },
+  { key: 'diamante', nombre: 'Diamante', min: 60000, orden: 5, color: '#B9F2FF' },
+];
+
+const CATALOGO = [
+  { id: 'tarjeta500', nombre: 'Tarjeta de regalo $500', costo: 500, nivelMin: null },
+  { id: 'mochila', nombre: 'Mochila escolar premium', costo: 2500, nivelMin: null },
+  { id: 'herramientas', nombre: 'Set de herramientas profesional', costo: 8000, nivelMin: 'oro' },
+  { id: 'tablet', nombre: 'Tablet educativa', costo: 12000, nivelMin: 'oro' },
+  { id: 'smartphone', nombre: 'Smartphone de gama media', costo: 18000, nivelMin: 'platino' },
+];
+
+const TABS = [
+  { id: 'inicio', label: 'Inicio' },
+  { id: 'viajes', label: 'Viajes' },
+  { id: 'premios', label: 'Premios' },
+  { id: 'perfil', label: 'Perfil' },
+];
+
+const fmt = (n) => new Intl.NumberFormat('es-MX').format(Math.max(0, Math.round(n)));
+
+class Component extends DCLogic {
+  state = { escaleraAbierta: false, hoja: null, canjeados: [], hecho: null, tab: 'perfil' };
+
+  nivelActual() {
+    const key = this.props.nivel ?? 'oro';
+    return NIVELES.find((n) => n.key === key) ?? NIVELES[1];
+  }
+
+  renderVals() {
+    const ganados = this.props.puntosGanados ?? 11240;
+    const nivel = this.nivelActual();
+    const siguiente = NIVELES[NIVELES.indexOf(nivel) + 1] ?? null;
+    const gastados = this.state.canjeados.reduce((s, id) => {
+      const p = CATALOGO.find((c) => c.id === id);
+      return s + (p ? p.costo : 0);
+    }, 0);
+    const disponibles = Math.max(0, (this.props.puntosDisponibles ?? 8740) - gastados);
+
+    const rango = siguiente ? siguiente.min - nivel.min : 1;
+    const avance = siguiente ? Math.min(1, Math.max(0, (ganados - nivel.min) / rango)) : 1;
+    const faltan = siguiente ? Math.max(0, siguiente.min - ganados) : 0;
+
+    const nivelIdx = NIVELES.indexOf(nivel);
+    const escalera = NIVELES.map((n, i) => ({
+      nombre: n.nombre,
+      detalle: i < nivelIdx ? 'Alcanzado' : i === nivelIdx ? 'Estás aquí' : 'Desde ' + fmt(n.min) + ' pts',
+      opacidad: i < nivelIdx ? 0.6 : i === nivelIdx ? 1 : 0.78,
+    }));
+
+    const premios = CATALOGO.filter((p) => !this.state.canjeados.includes(p.id))
+      .map((p) => {
+        const bloqueado = p.nivelMin === 'platino' && nivelIdx < 2;
+        const alcanza = !bloqueado && disponibles >= p.costo;
+        const meta = bloqueado
+          ? 'Requiere nivel Platino · ' + fmt(p.costo) + ' pts'
+          : alcanza
+            ? fmt(p.costo) + ' pts · disponible ahora'
+            : 'Te faltan ' + fmt(p.costo - disponibles) + ' pts';
+        return {
+          nombre: p.nombre,
+          meta,
+          colorTitulo: bloqueado ? '#7d7979' : '#201e1d',
+          btnLabel: bloqueado ? 'Bloqueado' : alcanza ? 'Canjear' : 'Seguir',
+          btnBg: alcanza ? '#c80000' : 'transparent',
+          btnFg: alcanza ? '#ffffff' : bloqueado ? '#9b9797' : '#201e1d',
+          btnBorder: alcanza ? '#c80000' : bloqueado ? '#d7d3d3' : '#201e1d',
+          btnCursor: bloqueado ? 'not-allowed' : 'pointer',
+          onClick: alcanza ? () => this.setState({ hoja: p.id }) : () => {},
+        };
+      })
+      .slice(0, 3);
+
+    const hojaPremio = CATALOGO.find((c) => c.id === this.state.hoja) ?? null;
+    const hecho = CATALOGO.find((c) => c.id === this.state.hecho) ?? null;
+
+    return {
+      nombre: this.props.nombre ?? 'Juan Ramírez Solís',
+      iniciales: (this.props.nombre ?? 'Juan Ramírez Solís').split(' ').filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join(''),
+      nivel: nivel.nombre,
+      nivelColor: nivel.color,
+      nivelOrden: nivel.orden,
+      nivelNota: siguiente ? 'Rumbo a ' + siguiente.nombre : 'Nivel máximo de la flota',
+      progresoPct: (avance * 100).toFixed(1) + '%',
+      puntosGanadosFmt: fmt(ganados),
+      umbralSiguienteFmt: siguiente ? fmt(siguiente.min) : '—',
+      faltanFmt: siguiente ? fmt(faltan) + ' PTS' : '0 PTS',
+      disponiblesFmt: fmt(disponibles),
+      escalera,
+      escaleraAbierta: this.state.escaleraAbierta,
+      escaleraLabel: this.state.escaleraAbierta ? 'Ocultar niveles' : 'Ver los 5 niveles',
+      escaleraCaret: this.state.escaleraAbierta ? '−' : '+',
+      toggleEscalera: () => this.setState((s) => ({ escaleraAbierta: !s.escaleraAbierta })),
+      premios,
+      tabs: TABS.map((t) => ({
+        label: t.label,
+        rule: this.state.tab === t.id ? '#c80000' : 'transparent',
+        color: this.state.tab === t.id ? '#c80000' : '#7d7979',
+        onClick: () => this.setState({ tab: t.id }),
+      })),
+      hojaAbierta: !!(hojaPremio || hecho),
+      hojaKicker: hecho ? 'Canje registrado' : 'Confirmar canje',
+      hojaTitulo: hecho ? hecho.nombre : hojaPremio ? hojaPremio.nombre : '',
+      hojaTexto: hecho
+        ? 'Tu solicitud quedó registrada. Recursos Humanos te avisa en cuanto esté aprobada — lo verás aquí y en tus notificaciones.'
+        : hojaPremio
+          ? 'Se descontarán ' + fmt(hojaPremio.costo) + ' puntos de tu saldo disponible. El canje pasa a revisión de Recursos Humanos.'
+          : '',
+      hojaSaldo: hecho ? fmt(disponibles) + ' pts' : hojaPremio ? fmt(disponibles - hojaPremio.costo) + ' pts' : '',
+      hojaCta: hecho ? 'Listo' : 'Sí, canjear',
+      confirmarCanje: () => {
+        if (this.state.hecho) { this.setState({ hecho: null, hoja: null }); return; }
+        const id = this.state.hoja;
+        if (!id) return;
+        this.setState((s) => ({ canjeados: s.canjeados.concat([id]), hoja: null, hecho: id }));
+      },
+      cerrarHoja: () => this.setState({ hoja: null, hecho: null }),
+      stop: (e) => e.stopPropagation(),
+    };
+  }
+}
+</script>
+</body>
+</html>

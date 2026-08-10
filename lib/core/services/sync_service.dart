@@ -35,7 +35,8 @@ class SyncService {
           ? fechaIngreso.substring(0, 10)
           : fechaIngreso;
 
-      await _db.profileDao.upsert(
+      await _db.profileDao.replaceProfile(
+        authUserId,
         OperadoresTableCompanion(
           id: Value(data['id'] as String),
           authUserId: Value(authUserId),
@@ -63,19 +64,15 @@ class SyncService {
 
   // ─── Trips ────────────────────────────────────────────────────────────────
 
+  // Descarga completa del operador: el corte incremental por `updated_at` no
+  // trae las filas borradas en el servidor, así que no habría con qué podar.
   Future<void> syncTrips(String operadorId) async {
     try {
-      final since = await _db.tripsDao.getLastUpdatedAt(operadorId);
-      var query =
-          _supabase.from('viajes').select().eq('operador_id', operadorId);
-
-      if (since != null) {
-        query = query.gt('updated_at', since.toIso8601String());
-      }
-
-      final rows = await query.order('updated_at');
-
-      if (rows.isEmpty) return;
+      final rows = await _supabase
+          .from('viajes')
+          .select()
+          .eq('operador_id', operadorId)
+          .order('updated_at');
 
       final companions = rows.map((r) {
         return ViajesTableCompanion(
@@ -107,7 +104,7 @@ class SyncService {
         );
       }).toList();
 
-      await _db.tripsDao.upsertAll(companions);
+      await _db.tripsDao.replaceViajes(operadorId, companions);
       await _db.syncDao.setLastSyncAt('viajes', DateTime.now().toUtc());
       _logger.d('syncTrips: ${rows.length} viajes sincronizados');
     } on Exception catch (e) {
@@ -135,8 +132,6 @@ class SyncService {
           .eq('viaje_id', viajeId)
           .order('timestamp_gps');
 
-      if (rows.isEmpty) return;
-
       final companions = rows
           .map((r) {
             final coords = _parseGeography(r['coordenada']);
@@ -157,7 +152,7 @@ class SyncService {
           .nonNulls
           .toList();
 
-      await _db.tripsDao.upsertGpsPoints(companions);
+      await _db.tripsDao.replaceGpsPoints(viajeId, companions);
     } on Exception catch (e) {
       _logger.w('_syncGpsPoints falló para $viajeId', error: e);
     }
@@ -170,8 +165,6 @@ class SyncService {
           .select()
           .eq('viaje_id', viajeId)
           .order('timestamp_incidencia');
-
-      if (rows.isEmpty) return;
 
       final companions = rows.map((r) {
         final coords = _parseGeography(r['coordenada']);
@@ -190,7 +183,7 @@ class SyncService {
         );
       }).toList();
 
-      await _db.tripsDao.upsertIncidencias(companions);
+      await _db.tripsDao.replaceIncidencias(viajeId, companions);
     } on Exception catch (e) {
       _logger.w('_syncIncidencias falló para $viajeId', error: e);
     }
@@ -203,8 +196,6 @@ class SyncService {
           .select()
           .eq('viaje_id', viajeId)
           .order('timestamp_alerta');
-
-      if (rows.isEmpty) return;
 
       final companions = rows.map((r) {
         final coords = _parseGeography(r['coordenada']);
@@ -223,7 +214,7 @@ class SyncService {
         );
       }).toList();
 
-      await _db.tripsDao.upsertAlertas(companions);
+      await _db.tripsDao.replaceAlertas(viajeId, companions);
     } on Exception catch (e) {
       _logger.w('_syncAlertas falló para $viajeId', error: e);
     }
@@ -234,29 +225,11 @@ class SyncService {
       final rows =
           await _supabase.from('reportes').select().eq('viaje_id', viajeId);
 
-      if (rows.isEmpty) return;
+      // `_reporteCompanion` lee `coordenada`; la tabla no tiene lat/lng
+      // sueltos, así que armarlo aparte dejaba las coordenadas en null.
+      final companions = rows.map(_reporteCompanion).toList();
 
-      final companions = rows.map((r) {
-        return ReportesTableCompanion(
-          id: Value(r['id'] as String),
-          viajeId: Value(r['viaje_id'] as String?),
-          operadorId: Value(r['operador_id'] as String),
-          tractoId: Value(r['tracto_id'] as String?),
-          tipo: Value(r['tipo'] as String),
-          estado: Value(r['estado'] as String? ?? 'abierto'),
-          descripcion: Value(r['descripcion'] as String),
-          lat: Value(_parseDouble(r['lat'])),
-          lng: Value(_parseDouble(r['lng'])),
-          fechaReporte: Value(
-            _parseDateTime(r['fecha_reporte']) ?? DateTime.now().toUtc(),
-          ),
-          updatedAt: Value(
-            _parseDateTime(r['updated_at']) ?? DateTime.now().toUtc(),
-          ),
-        );
-      }).toList();
-
-      await _db.tripsDao.upsertReportes(companions);
+      await _db.tripsDao.replaceReportesByViaje(viajeId, companions);
     } on Exception catch (e) {
       _logger.w('_syncReportes falló para $viajeId', error: e);
     }
@@ -266,19 +239,17 @@ class SyncService {
 
   Future<void> syncCatalogo() async {
     try {
-      final since = await _db.rewardsDao.getLastUpdatedAt();
-      var query =
-          _supabase.from('premios_catalogo').select().eq('activo', true);
-
-      if (since != null) {
-        query = query.gt('updated_at', since.toIso8601String());
-      }
-
-      final rows = await query.order('orden');
-      if (rows.isEmpty) return;
+      // Sin filtro incremental a propósito: hace falta la lista completa para
+      // poder borrar lo que ya no está. Un premio dado de baja tampoco
+      // desaparecía nunca, porque la consulta solo trae los activos.
+      final rows = await _supabase
+          .from('premios_catalogo')
+          .select()
+          .eq('activo', true)
+          .order('orden');
 
       final companions = rows.map(_premioCompanion).toList();
-      await _db.rewardsDao.upsertPremios(companions);
+      await _db.rewardsDao.replaceCatalogo(companions);
       _logger.d('syncCatalogo: ${rows.length} premios sincronizados');
     } on Exception catch (e) {
       _logger.w('syncCatalogo falló', error: e);
@@ -293,10 +264,8 @@ class SyncService {
           .eq('operador_id', operadorId)
           .order('fecha_solicitud');
 
-      if (rows.isEmpty) return;
-
       final companions = rows.map(_canjeCompanion).toList();
-      await _db.rewardsDao.upsertCanjes(companions);
+      await _db.rewardsDao.replaceCanjes(operadorId, companions);
       _logger.d(
         'syncCanjes: ${rows.length} canjes sincronizados',
       );
@@ -343,23 +312,18 @@ class SyncService {
 
   // ─── Movimientos de Puntos ───────────────────────────────────────────────
 
+  // Igual que el catálogo: descarga completa del operador para poder podar
+  // lo que ya no existe en el servidor.
   Future<void> syncMovimientos(String operadorId) async {
     try {
-      final since = await _db.pointsDao.getLastCreatedAt(operadorId);
-      var query = _supabase
+      final rows = await _supabase
           .from('movimientos_puntos')
           .select()
-          .eq('operador_id', operadorId);
-
-      if (since != null) {
-        query = query.gt('created_at', since.toIso8601String());
-      }
-
-      final rows = await query.order('created_at');
-      if (rows.isEmpty) return;
+          .eq('operador_id', operadorId)
+          .order('created_at');
 
       final companions = rows.map(_movimientoCompanion).toList();
-      await _db.pointsDao.upsertAll(companions);
+      await _db.pointsDao.replaceMovimientos(operadorId, companions);
       _logger.d(
         'syncMovimientos: ${rows.length} movimientos sincronizados',
       );
@@ -387,17 +351,15 @@ class SyncService {
 
   // ─── Tractos ─────────────────────────────────────────────────────────────
 
+  // Sin filtro por `activo`: la RLS ya limita la tabla a los tractos del
+  // operador, y como el reemplazo borra lo que no viene, filtrar aquí
+  // dejaría sin datos al tracto dado de baja que sigue en su historial.
   Future<void> syncTractos() async {
     try {
-      final since = await _db.trucksDao.getLastTractoUpdatedAt();
-      var query = _supabase.from('tractos').select().eq('activo', true);
-      if (since != null) {
-        query = query.gt('updated_at', since.toIso8601String());
-      }
-      final rows = await query.order('updated_at');
-      if (rows.isEmpty) return;
+      final rows =
+          await _supabase.from('tractos').select().order('updated_at');
       final companions = rows.map(_tractoCompanion).toList();
-      await _db.trucksDao.upsertTractos(companions);
+      await _db.trucksDao.replaceTractos(companions);
       _logger.d('syncTractos: ${rows.length} tractos sincronizados');
     } on Exception catch (e) {
       _logger.w('syncTractos falló', error: e);
@@ -406,18 +368,13 @@ class SyncService {
 
   Future<void> syncHistorialTractos(String operadorId) async {
     try {
-      final since = await _db.trucksDao.getLastHistorialUpdatedAt(operadorId);
-      var query = _supabase
+      final rows = await _supabase
           .from('historial_tractos_operador')
           .select()
-          .eq('operador_id', operadorId);
-      if (since != null) {
-        query = query.gt('updated_at', since.toIso8601String());
-      }
-      final rows = await query.order('updated_at');
-      if (rows.isEmpty) return;
+          .eq('operador_id', operadorId)
+          .order('updated_at');
       final companions = rows.map(_historialCompanion).toList();
-      await _db.trucksDao.upsertHistorial(companions);
+      await _db.trucksDao.replaceHistorial(operadorId, companions);
       _logger.d(
         'syncHistorialTractos: ${rows.length} registros sincronizados',
       );
@@ -433,9 +390,8 @@ class SyncService {
           .select()
           .eq('operador_id', operadorId)
           .order('fecha_reporte');
-      if (rows.isEmpty) return;
       final companions = rows.map(_reporteCompanion).toList();
-      await _db.tripsDao.upsertReportes(companions);
+      await _db.tripsDao.replaceReportesByOperador(operadorId, companions);
       _logger.d(
         'syncReportesOperador: ${rows.length} reportes sincronizados',
       );
@@ -514,7 +470,6 @@ class SyncService {
       final rows = (result as List<dynamic>? ?? const [])
           .cast<Map<String, dynamic>>()
           .toList();
-      if (rows.isEmpty) return;
 
       final now = DateTime.now().toUtc();
       final companions =

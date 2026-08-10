@@ -45,7 +45,15 @@
       "Bash(curl -s -N --max-time 120 \"http://localhost:4321/api/truncate\")",
       "Bash(curl -s -N --max-time 240 \"http://localhost:4321/api/seed?numOperadores=6&numTractos=4&numViajes=30&diasHistorico=90\")",
       "Bash(curl -s -N --max-time 300 \"http://localhost:4321/api/seed?numOperadores=8&numTractos=4&numViajes=25&diasHistorico=90\")",
-      "Bash(curl -s -N --max-time 300 \"http://localhost:4321/api/seed?numOperadores=5&numTractos=3&numViajes=20&diasHistorico=90\")"
+      "Bash(curl -s -N --max-time 300 \"http://localhost:4321/api/seed?numOperadores=5&numTractos=3&numViajes=20&diasHistorico=90\")",
+      "PowerShell($p = \"C:\\\\Users\\\\IO\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--dev-operadorapp\\\\763eaea8-c8bc-435f-8caf-33d7309d978b\\\\scratchpad\\\\design_inicio_viaje_activo.html\"; $c = Get-Content -LiteralPath $p -Raw; \"TOTAL CHARS: $\\($c.Length\\)\"; \"TOTAL LINES: $\\(\\(Get-Content -LiteralPath $p | Measure-Object -Line\\).Lines\\)\"; \"--- tag census ---\"; foreach \\($t in @\\('<script','<style','<svg','<div','<section','data-dc','@dsCard'\\)\\) { $n = \\([regex]::Matches\\($c, [regex]::Escape\\($t\\)\\)\\).Count; \"$t = $n\" })",
+      "PowerShell($p = \"C:\\\\Users\\\\IO\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--dev-operadorapp\\\\763eaea8-c8bc-435f-8caf-33d7309d978b\\\\scratchpad\\\\design_inicio_viaje_activo.html\"; $i=0; Get-Content -LiteralPath $p | ForEach-Object { $i++; if \\($_.Length -gt 0\\) { \"{0,4}  len={1,-8} {2}\" -f $i, $_.Length, \\($_.Trim\\(\\).Substring\\(0, [Math]::Min\\(110, $_.Trim\\(\\).Length\\)\\)\\) } })",
+      "PowerShell(& \"C:\\\\Users\\\\IO\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--dev-operadorapp\\\\763eaea8-c8bc-435f-8caf-33d7309d978b\\\\scratchpad\\\\unpack.ps1\")",
+      "PowerShell($out = \"C:\\\\Users\\\\IO\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--dev-operadorapp\\\\763eaea8-c8bc-435f-8caf-33d7309d978b\\\\scratchpad\\\\unpacked\"; \"=== template.html lines: $\\(\\(Get-Content -LiteralPath \\(Join-Path $out 'template.html'\\) | Measure-Object -Line\\).Lines\\)\"; \"=== ext_resources ===\"; Get-Content -LiteralPath \\(Join-Path $out 'ext_resources.json'\\) -Raw)",
+      "PowerShell($py = \\(Get-Command python -ErrorAction SilentlyContinue\\); if \\($py\\) { \"python: $\\($py.Source\\)\"; python -c \"import fontTools; print\\('fontTools', fontTools.version\\)\" 2>&1 | Select-Object -First 3 } else { \"python: NO DISPONIBLE\" })",
+      "PowerShell(supabase status *)",
+      "PowerShell(docker exec supabase_db_IO *)",
+      "PowerShell(supabase start *)"
     ],
     "additionalDirectories": [
       "D:\\dev\\operadorapp-admin"

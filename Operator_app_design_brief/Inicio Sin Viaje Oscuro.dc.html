@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="_ds/modernist-6cdfc298-0756-430c-a8bd-6ba520ebebfe/styles.css">
+<script src="_ds/modernist-6cdfc298-0756-430c-a8bd-6ba520ebebfe/_ds_bundle.js"></script>
+<style>
+body{margin:0;background:#171615;font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#ff8a8a;text-decoration:none}a:hover{color:#ff6b6b}
+::selection{background:#7a1f1f;color:#f3f2f2}
+@keyframes idleBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+@keyframes swayA{0%,100%{transform:rotate(-.7deg)}50%{transform:rotate(.7deg)}}
+@keyframes swayB{0%,100%{transform:rotate(.5deg)}50%{transform:rotate(-.9deg)}}
+@keyframes hintUp{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(-4px);opacity:1}}
+.sin-barra{scrollbar-width:none;-ms-overflow-style:none}
+.sin-barra::-webkit-scrollbar{display:none}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:34px 20px;box-sizing:border-box">
+<x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" width="412px" height="880px" hint-size="428px,896px">
+<div data-screen-label="Inicio sin viaje activo (oscuro)" style="position:relative;height:100%;background:#2d2b2b;color:#f3f2f2;display:flex;flex-direction:column;overflow:hidden">
+
+<div class="sin-barra" style="flex:1;min-height:0;overflow:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain">
+
+<section style="height:100%;scroll-snap-align:start;scroll-snap-stop:always;position:relative;display:flex;flex-direction:column;background:#3a3838;overflow:hidden">
+
+<div style="flex:none;box-sizing:border-box;background:#565353;color:#2d2b2b;border-bottom:2px solid #f3f2f2;display:flex;align-items:center;gap:10px;padding:9px 14px">
+<span style="flex:none;width:44px;height:7px;background:#ffe9a8"></span>
+<span style="flex:none;width:44px;height:7px;background:#ffe9a8"></span>
+<span style="flex:1"></span>
+<span style="flex:none;font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:#f3f2f2">Almacén · Andén 3</span>
+</div>
+
+<div style="flex:none;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:13px 20px 12px;background:#2d2b2b;border-bottom:2px solid #f3f2f2">
+<div style="display:flex;flex-direction:column;gap:2px">
+<span style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9b9797">Emp. 12345 · sin viaje asignado</span>
+<h1 style="margin:0;font-size:23px;font-weight:800;line-height:1.05;letter-spacing:-.02em">{{ saludo }}</h1>
+</div>
+<button type="button" onClick="{{ toggleDisponible }}" style="flex:none;font-family:inherit;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:0 12px;min-height:44px;cursor:pointer;text-align:left;border:2px solid #f3f2f2;background:{{ dispBg }};color:{{ dispFg }}" style-hover="opacity:.82">{{ dispLabel }}</button>
+</div>
+
+<div style="flex:1;min-height:0;position:relative;overflow:hidden">
+<div style="position:absolute;left:0;right:0;top:0;bottom:170px;background:#565353"></div>
+<svg viewBox="0 0 412 26" preserveAspectRatio="none" style="position:absolute;left:0;top:0;width:100%;height:26px"><polyline points="0,0 34,24 68,0 102,24 136,0 170,24 204,0 238,24 272,0 306,24 340,0 374,24 412,0" fill="none" stroke="#807c7c" stroke-width="2"></polyline></svg>
+<span style="position:absolute;left:26px;top:0;bottom:170px;width:10px;background:#4a4747"></span>
+<span style="position:absolute;right:26px;top:0;bottom:170px;width:10px;background:#4a4747"></span>
+<div style="position:absolute;left:62px;right:62px;top:212px;bottom:170px;background:#4a4747;background-image:repeating-linear-gradient(to bottom,transparent 0 11px,#807c7c 11px 13px)"></div>
+<div style="position:absolute;left:62px;right:62px;top:212px;height:3px;background:#201e1d"></div>
+
+<div style="position:absolute;right:14px;top:22px;display:flex;align-items:flex-start;gap:10px">
+<sc-for list="{{ colgados }}" as="c" hint-placeholder-count="2">
+<div style="flex:none;display:flex;flex-direction:column;align-items:center;transform-origin:top center;animation:{{ c.anim }}">
+<span style="width:2px;background:#8e8a8a;height:{{ c.cable }}"></span>
+<div style="border:2px solid #201e1d;background:{{ c.bg }};color:{{ c.fg }};padding:7px 10px;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:62px;box-sizing:border-box">
+<span style="font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.8;white-space:nowrap">{{ c.label }}</span>
+<span style="font-size:19px;font-weight:900;line-height:1;letter-spacing:-.02em">{{ c.valor }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div style="position:absolute;left:50%;margin-left:-62px;top:232px;width:124px;box-sizing:border-box;border:2px solid #201e1d;background:#d7d3d3;color:#201e1d;padding:9px 11px;display:flex;align-items:center;gap:10px">
+<span style="position:absolute;left:5px;top:5px;width:4px;height:4px;border-radius:50%;background:#9b9797"></span>
+<span style="position:absolute;right:5px;top:5px;width:4px;height:4px;border-radius:50%;background:#9b9797"></span>
+<span style="flex:none;width:30px;height:30px;border:1px solid #201e1d;background:{{ nivelColor }}"></span>
+<span style="display:flex;flex-direction:column;gap:1px">
+<span style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#444141">Nivel</span>
+<span style="font-size:16px;font-weight:900;line-height:1;letter-spacing:.02em;text-transform:uppercase">{{ nivelNombre }}</span>
+</span>
+</div>
+
+<div style="position:absolute;left:0;right:0;bottom:0;height:170px;background:#6e6a6a"></div>
+<div style="position:absolute;left:0;right:0;bottom:170px;height:2px;background:#201e1d"></div>
+<svg viewBox="0 0 412 170" preserveAspectRatio="none" style="position:absolute;left:0;bottom:0;width:100%;height:170px"><polyline points="128,0 62,170" fill="none" stroke="#f3f2f2" stroke-width="3" opacity="0.6"></polyline><polyline points="284,0 350,170" fill="none" stroke="#f3f2f2" stroke-width="3" opacity="0.6"></polyline></svg>
+<div style="position:absolute;left:10px;bottom:170px;display:flex;flex-direction:column-reverse;width:94px">
+<div style="height:84px;box-sizing:border-box;margin-left:8px;width:86px;background:#4d170e;border:2px solid #201e1d;background-image:repeating-linear-gradient(to bottom,transparent 0 15px,#6B3E1E 15px 17px)"></div>
+<div style="height:62px;box-sizing:border-box;background:#471d16;border:2px solid #201e1d;border-bottom:none;background-image:repeating-linear-gradient(to bottom,transparent 0 15px,#6B3E1E 15px 17px);display:flex;flex-direction:column;justify-content:center;gap:1px;padding:0 9px">
+<span style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#f8f4f4;-webkit-text-stroke:0.6px #201e1d;paint-order:stroke fill">Km</span>
+<span style="font-size:21px;font-weight:900;line-height:1;letter-spacing:-.02em;color:#f8f4f4;-webkit-text-stroke:0.6px #201e1d;paint-order:stroke fill">{{ kmMes }}</span>
+</div>
+<div style="height:62px;box-sizing:border-box;background:#471d16;border:2px solid #201e1d;border-bottom:none;background-image:repeating-linear-gradient(to bottom,transparent 0 15px,#6B3E1E 15px 17px);display:flex;flex-direction:column;justify-content:center;gap:1px;padding:0 9px">
+<span style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#f8f4f4;-webkit-text-stroke:0.6px #201e1d;paint-order:stroke fill">Viajes</span>
+<span style="font-size:21px;font-weight:900;line-height:1;letter-spacing:-.02em;color:#f8f4f4;-webkit-text-stroke:0.6px #201e1d;paint-order:stroke fill">{{ viajesMes }}</span>
+</div>
+</div>
+<span style="position:absolute;right:10px;bottom:170px;width:42px;height:26px;background:#8e8a8a"></span>
+
+<div style="position:absolute;bottom:156px;left:50%;margin-left:-155px;width:310px;height:14px;background:#000000;opacity:.32"></div>
+<div style="position:absolute;bottom:170px;left:50%;transform-origin:bottom center;transform:translateX(-50%) scale(1.55)">
+<div style="position:relative;display:flex;align-items:flex-end;gap:5px;animation:idleBob 2.8s ease-in-out infinite">
+<div style="width:136px;height:60px;background:#c80000;border:2px solid #201e1d;box-sizing:border-box"></div>
+<div style="position:relative;width:58px;height:76px;background:#201e1d">
+<div style="position:absolute;top:9px;left:8px;width:32px;height:21px;background:#d7d3d3"></div>
+<div style="position:absolute;bottom:8px;right:-5px;width:6px;height:11px;background:#201e1d"></div>
+</div>
+<div style="position:absolute;bottom:-13px;left:18px;width:26px;height:26px;border-radius:50%;background:#201e1d"><span style="position:absolute;top:10px;left:10px;width:6px;height:6px;border-radius:50%;background:#807c7c"></span></div>
+<div style="position:absolute;bottom:-13px;left:54px;width:26px;height:26px;border-radius:50%;background:#201e1d"><span style="position:absolute;top:10px;left:10px;width:6px;height:6px;border-radius:50%;background:#807c7c"></span></div>
+<div style="position:absolute;bottom:-13px;left:158px;width:26px;height:26px;border-radius:50%;background:#201e1d"><span style="position:absolute;top:10px;left:10px;width:6px;height:6px;border-radius:50%;background:#807c7c"></span></div>
+</div>
+</div>
+
+<div style="position:absolute;left:0;right:0;bottom:14px;display:flex;justify-content:center;animation:hintUp 2s ease-in-out infinite">
+<span style="display:flex;align-items:center;gap:8px;background:#f3f2f2;color:#201e1d;padding:8px 12px;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase"><span style="font-size:14px;font-weight:900;line-height:1">↑</span>Desliza para ver más</span>
+</div>
+</div>
+
+</section>
+
+<section style="height:100%;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;background:#2d2b2b">
+
+<div style="flex:none;padding:16px 20px 14px;border-bottom:2px solid #f3f2f2">
+<p style="margin:0;font-size:15px;font-weight:600;line-height:1.35;color:#565353;text-wrap:pretty">{{ mensajeEspera }}</p>
+</div>
+
+<div style="flex:none;padding:15px 20px 16px;border-bottom:2px solid #f3f2f2">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+<h2 style="margin:0;font-size:13px;font-weight:900;letter-spacing:.16em;text-transform:uppercase">Rumbo a {{ siguienteNivel }}</h2>
+<span style="font-size:12px;font-weight:800;color:#ff8a8a">faltan {{ faltan }}</span>
+</div>
+<div style="height:10px;background:#565353;margin-top:10px"><div style="height:100%;background:#c80000;width:{{ progresoNivel }}"></div></div>
+<a href="Premios Ruta Oscuro.dc.html" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;border:2px solid #f3f2f2;padding:14px;min-height:48px;box-sizing:border-box;color:#f3f2f2" style-hover="background:#3a3838">
+<span style="font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase">Ver ruta de premios</span>
+<span style="font-size:14px;font-weight:900">→</span>
+</a>
+</div>
+
+<div style="flex:1;min-height:0;overflow:auto;padding:15px 20px 4px" class="sin-barra">
+<h2 style="margin:0 0 4px;font-size:13px;font-weight:900;letter-spacing:.16em;text-transform:uppercase">Tus últimos viajes</h2>
+<sc-for list="{{ recientes }}" as="r" hint-placeholder-count="3">
+<a href="Detalle Viaje Oscuro.dc.html" style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:13px 0;border-top:1px solid rgba(243,242,242,.32);color:#f3f2f2" style-hover="opacity:.65">
+<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+<span style="font-size:15px;font-weight:800;line-height:1.2">{{ r.ruta }}</span>
+<span style="font-size:11px;font-weight:600;color:#bab6b6">{{ r.meta }}</span>
+</span>
+<span style="flex:none;font-size:16px;font-weight:900;letter-spacing:-.02em;color:#7ddb9b">+{{ r.puntos }}</span>
+</a>
+</sc-for>
+<p style="margin:14px 0 18px;font-size:12px;font-weight:600;color:#9b9797;text-wrap:pretty">{{ rachaNota }}</p>
+</div>
+
+<div style="flex:none;padding:13px 20px;border-top:2px solid #f3f2f2">
+<a href="Viajes Oscuro.dc.html" style="display:flex;align-items:center;background:#c80000;color:#fff;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:15px 14px;min-height:48px;box-sizing:border-box" style-hover="background:#ff6b6b" style-active="background:#ff8a8a">Ver mis viajes</a>
+</div>
+
+</section>
+</div>
+
+<div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);background:#2d2b2b;border-top:2px solid #f3f2f2">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+<a href="{{ t.href }}" style="display:flex;align-items:center;justify-content:center;border-top:3px solid transparent;padding:12px 4px 14px;min-height:50px;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;border-top-color:{{ t.rule }};color:{{ t.color }}" style-hover="background:#3a3838">{{ t.label }}</a>
+</sc-for>
+</div>
+
+</div>
+</x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:500,&quot;height&quot;:960},&quot;nombre&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Juan Ramírez Solís&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;nivel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;plata&quot;,&quot;oro&quot;,&quot;platino&quot;,&quot;esmeralda&quot;,&quot;diamante&quot;],&quot;default&quot;:&quot;oro&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;puntosGanados&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:11240,&quot;min&quot;:0,&quot;max&quot;:90000,&quot;step&quot;:100,&quot;tsType&quot;:&quot;number&quot;},&quot;viajesMes&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:4,&quot;min&quot;:0,&quot;max&quot;:40,&quot;step&quot;:1,&quot;section&quot;:&quot;Mes en curso&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;kmMes&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:628,&quot;min&quot;:0,&quot;max&quot;:20000,&quot;step&quot;:10,&quot;section&quot;:&quot;Mes en curso&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;puntosMes&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:711,&quot;min&quot;:0,&quot;max&quot;:20000,&quot;step&quot;:10,&quot;section&quot;:&quot;Mes en curso&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;racha&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:4,&quot;min&quot;:0,&quot;max&quot;:30,&quot;step&quot;:1,&quot;section&quot;:&quot;Mes en curso&quot;,&quot;tsType&quot;:&quot;number&quot;}}">
+// HomeState sin viaje activo (home_provider.dart):
+//   HomeStateDashboard → monthTrips + totalKm + totalPoints + streak
+//   HomeStateReturning → recentTrips + recentPoints
+const NIVEL_COLOR = { plata: '#C0C0C0', oro: '#FFD700', platino: '#E5E4E2', esmeralda: '#50C878', diamante: '#B9F2FF' };
+const NIVEL_NOMBRE = { plata: 'Plata', oro: 'Oro', platino: 'Platino', esmeralda: 'Esmeralda', diamante: 'Diamante' };
+const NIVEL_MIN = { plata: 0, oro: 5000, platino: 15000, esmeralda: 30000, diamante: 60000 };
+const ORDEN = ['plata', 'oro', 'platino', 'esmeralda', 'diamante'];
+
+// Dataset del mes: 4 viajes completados en días consecutivos (01–04 ago),
+// el más reciente cerrado hoy — así _computeStreak() devuelve 4.
+// km: 88 + 226 + 88 + 226 = 628 · puntos: 168 + 210 + 152 + 181 = 711
+const RECIENTES = [
+  { origen: 'Reynosa', destino: 'Monterrey', fecha: '04 ago', km: 226, puntos: 181 },
+  { origen: 'Monterrey', destino: 'Saltillo', fecha: '03 ago', km: 88, puntos: 152 },
+  { origen: 'Monterrey', destino: 'Reynosa', fecha: '02 ago', km: 226, puntos: 210 },
+];
+
+const TABS = [
+  { id: 'inicio', label: 'Inicio', href: 'Inicio Sin Viaje Oscuro.dc.html' },
+  { id: 'viajes', label: 'Viajes', href: 'Viajes Oscuro.dc.html' },
+  { id: 'premios', label: 'Premios', href: 'Premios Ruta Oscuro.dc.html' },
+  { id: 'perfil', label: 'Perfil', href: 'Perfil Operador Oscuro.dc.html' },
+];
+
+const fmt = (n) => new Intl.NumberFormat('es-MX').format(Math.max(0, Math.round(n)));
+
+class Component extends DCLogic {
+  state = { disponible: true };
+
+  renderVals() {
+    const nivelKey = this.props.nivel ?? 'oro';
+    const ganados = this.props.puntosGanados ?? 11240;
+    const idx = ORDEN.indexOf(nivelKey);
+    const siguiente = ORDEN[idx + 1] ?? null;
+    const base = NIVEL_MIN[nivelKey];
+    const tope = siguiente ? NIVEL_MIN[siguiente] : base;
+    const avance = siguiente ? Math.min(1, Math.max(0, (ganados - base) / (tope - base))) : 1;
+    const nombre = this.props.nombre ?? 'Juan Ramírez Solís';
+    const racha = this.props.racha ?? 4;
+
+    return {
+      saludo: 'Hola, ' + nombre.split(' ')[0],
+      nivelColor: NIVEL_COLOR[nivelKey] ?? NIVEL_COLOR.oro,
+      nivelNombre: NIVEL_NOMBRE[nivelKey] ?? 'Oro',
+      // Rótulos colgados de las vigas: los cuatro datos del mes
+      viajesMes: String(this.props.viajesMes ?? 4),
+      kmMes: fmt(this.props.kmMes ?? 628),
+      // Rótulos colgados de las vigas: racha y puntos del mes
+      // (viajes y km van estarcidos en las cajas; la insignia, en el letrero de la puerta)
+      colgados: [
+        { label: 'Racha', valor: racha + 'd', cable: '52px', bg: '#2d2b2b', fg: '#f3f2f2', anim: 'swayA 5.2s ease-in-out infinite' },
+        { label: 'Puntos', valor: '+' + fmt(this.props.puntosMes ?? 711), cable: '28px', bg: '#7ddb9b', fg: '#14301f', anim: 'swayB 4.9s ease-in-out infinite' },
+      ],
+      mensajeEspera: this.state.disponible
+        ? 'Estás disponible. Operación te asigna la siguiente ruta y te avisamos aquí mismo.'
+        : 'Marcado como no disponible. No vas a recibir asignaciones hasta que vuelvas a activarte.',
+      recientes: RECIENTES.map((r) => ({
+        ruta: r.origen + ' → ' + r.destino,
+        meta: r.fecha + ' · ' + fmt(r.km) + ' km',
+        puntos: fmt(r.puntos),
+      })),
+      racha,
+      rachaNota: racha > 0
+        ? 'Tu racha cuenta los días seguidos con viaje cerrado. Se rompe si pasas un día sin cerrar viaje.'
+        : 'Cierra un viaje hoy para volver a empezar la racha.',
+      siguienteNivel: siguiente ? NIVEL_NOMBRE[siguiente] : 'nivel máximo',
+      faltan: siguiente ? fmt(tope - ganados) + ' pts' : '—',
+      progresoNivel: (avance * 100).toFixed(1) + '%',
+      dispLabel: this.state.disponible ? 'Disponible' : 'Pausado',
+      dispBg: this.state.disponible ? '#f3f2f2' : 'transparent',
+      dispFg: this.state.disponible ? '#2d2b2b' : '#f3f2f2',
+      toggleDisponible: () => this.setState((s) => ({ disponible: !s.disponible })),
+      tabs: TABS.map((t) => ({
+        label: t.label,
+        href: t.href,
+        rule: t.id === 'inicio' ? '#c80000' : 'transparent',
+        color: t.id === 'inicio' ? '#ff8a8a' : '#9b9797',
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

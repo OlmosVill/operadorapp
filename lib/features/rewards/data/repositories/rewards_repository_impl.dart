@@ -53,8 +53,14 @@ class RewardsRepositoryImpl implements RewardsRepository {
       );
       await _local.upsertCanje(canje);
       return Right<AppError, Canje>(canje);
-    } on Exception catch (e) {
-      return Left<AppError, Canje>(UnexpectedError(error: e));
+    } on CanjeRejected catch (e) {
+      return Left<AppError, Canje>(
+        ServerError(statusCode: e.statusCode, message: e.message),
+      );
+    } on Object catch (e, s) {
+      // `Object` y no `Exception`: un fallo de parseo lanza `Error`, y si se
+      // escapa la pantalla se queda colgada en «ENVIANDO…».
+      return Left<AppError, Canje>(UnexpectedError(error: e, stackTrace: s));
     }
   }
 }

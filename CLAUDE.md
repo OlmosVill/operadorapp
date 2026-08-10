@@ -236,14 +236,32 @@ Archivos clave:
 - `lib/features/summary/presentation/providers/return_summary_provider.dart` —
   `returnSummaryProvider`, `returnSummaryShownProvider`, `saveReturnSnapshot`
 - `lib/features/summary/presentation/widgets/return_summary_dialog.dart` — el popup
-- `lib/features/trips/presentation/screens/home_screen.dart` — dispara el popup y guarda
-  el snapshot en `didChangeAppLifecycleState`
+- `lib/features/trips/presentation/screens/home_screen.dart` — guarda el snapshot al pausar,
+  y al volver del segundo plano rearma el resumen y vuelve a revisar (`_handleResume`)
+- `lib/core/providers/app_refresh.dart` — `refreshFromServer`, la sincronización manual del
+  regreso (perfil, viajes, movimientos, ranking)
 
 **Cómo decide qué mostrar**: compara contra el snapshot guardado al cerrar la app (puntos
 acumulados, nivel, posición), no contra una ventana de tiempo fija. Da igual si estuvo fuera
 dos horas o dos semanas, o si se le juntaron varios viajes.
 
-**Se muestra una sola vez por sesión** (`returnSummaryShownProvider`) y sólo si hay algo que
+**Funciona igual matando la app que volviendo del segundo plano.** El regreso desde segundo
+plano necesita tres cosas que no pasan solas, y por eso `_handleResume` las hace a mano:
+
+1. `ReturnSnapshotStore.rotate()` — el punto de comparación se captura una sola vez, al
+   construir el store. Sin rotarlo, al volver se seguiría comparando contra el arranque en
+   frío. Rota desde `_latest` (memoria), no releyendo SharedPreferences, porque entre el
+   `paused` y el `resumed` puede pasar menos de lo que tarda la escritura en disco.
+2. `refreshFromServer` — cada repositorio sincroniza al ABRIR su stream de Drift, una sola
+   vez. Al volver del segundo plano esos streams siguen vivos, así que nadie le vuelve a
+   preguntar a Supabase y el viaje cerrado no aparece nunca.
+3. Rearmar `returnSummaryShownProvider` y `_summaryHandled` — si no, la bandera de "ya se
+   mostró en esta sesión" bloquea el popup hasta que se mate la app.
+
+Lo que trae la sincronización llega asíncrono, así que el popup puede no salir en el mismo
+`resumed`: el `_scheduleSummaryCheck` de cada build lo reintenta cuando Drift emite.
+
+**Se muestra una sola vez por regreso** (`returnSummaryShownProvider`) y sólo si hay algo que
 contar (`hasContent`). El snapshot se reescribe al cerrar el popup y al pasar a segundo plano.
 
 **Cómo forzarlo para probar** (requiere el admin en `localhost:4321` y `supabase start`):
@@ -251,7 +269,7 @@ contar (`hasContent`). El snapshot se reescribe al cerrar el popup y al pasar a 
    Si se mata la app a la fuerza el snapshot no se guarda y el resumen compara contra un
    punto más viejo: sigue saliendo, pero con más cosas de las esperadas.
 2. En el admin: Viajes → Nuevo viaje, elegir el operador `12345`, crear y luego "Cerrar viaje".
-3. Volver a la app.
+3. Volver a la app — sirve tanto reabrirla desde el multitarea como matarla y arrancarla.
 
 Pendientes menores de esta feature (nada bloqueante):
 - `HomeStateReturning` en `home_provider.dart` quedó como código muerto: el popup cubre mejor
@@ -259,6 +277,56 @@ Pendientes menores de esta feature (nada bloqueante):
   con `updateHomLastSeen` y la clave `home_last_seen_ms`.
 - El popup no muestra canjes ni notificaciones recibidas durante la ausencia. Se puede sumar
   cuando exista la Fase 8.
+
+### 🔄 En curso — Rediseño Modernist (export de Claude Design)
+
+**Las 8 vistas del export están portadas**, cada una en claro y oscuro: Inicio
+(con viaje y sin viaje), Viajes, Detalle Viaje, Perfil Operador, Premios Ruta,
+Ranking y el popup de Resumen de Regreso.
+
+**Configuración** también está en el sistema, aunque no tiene export: se compuso
+con las piezas existentes y se llega por el **engrane del perfil**. Con eso
+desapareció el `ShellRoute` de Material y `AppBottomNav`; toda pantalla trae su
+barra.
+
+**Las cuatro pestañas se deslizan.** Viven en un `StatefulShellRoute` que no
+dibuja chrome —cada pantalla conserva su `ModernistTabBar`— y cuyo contenedor,
+`ModernistTabShell`, pone las ramas en una tira horizontal: Viajes entra desde
+la derecha viniendo de Inicio y desde la izquierda viniendo de Premios. Arrastrar
+desde cualquiera de los dos bordes mueve la tira con el dedo y cambia de pestaña
+al soltar. Ranking sigue apilándose encima, como el detalle de viaje o Ajustes,
+y esas pantallas entran desde la derecha con `modernistPage()`.
+
+Las pantallas viejas siguen en el repo sin usarse; conviene retirarlas en un
+commit aparte una vez validado todo en emulador.
+
+Los fuentes están en `Operator_app_design_brief/` — un `.dc.html` por vista y
+por tema. Usar esos, no el `.html` «offline» de 1.1 MB del botón de descarga.
+
+Ver `docs/features/modernist-home.md` — cómo leer los exports, las decisiones
+que conviene repetir y la lista de pendientes.
+
+Archivos clave:
+- `assets/fonts/Archivo.ttf` — fuente variable; declarada en `pubspec.yaml`
+- `lib/core/theme/modernist/modernist_tokens.dart` — `ModernistPalette` (claro/oscuro), tipografía y helpers
+- `lib/core/theme/modernist/modernist_icons.dart` — íconos pintados (Archivo no trae símbolos)
+- `lib/features/*/presentation/screens/modernist/` — una carpeta por feature
+- `lib/features/trips/presentation/widgets/modernist/` — `truck_scene`, `dock_scene`, los dos mapas ilustrados y `modernist_tab_bar`
+- `lib/core/router/app_router.dart` — shell de 4 ramas (`modernistBranchTabs`) + rutas apiladas
+- `lib/core/router/modernist_tab_shell.dart` — la tira que desliza y sigue al dedo desde los bordes
+- `lib/core/router/modernist_transitions.dart` — `modernistPage()`, entrada desde la derecha
+- `test/core/router/modernist_tab_shell_test.dart` — sentido del deslizamiento y arrastre
+- `lib/shared/widgets/app_bottom_nav.dart` — nav anterior, solo para Ajustes
+- `test/features/*/modernist/` — goldens 412×880, un par claro/oscuro por vista
+- `test/features/trips/modernist/modernist_golden_harness.dart` — montaje común de los goldens
+
+**La escena del tracto reemplaza el plan de Rive**: el export ya trae la máquina
+de estados completa en CSS/SVG, así que se portó a `CustomPaint` y ya no hace
+falta el `.riv` del animador. `docs/features/truck-animation.md` queda como
+referencia de la telemetría, no de la animación.
+
+**La escena no depende del tema**, solo de `horaDelDia`: los exports claro y
+oscuro la declaran idéntica y el oscuro simplemente arranca a las 21:00.
 
 ### 🔄 Próxima: Fase 8 — Notificaciones In-App + Preparación Push
 Ver `docs/ROADMAP.md`.
@@ -413,6 +481,82 @@ rojo que desaparecía solo (al siguiente build la bandera ya estaba puesta y no 
 Todo lo que mute estado va en `addPostFrameCallback`, nunca en `build`.
 
 23. **Repositorios que no disparan sync quedan con tablas locales vacías** — Cualquier `XxxRepositoryImpl` que solo lea de Drift sin llamar al `SyncService` correspondiente mostrará datos vacíos aunque Supabase tenga registros. El patrón correcto al inicio de cada stream watch es `unawaited(_sync.syncXxx(operadorId))`, igual que `TripsRepositoryImpl`. Afectó a `PointsRepositoryImpl`, `RewardsRepositoryImpl` y `TrucksRepositoryImpl`.
+
+24. **Flutter no instancia el eje `wght` de una fuente variable desde el pubspec** —
+Declarar `Archivo.ttf` con `weight:` no basta: sin
+`fontVariations: [FontVariation('wght', n)]` en el `TextStyle`, todos los pesos
+salen en 400. Por eso todo texto Modernist pasa por `ModernistType.of()`.
+
+25. **`DecoratedBox` pinta detrás del hijo** — Las secciones que dibujan a
+sangre (la escena, el mapa) tapan la regla de 2 px si va como decoración de
+fondo. Necesita `position: DecorationPosition.foreground`.
+
+26. **En los exports de Claude Design hay texto que hereda el color de `<a>`** —
+El chip de nivel de la cabecera es un enlace, y la hoja del sistema define
+`a { color:#8f0000 }` en claro y `#ff8a8a` en oscuro. El span del nombre del
+nivel no declara color, así que «ORO» va en rojo y no en tinta. Antes de portar
+un texto sin `color`, revisar de quién hereda — para eso existe
+`ModernistPalette.link`.
+
+27. **Archivo no trae `▲ ▼ ★`** — En Android los cubre el respaldo del sistema,
+pero en los goldens salen como cuadros. En `ranking_screen.dart` van pintados
+con `CustomPaint`. Comprobar que la fuente tenga el glifo antes de portarlo.
+
+28. **`DateFormat` interpreta las letras del patrón, también dentro de una
+palabra** — `'d de MMMM'` imprime «6 6e agosto» porque la `e` es el día de la
+semana. El texto literal va entre comillas simples *dentro* del patrón:
+`DateFormat("d 'de' MMMM", 'es_MX')`.
+
+29. **Un `AnimationController` en `late final` que solo se usa a veces truena al
+desmontar** — Si `build` no lo toca en algún estado, `dispose()` acaba
+*construyéndolo* durante la finalización del árbol y el test falla. Crearlos
+siempre en `initState`.
+
+30. **Un `Stack` con puros hijos `Positioned` no tiene altura** — Falla con
+`size.isFinite` salvo que algo de fuera le imponga una altura definida. Si el
+`Stack` solo dibuja rieles o líneas, darle un hijo sin posicionar o cambiarlo
+por `Padding` + `Align`.
+
+31. **Un sync que solo inserta deja huérfanos que rompen el canje** —
+`supabase db reset` regenera los `id` del catálogo, y como `syncCatalogo()`
+hacía upsert incremental por `updated_at` sin borrar nada, Drift acumulaba el
+catálogo de cada base anterior: cada premio salía dos veces y el de arriba
+llevaba un `id` que el servidor ya no conoce. Canjearlo devolvía 404 «Premio no
+encontrado o inactivo». Un premio dado de baja tampoco desaparecía nunca,
+porque la consulta filtra `activo = true`. Las tablas que el servidor manda
+enteras se reemplazan: `replaceCatalogo`, `replaceCanjes`, `replaceMovimientos`,
+`replaceViajes`, `replaceTractos`, `replaceHistorial`, `replaceReportesByOperador`
+y `replaceProfile`. Ningún `syncXxx` quedó solo-inserción. Cuatro cosas que
+aprendimos al extender el barrido a todas:
+   - **Ojo con `NOT IN ()`**, que no es SQL válido. Si el servidor no devolvió nada hay que borrar
+     todo (acotado por operador), no armar el `isNotIn` con una lista vacía.
+   - **El reemplazo obliga a descarga completa.** Un corte incremental por `updated_at` nunca trae
+     las filas borradas, así que no hay con qué podar; peor, borraría todo lo que no cambió desde
+     el último sync. Por eso `syncTrips`, `syncCatalogo`, `syncMovimientos`, `syncTractos` y
+     `syncHistorialTractos` dejaron de usar cursor.
+   - **Las tablas hijas se barren por su padre, sin lista de ids.** El servidor devuelve el set
+     completo del viaje, así que `replaceGpsPoints`/`replaceIncidencias`/`replaceAlertas`/
+     `replaceReportesByViaje` borran la rebanada entera y reinsertan: un viaje puede traer miles
+     de puntos GPS y drift bindea una variable por id (`SQLITE_MAX_VARIABLE_NUMBER`).
+   - **Drift no declara FKs, así que no hay ON DELETE CASCADE.** `TripsDao.replaceViajes`
+     borra a mano los puntos GPS, incidencias y alertas de los viajes que desaparecieron; sin eso
+     quedan como basura invisible que nadie vuelve a leer. Y `replaceProfile` borra los perfiles
+     de otros `auth_user_id`, que cada reset regenera — ojo si algún día un dispositivo alterna
+     operadores.
+
+32. **`functions.invoke` lanza, no devuelve el status** — En
+`functions_client` ≥ 2.x cualquier respuesta fuera de 2xx sale como
+`FunctionException`; el `if (result.status != 200)` que había en
+`RewardsRemoteDatasource` era código muerto y el motivo del servidor se perdía.
+El cuerpo viene en `e.details['error']`. Además, un repositorio que atrapa solo
+`on Exception` deja escapar los `Error` de parseo, y la pantalla se queda
+colgada en «ENVIANDO…» porque el `await` nunca vuelve: usar `on Object`.
+
+33. **`reportes` no tiene columnas `lat`/`lng`, tiene `coordenada` GEOGRAPHY** —
+`_syncReportes` armaba su companion con `r['lat']`/`r['lng']` (siempre null) y
+pisaba las coordenadas que el sync por operador sí parseaba con
+`_parseGeography`. Cualquier lectura de `reportes` desde Supabase debe pasar por
+`_reporteCompanion`.
 
 ---
 

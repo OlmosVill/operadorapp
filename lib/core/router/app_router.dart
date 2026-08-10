@@ -2,19 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
+import 'package:operadorapp/core/router/modernist_tab_shell.dart';
+import 'package:operadorapp/core/router/modernist_transitions.dart';
 import 'package:operadorapp/features/auth/domain/entities/operator_session.dart';
 import 'package:operadorapp/features/auth/presentation/providers/auth_provider.dart';
 import 'package:operadorapp/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:operadorapp/features/auth/presentation/screens/login_screen.dart';
 import 'package:operadorapp/features/points/presentation/screens/points_screen.dart';
-import 'package:operadorapp/features/profile/presentation/screens/profile_screen.dart';
-import 'package:operadorapp/features/ranking/presentation/screens/ranking_screen.dart';
-import 'package:operadorapp/features/rewards/presentation/screens/rewards_roadmap_screen.dart';
-import 'package:operadorapp/features/rewards/presentation/screens/rewards_screen.dart';
-import 'package:operadorapp/features/settings/presentation/screens/settings_screen.dart';
+import 'package:operadorapp/features/profile/presentation/screens/modernist/operator_profile_screen.dart';
+import 'package:operadorapp/features/ranking/presentation/screens/modernist/ranking_screen.dart';
+import 'package:operadorapp/features/rewards/presentation/screens/modernist/rewards_route_screen.dart';
+import 'package:operadorapp/features/settings/presentation/screens/modernist/settings_screen.dart';
 import 'package:operadorapp/features/trips/presentation/screens/home_screen.dart';
-import 'package:operadorapp/features/trips/presentation/screens/trip_detail_screen.dart';
-import 'package:operadorapp/features/trips/presentation/screens/trips_list_screen.dart';
+import 'package:operadorapp/features/trips/presentation/screens/modernist/trip_detail_screen.dart';
+import 'package:operadorapp/features/trips/presentation/screens/modernist/trips_screen.dart';
+import 'package:operadorapp/features/trips/presentation/widgets/modernist/modernist_tab_bar.dart';
 import 'package:operadorapp/features/trucks/presentation/screens/truck_detail_screen.dart';
 import 'package:operadorapp/features/trucks/presentation/screens/trucks_history_screen.dart';
 
@@ -31,10 +33,20 @@ class _RouterNotifier extends ChangeNotifier {
 final routerNotifierProvider =
     ChangeNotifierProvider<_RouterNotifier>(_RouterNotifier.new);
 
+final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+
+/// Una llave por pestaña: cada rama del shell mantiene su propio navegador y,
+/// con él, el scroll y el estado de su pantalla.
+final List<GlobalKey<NavigatorState>> _tabNavigatorKeys = [
+  for (final tab in modernistBranchTabs)
+    GlobalKey<NavigatorState>(debugLabel: tab.name),
+];
+
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = ref.watch(routerNotifierProvider);
 
   return GoRouter(
+    navigatorKey: _rootNavigatorKey,
     refreshListenable: notifier,
     initialLocation: '/home',
     redirect: (context, state) {
@@ -59,118 +71,121 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      ShellRoute(
-        builder: (context, state, child) => _AppShell(child: child),
-        routes: [
-          GoRoute(
-            path: '/home',
-            builder: (_, __) => const HomeScreen(),
+      // Las cuatro pestañas de la barra Modernist viven en un shell con una
+      // rama cada una. No dibuja nada alrededor —cada pantalla trae su propia
+      // barra—: lo único que aporta es conservar el estado de cada pestaña y
+      // animar el paso de una a otra. Ver `ModernistTabShell`.
+      StatefulShellRoute(
+        pageBuilder: (context, state, shell) => modernistPage(
+          key: state.pageKey,
+          child: shell,
+        ),
+        navigatorContainerBuilder: (context, shell, children) =>
+            ModernistTabShell(shell: shell, branches: children),
+        branches: [
+          StatefulShellBranch(
+            navigatorKey: _tabNavigatorKeys[0],
+            routes: [
+              GoRoute(
+                path: '/home',
+                builder: (_, __) => const HomeScreen(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/trips',
-            builder: (_, __) => const TripsListScreen(),
+          // El resto se precarga: para que el arrastre muestre la pestaña
+          // vecina moviéndose de verdad, su navegador tiene que existir antes
+          // de que el dedo toque la pantalla. Sin esto la primera vez se
+          // arrastraría contra un hueco en blanco.
+          StatefulShellBranch(
+            navigatorKey: _tabNavigatorKeys[1],
+            preload: true,
+            routes: [
+              GoRoute(
+                path: '/trips',
+                builder: (_, __) => const ModernistTripsScreen(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/rewards',
-            builder: (_, __) => const RewardsScreen(),
+          StatefulShellBranch(
+            navigatorKey: _tabNavigatorKeys[2],
+            preload: true,
+            routes: [
+              GoRoute(
+                path: '/rewards',
+                builder: (_, __) => const RewardsRouteScreen(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/settings',
-            builder: (_, __) => const SettingsScreen(),
+          StatefulShellBranch(
+            navigatorKey: _tabNavigatorKeys[3],
+            preload: true,
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (_, __) => const OperatorProfileScreen(),
+              ),
+            ],
           ),
         ],
       ),
+      // Fuera del shell: se apilan encima de las pestañas y entran desde la
+      // derecha.
       GoRoute(
-        path: '/profile',
-        builder: (_, __) => const ProfileScreen(),
+        path: '/settings',
+        pageBuilder: (_, state) => modernistPage(
+          key: state.pageKey,
+          child: const ModernistSettingsScreen(),
+        ),
       ),
+      // El export «Premios Ruta» fusiona catálogo y roadmap en una vista, así
+      // que `/rewards/catalog` apunta a la misma pantalla mientras quedan
+      // enlaces viejos apuntando ahí.
       GoRoute(
         path: '/rewards/catalog',
-        builder: (_, __) => const RewardsRoadmapScreen(),
+        pageBuilder: (_, state) => modernistPage(
+          key: state.pageKey,
+          child: const RewardsRouteScreen(),
+        ),
       ),
       GoRoute(
         path: '/points',
-        builder: (_, __) => const PointsScreen(),
+        pageBuilder: (_, state) => modernistPage(
+          key: state.pageKey,
+          child: const PointsScreen(),
+        ),
       ),
       GoRoute(
         path: '/ranking',
-        builder: (_, __) => const RankingScreen(),
+        pageBuilder: (_, state) => modernistPage(
+          key: state.pageKey,
+          child: const ModernistRankingScreen(),
+        ),
       ),
       GoRoute(
         path: '/trips/:id',
-        builder: (_, state) => TripDetailScreen(
-          tripId: state.pathParameters['id']!,
+        pageBuilder: (_, state) => modernistPage(
+          key: state.pageKey,
+          child: ModernistTripDetailScreen(
+            tripId: state.pathParameters['id']!,
+          ),
         ),
       ),
       GoRoute(
         path: '/trucks',
-        builder: (_, __) => const TrucksHistoryScreen(),
+        pageBuilder: (_, state) => modernistPage(
+          key: state.pageKey,
+          child: const TrucksHistoryScreen(),
+        ),
       ),
       GoRoute(
         path: '/trucks/:id',
-        builder: (_, state) => TruckDetailScreen(
-          tractoId: state.pathParameters['id']!,
+        pageBuilder: (_, state) => modernistPage(
+          key: state.pageKey,
+          child: TruckDetailScreen(
+            tractoId: state.pathParameters['id']!,
+          ),
         ),
       ),
     ],
   );
 });
-
-class _AppShell extends ConsumerWidget {
-  const _AppShell({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final location = GoRouterState.of(context).matchedLocation;
-
-    final currentIndex = switch (true) {
-      _ when location.startsWith('/trips') => 1,
-      _ when location.startsWith('/rewards') => 2,
-      _ when location.startsWith('/settings') => 3,
-      _ => 0,
-    };
-
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: currentIndex,
-        onDestinationSelected: (index) {
-          switch (index) {
-            case 0:
-              context.go('/home');
-            case 1:
-              context.go('/trips');
-            case 2:
-              context.go('/rewards');
-            case 3:
-              context.go('/settings');
-          }
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Inicio',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.route_outlined),
-            selectedIcon: Icon(Icons.route),
-            label: 'Viajes',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.redeem_outlined),
-            selectedIcon: Icon(Icons.redeem),
-            label: 'Premios',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
-            label: 'Config',
-          ),
-        ],
-      ),
-    );
-  }
-}

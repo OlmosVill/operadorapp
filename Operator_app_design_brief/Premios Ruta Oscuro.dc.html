@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="_ds/modernist-6cdfc298-0756-430c-a8bd-6ba520ebebfe/styles.css">
+<script src="_ds/modernist-6cdfc298-0756-430c-a8bd-6ba520ebebfe/_ds_bundle.js"></script>
+<style>
+body{margin:0;background:#171615;font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#ff8a8a;text-decoration:none}a:hover{color:#ff563c}
+::selection{background:#ffc2c2;color:#f3f2f2}
+@keyframes nodePulse{0%,100%{box-shadow:0 0 0 0 rgba(200,0,0,.55)}70%{box-shadow:0 0 0 9px rgba(200,0,0,0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes markerBlink{0%,100%{opacity:1}50%{opacity:.55}}
+.sin-barra{scrollbar-width:none;-ms-overflow-style:none}
+.sin-barra::-webkit-scrollbar{display:none}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:34px 20px;box-sizing:border-box">
+<x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" width="412px" height="880px" hint-size="428px,896px">
+<div data-screen-label="Premios — ruta vertical (oscuro)" style="position:relative;height:100%;background:#2d2b2b;color:#f3f2f2;display:flex;flex-direction:column;overflow:hidden">
+
+<div style="flex:none;border-bottom:2px solid #f3f2f2">
+<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:16px 20px 12px">
+<div style="display:flex;flex-direction:column;gap:3px">
+<span style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9b9797">Ruta de premios</span>
+<h1 style="margin:0;font-size:25px;font-weight:800;line-height:1.05;letter-spacing:-.02em">Sigue subiendo</h1>
+</div>
+<div style="display:flex;flex-direction:column;align-items:flex-start;gap:1px">
+<span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9b9797">Disponibles</span>
+<span style="font-size:26px;font-weight:900;line-height:1;letter-spacing:-.02em">{{ disponiblesFmt }}</span>
+</div>
+</div>
+<div style="display:flex;gap:8px;padding:0 20px 12px">
+<sc-for list="{{ filtros }}" as="f" hint-placeholder-count="6">
+<button type="button" onClick="{{ f.onClick }}" title="{{ f.label }}" aria-label="{{ f.label }}" style="flex:none;font-family:inherit;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:0 8px;min-height:44px;display:flex;align-items:center;justify-content:center;border:2px solid #f3f2f2;cursor:pointer;background:{{ f.bg }};color:{{ f.fg }}" style-hover="opacity:.8">
+<sc-if value="{{ f.esTexto }}" hint-placeholder-val="{{ true }}"><span>{{ f.label }}</span></sc-if>
+<sc-if value="{{ f.esInsignia }}" hint-placeholder-val="{{ false }}"><span style="width:24px;height:24px;border:1px solid #f3f2f2;background:{{ f.insignia }}"></span></sc-if>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div ref="{{ refScroller }}" class="sin-barra" style="flex:1;min-height:0;overflow:auto">
+<sc-for list="{{ filas }}" as="fila" hint-placeholder-count="8">
+<div style="position:relative">
+<sc-if value="{{ fila.esBanner }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:stretch">
+<div style="flex:none;width:56px;position:relative"><span style="position:absolute;left:26px;top:0;bottom:0;width:4px;background:{{ fila.lineaColor }}"></span></div>
+<div style="flex:1;display:flex;align-items:center;gap:10px;padding:18px 20px 18px 0">
+<span style="flex:none;width:14px;height:14px;border:1px solid #f3f2f2;background:{{ fila.nivelColor }}"></span>
+<span style="flex:none;white-space:nowrap;font-size:13px;font-weight:900;letter-spacing:.1em;text-transform:uppercase">{{ fila.nivel }}</span>
+<span style="flex:1;min-width:12px;height:2px;background:#f3f2f2"></span>
+<span style="flex:0 1 auto;min-width:0;white-space:nowrap;font-size:11px;font-weight:700;letter-spacing:.06em;color:#9b9797">{{ fila.desde }}</span>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ fila.esMarcador }}" hint-placeholder-val="{{ false }}">
+<div ref="{{ refMarcador }}" style="display:flex;align-items:stretch;background:#c80000;color:#fff">
+<div style="flex:none;width:56px;position:relative"><span style="position:absolute;left:26px;top:0;bottom:0;width:4px;background:#fff"></span><span style="position:absolute;left:18px;top:50%;margin-top:-10px;width:20px;height:20px;background:#fff;animation:markerBlink 1.4s ease-in-out infinite"></span></div>
+<div style="flex:1;display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:14px 20px 14px 0">
+<span style="font-size:14px;font-weight:900;letter-spacing:.16em;text-transform:uppercase">Estás aquí</span>
+<span style="font-size:13px;font-weight:800;letter-spacing:.06em">{{ fila.saldo }} pts</span>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ fila.esPremio }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:stretch">
+<div style="flex:none;width:56px;position:relative">
+<span style="position:absolute;left:26px;top:0;bottom:0;width:4px;background:{{ fila.lineaColor }}"></span>
+<span style="position:absolute;left:14px;top:28px;width:28px;height:28px;box-sizing:border-box;background:{{ fila.nodoBg }};border:2px solid {{ fila.nodoBorde }};animation:{{ fila.nodoAnim }}"></span>
+<span style="position:absolute;left:42px;top:41px;width:14px;height:2px;background:{{ fila.lineaColor }}"></span>
+</div>
+<div style="flex:1;padding:14px 20px 14px 0">
+<div style="border:{{ fila.cardBorde }};padding:13px 14px;display:flex;flex-direction:column;gap:7px;background:{{ fila.cardBg }}">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#9b9797">{{ fila.tipo }}</span>
+<span style="font-size:19px;font-weight:900;letter-spacing:-.02em;color:{{ fila.costoColor }}">{{ fila.costo }}</span>
+</div>
+<span style="font-size:16px;font-weight:800;line-height:1.15;letter-spacing:-.01em;color:{{ fila.tituloColor }};text-wrap:pretty">{{ fila.nombre }}</span>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:1px">
+<span style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:{{ fila.estadoColor }}">{{ fila.estado }}</span>
+<sc-if value="{{ fila.canjeable }}" hint-placeholder-val="{{ false }}">
+<button type="button" onClick="{{ fila.onCanjear }}" style="flex:none;font-family:inherit;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:#c80000;color:#fff;border:none;padding:12px 14px;min-height:44px;cursor:pointer;text-align:left" style-hover="background:#ff563c" style-active="background:#ff8a8a">Canjear</button>
+</sc-if>
+</div>
+<sc-if value="{{ fila.mostrarBarra }}" hint-placeholder-val="{{ false }}">
+<div style="height:6px;background:#565353;margin-top:2px"><div style="height:100%;background:#f3f2f2;width:{{ fila.barraPct }}"></div></div>
+</sc-if>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-for>
+<div style="display:flex;align-items:stretch">
+<div style="flex:none;width:56px;position:relative"><span style="position:absolute;left:26px;top:0;height:22px;width:4px;background:#807c7c"></span></div>
+<div style="flex:1;padding:22px 20px 26px 0;font-size:12px;font-weight:600;color:#9b9797;text-wrap:pretty">Cada viaje completado sin incidencias te acerca al siguiente hito de la ruta.</div>
+</div>
+</div>
+
+<div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);background:#2d2b2b;border-top:2px solid #f3f2f2">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+<button type="button" onClick="{{ t.onClick }}" style="font-family:inherit;background:transparent;border:none;border-top:3px solid transparent;padding:12px 4px 14px;min-height:50px;cursor:pointer;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;border-top-color:{{ t.rule }};color:{{ t.color }}" style-hover="background:#3a3838">{{ t.label }}</button>
+</sc-for>
+</div>
+
+<sc-if value="{{ hojaAbierta }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ cerrarHoja }}" style="position:absolute;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;z-index:5;animation:fadeUp .2s ease both">
+<div onClick="{{ stop }}" style="width:100%;background:#2d2b2b;border-top:2px solid #f3f2f2;padding:20px;box-sizing:border-box">
+<span style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9b9797">{{ hojaKicker }}</span>
+<h3 style="margin:6px 0 0;font-size:24px;font-weight:900;line-height:1.1;letter-spacing:-.02em">{{ hojaTitulo }}</h3>
+<p style="margin:10px 0 0;font-size:14px;font-weight:500;line-height:1.45;color:#eae9e9;text-wrap:pretty">{{ hojaTexto }}</p>
+<div style="margin-top:16px;border-top:2px solid #f3f2f2;display:flex;justify-content:space-between;gap:12px;padding-top:12px">
+<span style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#bab6b6">Saldo después</span>
+<span style="font-size:14px;font-weight:800">{{ hojaSaldo }}</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:18px">
+<button type="button" onClick="{{ confirmarCanje }}" style="width:100%;font-family:inherit;font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:16px;min-height:52px;border:none;background:#c80000;color:#fff;cursor:pointer;text-align:left" style-hover="background:#ff563c" style-active="background:#ff8a8a">{{ hojaCta }}</button>
+<button type="button" onClick="{{ cerrarHoja }}" style="width:100%;font-family:inherit;font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:16px;min-height:52px;background:transparent;border:2px solid #f3f2f2;color:#f3f2f2;cursor:pointer;text-align:left" style-hover="background:#3a3838">Cancelar</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:500,&quot;height&quot;:960},&quot;nivel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;plata&quot;,&quot;oro&quot;,&quot;platino&quot;,&quot;esmeralda&quot;,&quot;diamante&quot;],&quot;default&quot;:&quot;oro&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;puntosDisponibles&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:8740,&quot;min&quot;:0,&quot;max&quot;:160000,&quot;step&quot;:500,&quot;tsType&quot;:&quot;number&quot;}}">
+const TABS = [
+  { id: 'inicio', label: 'Inicio' },
+  { id: 'viajes', label: 'Viajes' },
+  { id: 'premios', label: 'Premios' },
+  { id: 'perfil', label: 'Perfil' },
+];
+
+const NIVELES = ['plata', 'oro', 'platino', 'esmeralda', 'diamante'];
+const NIVEL_NOMBRE = { plata: 'Plata', oro: 'Oro', platino: 'Platino', esmeralda: 'Esmeralda', diamante: 'Diamante' };
+// niveles_operador.color_hex + puntos_minimos — supabase/seed.sql
+const NIVEL_COLOR = { plata: '#C0C0C0', oro: '#FFD700', platino: '#E5E4E2', esmeralda: '#50C878', diamante: '#B9F2FF' };
+const NIVEL_MIN = { plata: 0, oro: 5000, platino: 15000, esmeralda: 30000, diamante: 60000 };
+
+// PremioTipoX.displayName — premio.dart
+const TIPO_NOMBRE = { tarjeta_regalo: 'Tarjeta regalo', producto_fisico: 'Producto', experiencia: 'Experiencia', vehiculo: 'Vehículo' };
+
+// premios_catalogo — supabase/seed.sql
+const CATALOGO = [
+  { id: 'tarjeta500', nombre: 'Tarjeta de regalo $500', tipo: 'tarjeta_regalo', costo: 500, nivel: 'plata' },
+  { id: 'tarjeta1000', nombre: 'Tarjeta de regalo $1,000', tipo: 'tarjeta_regalo', costo: 1000, nivel: 'plata' },
+  { id: 'mochila', nombre: 'Mochila escolar premium', tipo: 'producto_fisico', costo: 2500, nivel: 'plata' },
+  { id: 'despensa', nombre: 'Despensa familiar completa', tipo: 'producto_fisico', costo: 5000, nivel: 'oro' },
+  { id: 'herramientas', nombre: 'Set de herramientas profesional', tipo: 'producto_fisico', costo: 8000, nivel: 'oro' },
+  { id: 'tablet', nombre: 'Tablet educativa', tipo: 'producto_fisico', costo: 12000, nivel: 'oro' },
+  { id: 'smartphone', nombre: 'Smartphone de gama media', tipo: 'producto_fisico', costo: 18000, nivel: 'platino' },
+  { id: 'vacaciones', nombre: 'Paquete de vacaciones familiar', tipo: 'experiencia', costo: 30000, nivel: 'platino' },
+  { id: 'moto', nombre: 'Motocicleta de trabajo', tipo: 'vehiculo', costo: 60000, nivel: 'esmeralda' },
+  { id: 'auto', nombre: 'Auto compacto 0km', tipo: 'vehiculo', costo: 150000, nivel: 'diamante' },
+];
+
+const fmt = (n) => new Intl.NumberFormat('es-MX').format(Math.max(0, Math.round(n)));
+
+class Component extends DCLogic {
+  state = { tab: 'premios', filtro: 'todos', hoja: null, hecho: null, canjeados: [] };
+
+  // Abre la ruta en la posición del operador, como TrophyPositionMarker
+  irAPosicion(intentos) {
+    const n = intentos ?? 0;
+    const sc = this.scroller;
+    if (!sc) { if (n < 20) setTimeout(() => this.irAPosicion(n + 1), 60); return; }
+    const objetivo = Math.max(0, sc.scrollHeight - sc.clientHeight);
+    sc.scrollTop = objetivo;
+    if (sc.scrollTop < objetivo - 2 && n < 20) setTimeout(() => this.irAPosicion(n + 1), 60);
+  }
+
+  componentDidMount() {
+    this.irAPosicion(0);
+  }
+
+  renderVals() {
+    const nivelKey = this.props.nivel ?? 'oro';
+    const nivelIdx = NIVELES.indexOf(nivelKey);
+    const gastados = this.state.canjeados.reduce((s, id) => {
+      const p = CATALOGO.find((c) => c.id === id);
+      return s + (p ? p.costo : 0);
+    }, 0);
+    const disponibles = Math.max(0, (this.props.puntosDisponibles ?? 8740) - gastados);
+
+    // filterAndSortPremios() — rewards_roadmap_screen.dart
+    const visibles = CATALOGO
+      .filter((p) => this.state.filtro === 'todos' || p.nivel === this.state.filtro)
+      .slice()
+      .sort((a, b) => a.costo - b.costo);
+
+    const desbloqueado = (p) => disponibles >= p.costo && nivelIdx >= NIVELES.indexOf(p.nivel);
+    const objetivo = visibles.find((p) => !desbloqueado(p) && !this.state.canjeados.includes(p.id));
+
+    // La ruta asciende: el hito más caro arriba, el operador abajo
+    const orden = visibles.slice().reverse();
+    const filas = [];
+    let nivelPrevio = null;
+    orden.forEach((p) => {
+      if (p.nivel !== nivelPrevio) {
+        nivelPrevio = p.nivel;
+        filas.push({
+          key: 'b-' + p.nivel,
+          esBanner: true,
+          nivel: NIVEL_NOMBRE[p.nivel],
+          nivelColor: NIVEL_COLOR[p.nivel],
+          desde: NIVEL_MIN[p.nivel] === 0 ? 'inicial' : fmt(NIVEL_MIN[p.nivel]) + ' pts',
+          lineaColor: NIVELES.indexOf(p.nivel) <= nivelIdx ? '#f3f2f2' : '#807c7c',
+        });
+      }
+      const abierto = desbloqueado(p);
+      const canjeado = this.state.canjeados.includes(p.id);
+      const nivelInsuficiente = nivelIdx < NIVELES.indexOf(p.nivel);
+      const esObjetivo = objetivo && objetivo.id === p.id;
+      filas.push({
+        key: p.id,
+        esPremio: true,
+        nombre: p.nombre,
+        tipo: TIPO_NOMBRE[p.tipo],
+        costo: fmt(p.costo) + ' pts',
+        lineaColor: abierto || canjeado ? '#f3f2f2' : '#807c7c',
+        nodoBg: canjeado ? '#c80000' : abierto ? '#f3f2f2' : '#2d2b2b',
+        nodoBorde: canjeado ? '#c80000' : abierto ? '#f3f2f2' : esObjetivo ? '#c80000' : '#807c7c',
+        nodoAnim: esObjetivo ? 'nodePulse 1.6s ease-out infinite' : 'none',
+        cardBorde: canjeado || esObjetivo ? '2px solid #c80000' : abierto ? '2px solid #f3f2f2' : '1px solid #807c7c',
+        cardBg: canjeado ? '#4a0f0f' : 'transparent',
+        tituloColor: abierto || canjeado ? '#f3f2f2' : '#9b9797',
+        costoColor: canjeado ? '#ff8a8a' : abierto ? '#f3f2f2' : '#8e8a8a',
+        estado: canjeado
+          ? 'Canje solicitado'
+          : nivelInsuficiente
+            ? 'Requiere nivel ' + NIVEL_NOMBRE[p.nivel]
+            : abierto
+              ? 'Puedes canjearlo'
+              : 'Te faltan ' + fmt(p.costo - disponibles) + ' pts',
+        estadoColor: canjeado ? '#ff8a8a' : abierto ? '#f3f2f2' : '#9b9797',
+        canjeable: abierto && !canjeado,
+        mostrarBarra: !abierto && !canjeado && !nivelInsuficiente,
+        barraPct: Math.min(100, (disponibles / p.costo) * 100).toFixed(1) + '%',
+        onCanjear: () => this.setState({ hoja: p.id }),
+      });
+    });
+    filas.push({ key: 'marker', esMarcador: true, saldo: fmt(disponibles) });
+
+    const hojaPremio = CATALOGO.find((c) => c.id === this.state.hoja) ?? null;
+    const hecho = CATALOGO.find((c) => c.id === this.state.hecho) ?? null;
+
+    return {
+      disponiblesFmt: fmt(disponibles),
+      filas,
+      // Placeholder: el cuadro de color se sustituye por la insignia diseñada de cada nivel
+      filtros: [{ id: 'todos', label: 'Todos' }].concat(NIVELES.map((n) => ({ id: n, label: NIVEL_NOMBRE[n], insignia: NIVEL_COLOR[n] }))).map((f) => ({
+        label: f.label,
+        esTexto: !f.insignia,
+        esInsignia: !!f.insignia,
+        insignia: f.insignia,
+        bg: this.state.filtro === f.id ? '#f3f2f2' : 'transparent',
+        fg: this.state.filtro === f.id ? '#2d2b2b' : '#f3f2f2',
+        onClick: () => this.setState({ filtro: f.id }),
+      })),
+      tabs: TABS.map((t) => ({
+        label: t.label,
+        rule: this.state.tab === t.id ? '#c80000' : 'transparent',
+        color: this.state.tab === t.id ? '#ff8a8a' : '#9b9797',
+        onClick: () => this.setState({ tab: t.id }),
+      })),
+      refScroller: (el) => { this.scroller = el; },
+      refMarcador: (el) => { this.marcador = el; },
+      hojaAbierta: !!(hojaPremio || hecho),
+      hojaKicker: hecho ? 'Canje registrado' : 'Confirmar canje',
+      hojaTitulo: hecho ? hecho.nombre : hojaPremio ? hojaPremio.nombre : '',
+      hojaTexto: hecho
+        ? 'Tu solicitud quedó registrada. Recursos Humanos te avisa en cuanto esté aprobada.'
+        : hojaPremio
+          ? 'Se descontarán ' + fmt(hojaPremio.costo) + ' puntos de tu saldo disponible. El canje pasa a revisión de Recursos Humanos.'
+          : '',
+      hojaSaldo: hecho ? fmt(disponibles) + ' pts' : hojaPremio ? fmt(disponibles - hojaPremio.costo) + ' pts' : '',
+      hojaCta: hecho ? 'Listo' : 'Sí, canjear',
+      confirmarCanje: () => {
+        if (this.state.hecho) { this.setState({ hecho: null, hoja: null }); return; }
+        const id = this.state.hoja;
+        if (!id) return;
+        this.setState((s) => ({ canjeados: s.canjeados.concat([id]), hoja: null, hecho: id }));
+      },
+      cerrarHoja: () => this.setState({ hoja: null, hecho: null }),
+      stop: (e) => e.stopPropagation(),
+    };
+  }
+}
+</script>
+</body>
+</html>

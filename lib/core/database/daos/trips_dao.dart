@@ -38,18 +38,40 @@ class TripsDao extends DatabaseAccessor<AppDatabase> with _$TripsDaoMixin {
   Future<ViajeRow?> getById(String id) =>
       (select(viajesTable)..where((t) => t.id.equals(id))).getSingleOrNull();
 
-  Future<DateTime?> getLastUpdatedAt(String operadorId) async {
-    final query = select(viajesTable)
-      ..where((t) => t.operadorId.equals(operadorId))
-      ..orderBy([(t) => OrderingTerm.desc(t.updatedAt)])
-      ..limit(1);
-    final row = await query.getSingleOrNull();
-    return row?.updatedAt;
-  }
+  /// Deja los viajes locales del operador iguales a los del servidor.
+  ///
+  /// Además arrastra las tablas hijas: Drift no declara FKs, así que no hay
+  /// `ON DELETE CASCADE` y los puntos GPS, incidencias y alertas de un viaje
+  /// que ya no existe se quedarían como basura que nadie vuelve a leer.
+  Future<void> replaceViajes(
+    String operadorId,
+    List<ViajesTableCompanion> rows,
+  ) =>
+      transaction(() async {
+        final ids = rows.map((r) => r.id.value).toList();
+        final query = select(viajesTable)
+          ..where((t) => t.operadorId.equals(operadorId));
+        // `NOT IN ()` no es SQL válido: sin filas, se borra todo lo suyo.
+        if (ids.isNotEmpty) {
+          query.where((t) => t.id.isNotIn(ids));
+        }
+        final obsoletos = await query.map((row) => row.id).get();
 
-  Future<void> upsertAll(List<ViajesTableCompanion> rows) => batch(
-        (b) => b.insertAllOnConflictUpdate(viajesTable, rows),
-      );
+        if (obsoletos.isNotEmpty) {
+          await (delete(gpsPuntosTable)
+                ..where((t) => t.viajeId.isIn(obsoletos)))
+              .go();
+          await (delete(incidenciasTable)
+                ..where((t) => t.viajeId.isIn(obsoletos)))
+              .go();
+          await (delete(alertasTable)..where((t) => t.viajeId.isIn(obsoletos)))
+              .go();
+          await (delete(viajesTable)..where((t) => t.id.isIn(obsoletos))).go();
+        }
+
+        if (rows.isEmpty) return;
+        await batch((b) => b.insertAllOnConflictUpdate(viajesTable, rows));
+      });
 
   // ─── GPS Points ──────────────────────────────────────────────────────────
 
@@ -59,9 +81,21 @@ class TripsDao extends DatabaseAccessor<AppDatabase> with _$TripsDaoMixin {
             ..orderBy([(t) => OrderingTerm.asc(t.timestampGps)]))
           .get();
 
-  Future<void> upsertGpsPoints(List<GpsPuntosTableCompanion> rows) => batch(
-        (b) => b.insertAllOnConflictUpdate(gpsPuntosTable, rows),
-      );
+  /// Deja los puntos GPS locales del viaje iguales a los del servidor.
+  ///
+  /// A diferencia de los reemplazos por operador, aquí no se arma lista de
+  /// `id`: el servidor manda el set completo del viaje, y un viaje largo trae
+  /// miles de puntos, uno por variable enlazada (`SQLITE_MAX_VARIABLE_NUMBER`).
+  /// Sale más barato borrar la rebanada del viaje y reinsertarla.
+  Future<void> replaceGpsPoints(
+    String viajeId,
+    List<GpsPuntosTableCompanion> rows,
+  ) =>
+      transaction(() async {
+        await (delete(gpsPuntosTable)..where((t) => t.viajeId.equals(viajeId)))
+            .go();
+        await batch((b) => b.insertAll(gpsPuntosTable, rows));
+      });
 
   // ─── Incidencias ─────────────────────────────────────────────────────────
 
@@ -71,9 +105,17 @@ class TripsDao extends DatabaseAccessor<AppDatabase> with _$TripsDaoMixin {
             ..orderBy([(t) => OrderingTerm.asc(t.timestampIncidencia)]))
           .get();
 
-  Future<void> upsertIncidencias(List<IncidenciasTableCompanion> rows) => batch(
-        (b) => b.insertAllOnConflictUpdate(incidenciasTable, rows),
-      );
+  /// Mismo criterio que [replaceGpsPoints], por viaje.
+  Future<void> replaceIncidencias(
+    String viajeId,
+    List<IncidenciasTableCompanion> rows,
+  ) =>
+      transaction(() async {
+        await (delete(incidenciasTable)
+              ..where((t) => t.viajeId.equals(viajeId)))
+            .go();
+        await batch((b) => b.insertAll(incidenciasTable, rows));
+      });
 
   // ─── Alertas ─────────────────────────────────────────────────────────────
 
@@ -82,16 +124,52 @@ class TripsDao extends DatabaseAccessor<AppDatabase> with _$TripsDaoMixin {
         ..orderBy([(t) => OrderingTerm.asc(t.timestampAlerta)]))
       .get();
 
-  Future<void> upsertAlertas(List<AlertasTableCompanion> rows) => batch(
-        (b) => b.insertAllOnConflictUpdate(alertasTable, rows),
-      );
+  /// Mismo criterio que [replaceGpsPoints], por viaje.
+  Future<void> replaceAlertas(
+    String viajeId,
+    List<AlertasTableCompanion> rows,
+  ) =>
+      transaction(() async {
+        await (delete(alertasTable)..where((t) => t.viajeId.equals(viajeId)))
+            .go();
+        await batch((b) => b.insertAll(alertasTable, rows));
+      });
 
   // ─── Reportes ────────────────────────────────────────────────────────────
 
   Future<List<ReporteRow>> getReportesByViaje(String viajeId) =>
       (select(reportesTable)..where((t) => t.viajeId.equals(viajeId))).get();
 
-  Future<void> upsertReportes(List<ReportesTableCompanion> rows) => batch(
-        (b) => b.insertAllOnConflictUpdate(reportesTable, rows),
-      );
+  /// Mismo criterio que [replaceGpsPoints], por viaje.
+  Future<void> replaceReportesByViaje(
+    String viajeId,
+    List<ReportesTableCompanion> rows,
+  ) =>
+      transaction(() async {
+        await (delete(reportesTable)..where((t) => t.viajeId.equals(viajeId)))
+            .go();
+        await batch((b) => b.insertAll(reportesTable, rows));
+      });
+
+  /// Deja los reportes locales del operador iguales a los del servidor.
+  ///
+  /// Los reportes sin viaje sólo los alcanza este barrido, que además cubre
+  /// lo que escribe [replaceReportesByViaje]: todo reporte de un viaje del
+  /// operador vuelve también en la consulta por operador.
+  Future<void> replaceReportesByOperador(
+    String operadorId,
+    List<ReportesTableCompanion> rows,
+  ) =>
+      transaction(() async {
+        final ids = rows.map((r) => r.id.value).toList();
+        final stale = delete(reportesTable)
+          ..where((t) => t.operadorId.equals(operadorId));
+        // `NOT IN ()` no es SQL válido: sin filas, se borra todo lo suyo.
+        if (ids.isNotEmpty) {
+          stale.where((t) => t.id.isNotIn(ids));
+        }
+        await stale.go();
+        if (rows.isEmpty) return;
+        await batch((b) => b.insertAllOnConflictUpdate(reportesTable, rows));
+      });
 }

@@ -16,6 +16,19 @@ class ProfileDao extends DatabaseAccessor<AppDatabase> with _$ProfileDaoMixin {
       (select(operadoresTable)..where((t) => t.authUserId.equals(authUserId)))
           .watchSingleOrNull();
 
-  Future<void> upsert(OperadoresTableCompanion data) =>
-      into(operadoresTable).insertOnConflictUpdate(data);
+  /// Deja en la tabla local sólo el perfil de la sesión activa.
+  ///
+  /// Cada `supabase db reset` regenera el `auth_user_id`, así que sin el
+  /// barrido se va juntando una fila muerta por cada base anterior. No se
+  /// notaba porque las lecturas filtran por `auth_user_id`.
+  Future<void> replaceProfile(
+    String authUserId,
+    OperadoresTableCompanion data,
+  ) =>
+      transaction(() async {
+        await (delete(operadoresTable)
+              ..where((t) => t.authUserId.equals(authUserId).not()))
+            .go();
+        await into(operadoresTable).insertOnConflictUpdate(data);
+      });
 }

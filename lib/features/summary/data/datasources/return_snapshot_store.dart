@@ -24,6 +24,10 @@ class ReturnSnapshot {
 /// snapshot nuevo borraría la referencia contra la que se calcula el resumen
 /// —el bug que dejaba muerta a la vista de bienvenida original, que escribía
 /// el timestamp en `initState` antes de leerlo—.
+///
+/// Ese punto de comparación solo se mueve cuando alguien llama a [rotate]: al
+/// volver del segundo plano, porque lo guardado al salir es exactamente lo que
+/// el operador ya vio.
 class ReturnSnapshotStore {
   ReturnSnapshotStore(this._prefs) : _previous = _read(_prefs);
 
@@ -33,10 +37,22 @@ class ReturnSnapshotStore {
   static const _kRank = 'return_summary_rank_global';
 
   final SharedPreferences _prefs;
-  final ReturnSnapshot? _previous;
+  ReturnSnapshot? _previous;
+
+  /// Último snapshot escrito en esta sesión, aún no promovido a [previous].
+  ReturnSnapshot? _latest;
 
   /// Snapshot de la sesión anterior; null en el primer arranque.
   ReturnSnapshot? get previous => _previous;
+
+  /// Convierte el último snapshot guardado en el nuevo punto de comparación.
+  ///
+  /// Se guarda el valor en memoria en vez de releer SharedPreferences para no
+  /// depender de que la escritura en disco haya terminado: entre el `paused` y
+  /// el `resumed` puede pasar menos de lo que tarda el canal de plataforma.
+  void rotate() {
+    if (_latest != null) _previous = _latest;
+  }
 
   static ReturnSnapshot? _read(SharedPreferences prefs) {
     final savedAtMs = prefs.getInt(_kSavedAt);
@@ -57,7 +73,17 @@ class ReturnSnapshotStore {
     required OperatorLevel level,
     int? rankGlobal,
   }) async {
-    await _prefs.setInt(_kSavedAt, DateTime.now().millisecondsSinceEpoch);
+    final savedAt = DateTime.now();
+    // Antes de cualquier `await`: quien llame con `unawaited` desde
+    // `didChangeAppLifecycleState` necesita que el valor quede registrado ya.
+    _latest = ReturnSnapshot(
+      savedAt: savedAt,
+      points: points,
+      level: level,
+      rankGlobal: rankGlobal,
+    );
+
+    await _prefs.setInt(_kSavedAt, savedAt.millisecondsSinceEpoch);
     await _prefs.setInt(_kPoints, points);
     await _prefs.setString(_kLevel, level.name);
 

@@ -1,6 +1,18 @@
 import 'package:operadorapp/features/rewards/domain/entities/premio.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+/// Error de la Edge Function `canjear-premio` con el motivo que dio el
+/// servidor («Puntos insuficientes», «Premio no encontrado o inactivo»…).
+class CanjeRejected implements Exception {
+  const CanjeRejected(this.message, this.statusCode);
+
+  final String message;
+  final int statusCode;
+
+  @override
+  String toString() => message;
+}
+
 class RewardsRemoteDatasource {
   const RewardsRemoteDatasource(this._supabase);
 
@@ -10,16 +22,27 @@ class RewardsRemoteDatasource {
     required String premioId,
     required String operadorId,
   }) async {
-    final result = await _supabase.functions.invoke(
-      'canjear-premio',
-      body: {'premio_id': premioId, 'operador_id': operadorId},
-    );
-    if (result.status != 200) {
-      final data = result.data as Map<String, dynamic>?;
-      final msg = data?['error'] as String? ?? 'Error al canjear';
-      throw Exception(msg);
+    final FunctionResponse result;
+    try {
+      result = await _supabase.functions.invoke(
+        'canjear-premio',
+        body: {'premio_id': premioId, 'operador_id': operadorId},
+      );
+    } on FunctionException catch (e) {
+      // `invoke` lanza en cualquier respuesta fuera de 2xx; el cuerpo trae el
+      // motivo. Sin esto la pantalla solo podía decir «no se pudo».
+      final details = e.details;
+      final message = details is Map
+          ? details['error'] as String? ?? 'Error al canjear'
+          : 'Error al canjear';
+      throw CanjeRejected(message, e.status);
     }
-    return _canjeFromMap(result.data as Map<String, dynamic>);
+
+    final data = result.data;
+    if (data is! Map<String, dynamic>) {
+      throw const CanjeRejected('Respuesta inesperada del servidor', 500);
+    }
+    return _canjeFromMap(data);
   }
 
   static Canje _canjeFromMap(Map<String, dynamic> r) => Canje(

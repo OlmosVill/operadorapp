@@ -144,5 +144,52 @@ void main() {
         ),
       );
     });
+
+    test('conserva el motivo que dio la Edge Function', () async {
+      when(
+        () => mockRemote.canjearPremio(
+          premioId: any(named: 'premioId'),
+          operadorId: any(named: 'operadorId'),
+        ),
+      ).thenThrow(const CanjeRejected('Premio no encontrado o inactivo', 404));
+
+      final result = await sut.canjearPremio(
+        premioId: 'premio-fantasma',
+        operadorId: tOperadorId,
+      );
+
+      expect(
+        result,
+        isA<Left<AppError, Canje>>().having(
+          (l) => l.value,
+          'error',
+          isA<ServerError>()
+              .having((e) => e.statusCode, 'statusCode', 404)
+              .having(
+                (e) => e.message,
+                'message',
+                'Premio no encontrado o inactivo',
+              ),
+        ),
+      );
+    });
+
+    test('atrapa también los Error, no solo las Exception', () async {
+      // Un fallo de parseo lanza `TypeError`. Si se escapa, la hoja se queda
+      // colgada en «ENVIANDO…» porque el `await` nunca vuelve.
+      when(
+        () => mockRemote.canjearPremio(
+          premioId: any(named: 'premioId'),
+          operadorId: any(named: 'operadorId'),
+        ),
+      ).thenThrow(ArgumentError('campo inesperado'));
+
+      final result = await sut.canjearPremio(
+        premioId: 'premio-001',
+        operadorId: tOperadorId,
+      );
+
+      expect(result, isA<Left<AppError, Canje>>());
+    });
   });
 }

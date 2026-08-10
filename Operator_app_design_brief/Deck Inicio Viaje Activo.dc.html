@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="_ds/modernist-6cdfc298-0756-430c-a8bd-6ba520ebebfe/styles.css">
+<script src="_ds/modernist-6cdfc298-0756-430c-a8bd-6ba520ebebfe/_ds_bundle.js"></script>
+<style>
+body{margin:0;background:#201e1d;font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#8f0000;text-decoration:none}a:hover{color:#b00000}
+</style>
+</helmet>
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+<section data-label="Portada" data-speaker-notes="OperadorApp: la pantalla de Inicio cuando el operador tiene un viaje en curso. Es la vista que más van a ver en el día." style="width:1920px;height:1080px;box-sizing:border-box;background:#f3f2f2;color:#201e1d;padding:96px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:48px">
+<span style="font-size:26px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#7d7979">OperadorApp · Diseño de producto</span>
+<span style="font-size:26px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#7d7979">Agosto 2026</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:40px">
+<div style="height:4px;background:#201e1d"></div>
+<h1 style="margin:0;font-size:172px;font-weight:900;line-height:.92;letter-spacing:-.035em;max-width:1500px">Inicio con viaje en curso</h1>
+<p style="margin:0;font-size:38px;font-weight:600;line-height:1.35;max-width:1150px;color:#444141;text-wrap:pretty">La compañera de ruta del operador de tractocamión: dónde va, cómo va manejando y qué está ganando — en una sola pantalla, sin tocar nada.</p>
+</div>
+<div style="display:flex;gap:16px;align-items:center">
+<span style="width:36px;height:36px;background:#c80000"></span>
+<span style="font-size:24px;font-weight:800;letter-spacing:.18em;text-transform:uppercase">Fase 4 · Home dinámico</span>
+</div>
+</section>
+
+<section data-label="Referencias" data-speaker-notes="Estas son las apps que hoy traen los operadores en la mano: Samsara en flotas de Estados Unidos y Motum aquí en México. Samsara resuelve el cumplimiento con relojes de horas de servicio y un puntaje de manejo. Motum resuelve el despacho: el viaje como ficha de datos y el mapa. Ninguna de las dos convierte el turno en progreso ni en premios — ahí está nuestro espacio." style="width:1920px;height:1080px;box-sizing:border-box;background:#f3f2f2;color:#201e1d;padding:88px 96px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<span style="font-size:24px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#c80000">Qué existe hoy</span>
+<h2 style="margin:0;font-size:80px;font-weight:900;line-height:1;letter-spacing:-.025em">El producto que ya usan los operadores</h2>
+<div style="height:4px;background:#201e1d"></div>
+</div>
+<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:0">
+<div style="padding:0 64px 0 0;border-right:4px solid #201e1d;display:flex;flex-direction:column;gap:24px;min-height:0">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px">
+<span style="font-size:46px;font-weight:900;letter-spacing:-.02em">Samsara</span>
+<span style="font-size:24px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#7d7979">Flotas · EE. UU.</span>
+</div>
+<div style="flex:1;display:flex;gap:24px;align-items:flex-start;min-height:0">
+<img src="uploads/Samsara 1.png" alt="Samsara — inicio del conductor con puntaje de manejo" style="height:100%;width:auto;display:block;border:2px solid #201e1d"></img>
+<img src="uploads/Samsara 2.png" alt="Samsara — relojes de horas de servicio" style="height:100%;width:auto;display:block;border:2px solid #201e1d"></img>
+<p style="margin:0;flex:1;font-size:25px;font-weight:600;line-height:1.4;color:#444141;text-wrap:pretty">Cumplimiento primero: relojes de horas de servicio, puntaje de manejo y tareas de seguridad. Mide al operador, pero no lo premia.</p>
+</div>
+</div>
+<div style="padding:0 0 0 64px;display:flex;flex-direction:column;gap:24px;min-height:0">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px">
+<span style="font-size:46px;font-weight:900;letter-spacing:-.02em">Motum</span>
+<span style="font-size:24px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#7d7979">Transporte · México</span>
+</div>
+<div style="flex:1;display:flex;gap:24px;align-items:flex-start;min-height:0">
+<img src="uploads/Motum 1.png" alt="Motum — mapa del viaje" style="height:100%;width:auto;display:block;border:2px solid #201e1d"></img>
+<img src="uploads/Motum 2.png" alt="Motum — ficha del viaje actual" style="height:100%;width:auto;display:block;border:2px solid #201e1d"></img>
+<p style="margin:0;flex:1;font-size:25px;font-weight:600;line-height:1.4;color:#444141;text-wrap:pretty">Despacho primero: el viaje como ficha de datos y el mapa de ruta. Resuelve la operación, no la relación con el operador.</p>
+</div>
+</div>
+</div>
+<p style="margin:0;font-size:32px;font-weight:700;line-height:1.35;max-width:1600px;border-top:4px solid #201e1d;padding-top:28px;text-wrap:pretty">Las dos le hablan a la empresa. <strong style="color:#8f0000">Ninguna convierte el turno en progreso, nivel y premios</strong> — ahí entra OperadorApp.</p>
+</section>
+
+<section data-label="Contexto" data-speaker-notes="Tres restricciones del contexto real: se usa en movimiento, con luz de sol o de noche, y muchas veces con guantes. Todo lo demás sale de aquí." style="width:1920px;height:1080px;box-sizing:border-box;background:#f3f2f2;color:#201e1d;padding:96px;display:flex;flex-direction:column;gap:64px">
+<div style="display:flex;flex-direction:column;gap:24px">
+<span style="font-size:24px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#c80000">El contexto manda</span>
+<h2 style="margin:0;font-size:88px;font-weight:900;line-height:1;letter-spacing:-.025em">Se lee en la cabina, no en un escritorio</h2>
+<div style="height:4px;background:#201e1d"></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;flex:1">
+<div style="padding:0 56px 0 0;border-right:4px solid #201e1d;display:flex;flex-direction:column;gap:20px">
+<span style="font-size:96px;font-weight:900;line-height:1;letter-spacing:-.03em;color:#c80000">01</span>
+<h3 style="margin:0;font-size:44px;font-weight:800;line-height:1.1">Un vistazo, no una lectura</h3>
+<p style="margin:0;font-size:30px;font-weight:500;line-height:1.4;color:#444141;text-wrap:pretty">Cada dato vive en su propia celda con regla visible. Ningún número por debajo de 23px.</p>
+</div>
+<div style="padding:0 56px;border-right:4px solid #201e1d;display:flex;flex-direction:column;gap:20px">
+<span style="font-size:96px;font-weight:900;line-height:1;letter-spacing:-.03em;color:#c80000">02</span>
+<h3 style="margin:0;font-size:44px;font-weight:800;line-height:1.1">Alto contraste, sin adornos</h3>
+<p style="margin:0;font-size:30px;font-weight:500;line-height:1.4;color:#444141;text-wrap:pretty">Tinta sobre fondo claro, rojo solo para el estado del viaje y la acción principal.</p>
+</div>
+<div style="padding:0 0 0 56px;display:flex;flex-direction:column;gap:20px">
+<span style="font-size:96px;font-weight:900;line-height:1;letter-spacing:-.03em;color:#c80000">03</span>
+<h3 style="margin:0;font-size:44px;font-weight:800;line-height:1.1">Acciones fijas abajo</h3>
+<p style="margin:0;font-size:30px;font-weight:500;line-height:1.4;color:#444141;text-wrap:pretty">Ver detalle y Reportar nunca se van con el scroll. Área táctil de 48px mínimo.</p>
+</div>
+</div>
+</section>
+
+<section data-label="Anatomía" data-speaker-notes="Recorrido de arriba abajo: saludo e insignia de nivel, banda de estado con la ruta, la animación del tracto, el mapa GPS, la fila de telemetría y las acciones fijas." style="width:1920px;height:1080px;box-sizing:border-box;background:#f3f2f2;color:#201e1d;padding:72px 96px;display:flex;gap:88px;align-items:center">
+<img src="assets/inicio-claro.png" alt="Pantalla de inicio con viaje activo" style="width:436px;height:auto;display:block;flex:none"></img>
+<div style="flex:1;display:flex;flex-direction:column;gap:0">
+<div style="display:flex;flex-direction:column;gap:20px;padding-bottom:36px">
+<span style="font-size:24px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#c80000">Anatomía</span>
+<h2 style="margin:0;font-size:80px;font-weight:900;line-height:1;letter-spacing:-.025em">Seis bandas, una jerarquía</h2>
+</div>
+<div style="display:flex;gap:28px;align-items:baseline;padding:26px 0;border-top:4px solid #201e1d"><span style="flex:none;width:62px;font-size:30px;font-weight:900;color:#c80000">01</span><span style="flex:none;width:330px;font-size:34px;font-weight:800">Identidad y nivel</span><span style="flex:1;font-size:27px;font-weight:500;color:#444141">Insignia del nivel + número de empleado</span></div>
+<div style="display:flex;gap:28px;align-items:baseline;padding:26px 0;border-top:2px solid rgba(32,30,29,.4)"><span style="flex:none;width:62px;font-size:30px;font-weight:900;color:#c80000">02</span><span style="flex:none;width:330px;font-size:34px;font-weight:800">Estado del viaje</span><span style="flex:1;font-size:27px;font-weight:500;color:#444141">Origen → destino, avance y km restantes</span></div>
+<div style="display:flex;gap:28px;align-items:baseline;padding:26px 0;border-top:2px solid rgba(32,30,29,.4)"><span style="flex:none;width:62px;font-size:30px;font-weight:900;color:#c80000">03</span><span style="flex:none;width:330px;font-size:34px;font-weight:800">Animación del tracto</span><span style="flex:1;font-size:27px;font-weight:500;color:#444141">Reacciona a velocidad, hora y estado mecánico</span></div>
+<div style="display:flex;gap:28px;align-items:baseline;padding:26px 0;border-top:2px solid rgba(32,30,29,.4)"><span style="flex:none;width:62px;font-size:30px;font-weight:900;color:#c80000">04</span><span style="flex:none;width:330px;font-size:34px;font-weight:800">Mapa GPS</span><span style="flex:1;font-size:27px;font-weight:500;color:#444141">Tramo recorrido en tinta, faltante punteado</span></div>
+<div style="display:flex;gap:28px;align-items:baseline;padding:26px 0;border-top:2px solid rgba(32,30,29,.4)"><span style="flex:none;width:62px;font-size:30px;font-weight:900;color:#c80000">05</span><span style="flex:none;width:330px;font-size:34px;font-weight:800">Telemetría</span><span style="flex:1;font-size:27px;font-weight:500;color:#444141">Rendimiento · alertas · puntos estimados</span></div>
+<div style="display:flex;gap:28px;align-items:baseline;padding:26px 0;border-top:2px solid rgba(32,30,29,.4);border-bottom:4px solid #201e1d"><span style="flex:none;width:62px;font-size:30px;font-weight:900;color:#c80000">06</span><span style="flex:none;width:330px;font-size:34px;font-weight:800">Acciones fijas</span><span style="flex:1;font-size:27px;font-weight:500;color:#444141">Ver detalle del viaje · Reportar en ruta</span></div>
+</div>
+</section>
+
+<section data-label="Animación · estados" data-speaker-notes="La animación no es decorativa: es un indicador. Cinco estados que salen del documento de diseño de la feature y de la tabla reportes." style="width:1920px;height:1080px;box-sizing:border-box;background:#c80000;color:#fff;padding:96px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:22px">
+<span style="font-size:24px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;opacity:.8">Animación reactiva</span>
+<h2 style="margin:0;font-size:96px;font-weight:900;line-height:1;letter-spacing:-.03em">El tracto dice cómo va el viaje</h2>
+<div style="height:4px;background:#fff"></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0;flex:1">
+<div style="padding:0 40px 0 0;border-right:2px solid rgba(255,255,255,.5);display:flex;flex-direction:column;gap:16px"><span style="font-size:34px;font-weight:900;letter-spacing:-.01em">En marcha</span><span style="font-size:26px;font-weight:600;line-height:1.35;opacity:.9">Parallax activo, llantas girando al ritmo de la velocidad</span></div>
+<div style="padding:0 40px;border-right:2px solid rgba(255,255,255,.5);display:flex;flex-direction:column;gap:16px"><span style="font-size:34px;font-weight:900;letter-spacing:-.01em">Detenido</span><span style="font-size:26px;font-weight:600;line-height:1.35;opacity:.9">Fondo quieto, motor encendido, señal de descanso</span></div>
+<div style="padding:0 40px;border-right:2px solid rgba(255,255,255,.5);display:flex;flex-direction:column;gap:16px"><span style="font-size:34px;font-weight:900;letter-spacing:-.01em">Llanta ponchada</span><span style="font-size:26px;font-weight:600;line-height:1.35;opacity:.9">La cabina cojea y la velocidad cae a 20 km/h</span></div>
+<div style="padding:0 40px;border-right:2px solid rgba(255,255,255,.5);display:flex;flex-direction:column;gap:16px"><span style="font-size:34px;font-weight:900;letter-spacing:-.01em">En taller</span><span style="font-size:26px;font-weight:600;line-height:1.35;opacity:.9">Escena estática mientras hay mantenimiento abierto</span></div>
+<div style="padding:0 0 0 40px;display:flex;flex-direction:column;gap:16px"><span style="font-size:34px;font-weight:900;letter-spacing:-.01em">Accidentado</span><span style="font-size:26px;font-weight:600;line-height:1.35;opacity:.9">Viaje detenido y humo — el reporte ya está abierto</span></div>
+</div>
+<p style="margin:0;font-size:30px;font-weight:600;max-width:1400px;line-height:1.4">Las tres entradas son las mismas del diseño técnico: <strong>speed</strong>, <strong>timeOfDay</strong> y <strong>mechanicalState</strong>. Nada se calcula en la pantalla.</p>
+</section>
+
+<section data-label="Parallax" data-speaker-notes="El parallax por capas es lo que da sensación de velocidad. Los factores son los del documento: si el operador va a 100, la carretera corre al doble que a 50." style="width:1920px;height:1080px;box-sizing:border-box;background:#f3f2f2;color:#201e1d;padding:96px;display:flex;flex-direction:column;gap:52px">
+<div style="display:flex;flex-direction:column;gap:22px">
+<span style="font-size:24px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#c80000">Cómo se siente la velocidad</span>
+<h2 style="margin:0;font-size:88px;font-weight:900;line-height:1;letter-spacing:-.025em">Cuatro capas, un solo dato</h2>
+<div style="height:4px;background:#201e1d"></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:40px;padding:30px 0;border-bottom:2px solid rgba(32,30,29,.4)"><span style="flex:none;width:330px;font-size:38px;font-weight:800">Cerros lejanos</span><span style="flex:none;width:150px;font-size:38px;font-weight:900;color:#c80000">0.05×</span><span style="flex:1;height:14px;background:#d7d3d3"><span style="display:block;height:14px;width:5%;background:#201e1d"></span></span></div>
+<div style="display:flex;align-items:center;gap:40px;padding:30px 0;border-bottom:2px solid rgba(32,30,29,.4)"><span style="flex:none;width:330px;font-size:38px;font-weight:800">Arbustos</span><span style="flex:none;width:150px;font-size:38px;font-weight:900;color:#c80000">0.20×</span><span style="flex:1;height:14px;background:#d7d3d3"><span style="display:block;height:14px;width:20%;background:#201e1d"></span></span></div>
+<div style="display:flex;align-items:center;gap:40px;padding:30px 0;border-bottom:2px solid rgba(32,30,29,.4)"><span style="flex:none;width:330px;font-size:38px;font-weight:800">Postes de luz</span><span style="flex:none;width:150px;font-size:38px;font-weight:900;color:#c80000">0.70×</span><span style="flex:1;height:14px;background:#d7d3d3"><span style="display:block;height:14px;width:70%;background:#201e1d"></span></span></div>
+<div style="display:flex;align-items:center;gap:40px;padding:30px 0;border-bottom:4px solid #201e1d"><span style="flex:none;width:330px;font-size:38px;font-weight:800">Carretera</span><span style="flex:none;width:150px;font-size:38px;font-weight:900;color:#c80000">1.00×</span><span style="flex:1;height:14px;background:#d7d3d3"><span style="display:block;height:14px;width:100%;background:#201e1d"></span></span></div>
+</div>
+<p style="margin:0;font-size:30px;font-weight:600;color:#444141;max-width:1500px;line-height:1.4;text-wrap:pretty">De noche cambian cielo, faros y estrellas; a más de 88 km/h aparecen ráfagas de movimiento. Al detenerse, todo se congela salvo el ralentí del motor.</p>
+</section>
+
+<section data-label="Telemetría" data-speaker-notes="Los tres números que le importan al operador. Los puntos estimados bajan cinco por cada alerta: la penalización se ve en el momento, no al final del mes." style="width:1920px;height:1080px;box-sizing:border-box;background:#f3f2f2;color:#201e1d;padding:96px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:22px">
+<span style="font-size:24px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#c80000">Lo que se mide</span>
+<h2 style="margin:0;font-size:88px;font-weight:900;line-height:1;letter-spacing:-.025em">Tres números y su consecuencia</h2>
+<div style="height:4px;background:#201e1d"></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);flex:1">
+<div style="padding:0 56px 0 0;border-right:4px solid #201e1d;display:flex;flex-direction:column;gap:18px">
+<span style="font-size:26px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#7d7979">Rendimiento</span>
+<span style="font-size:150px;font-weight:900;line-height:.9;letter-spacing:-.04em">4.6</span>
+<span style="font-size:30px;font-weight:600;color:#444141">km/l contra una meta de 4.5 — el factor de mayor peso en el puntaje</span>
+</div>
+<div style="padding:0 56px;border-right:4px solid #201e1d;display:flex;flex-direction:column;gap:18px">
+<span style="font-size:26px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#7d7979">Alertas</span>
+<span style="font-size:150px;font-weight:900;line-height:.9;letter-spacing:-.04em;color:#8f0000">1</span>
+<span style="font-size:30px;font-weight:600;color:#444141">Un frenado brusco en la ruta. Cada evento resta 5 puntos</span>
+</div>
+<div style="padding:0 0 0 56px;display:flex;flex-direction:column;gap:18px">
+<span style="font-size:26px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#7d7979">Puntos est.</span>
+<span style="font-size:150px;font-weight:900;line-height:.9;letter-spacing:-.04em;color:#8f0000">+137</span>
+<span style="font-size:30px;font-weight:600;color:#444141">Al completar el viaje. Se acreditan del lado del servidor, nunca en la app</span>
+</div>
+</div>
+</section>
+
+<section data-label="Modo oscuro" data-speaker-notes="El modo oscuro no es un filtro: la escena del tracto tiene su propia paleta de noche, con faros y estrellas. Es la vista real de un turno nocturno." style="width:1920px;height:1080px;box-sizing:border-box;background:#2d2b2b;color:#f3f2f2;padding:72px 96px;display:flex;gap:88px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:34px">
+<span style="font-size:24px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#ff8a8a">Turno nocturno</span>
+<h2 style="margin:0;font-size:88px;font-weight:900;line-height:1;letter-spacing:-.025em">Modo oscuro con escena de noche</h2>
+<div style="height:4px;background:#f3f2f2"></div>
+<div style="display:flex;flex-direction:column;gap:26px;max-width:900px">
+<p style="margin:0;font-size:32px;font-weight:600;line-height:1.4;color:#d7d3d3;text-wrap:pretty">La misma jerarquía invertida sobre fondo oscuro: tinta y fondo cambian de papel, el rojo sigue siendo el estado del viaje y la acción principal, y el texto en acento usa el paso claro de la rampa para mantener el contraste.</p>
+<p style="margin:0;font-size:32px;font-weight:600;line-height:1.4;color:#d7d3d3;text-wrap:pretty">La animación reacciona a la hora real: cielo nocturno, cono de faros encendido y estrellas — sin cambiar una sola regla de la interfaz.</p>
+</div>
+</div>
+<img src="assets/inicio-oscuro.png" alt="Pantalla de inicio en modo oscuro" style="width:436px;height:auto;display:block;flex:none"></img>
+</section>
+
+<section data-label="Siguientes pasos" data-speaker-notes="Lo que sigue: la insignia diseñada por nivel, el .riv real del tracto, el mapa con flutter_map y los otros dos estados del Home." style="width:1920px;height:1080px;box-sizing:border-box;background:#f3f2f2;color:#201e1d;padding:96px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;flex-direction:column;gap:22px">
+<span style="font-size:24px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#c80000">Qué falta</span>
+<h2 style="margin:0;font-size:88px;font-weight:900;line-height:1;letter-spacing:-.025em">Siguientes pasos</h2>
+<div style="height:4px;background:#201e1d"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+<div style="padding:36px 56px 36px 0;border-right:4px solid #201e1d;border-bottom:2px solid rgba(32,30,29,.4);display:flex;flex-direction:column;gap:12px"><span style="font-size:40px;font-weight:800">Insignias de nivel</span><span style="font-size:28px;font-weight:600;color:#444141">Hoy es un cuadro con el color del nivel; entra la insignia diseñada</span></div>
+<div style="padding:36px 0 36px 56px;border-bottom:2px solid rgba(32,30,29,.4);display:flex;flex-direction:column;gap:12px"><span style="font-size:40px;font-weight:800">Animación en Rive</span><span style="font-size:28px;font-weight:600;color:#444141">Sustituir el prototipo por el archivo del animador</span></div>
+<div style="padding:36px 56px 36px 0;border-right:4px solid #201e1d;display:flex;flex-direction:column;gap:12px"><span style="font-size:40px;font-weight:800">Mapa real</span><span style="font-size:28px;font-weight:600;color:#444141">Puntos GPS del viaje sobre el mapa del proveedor configurado</span></div>
+<div style="padding:36px 0 36px 56px;display:flex;flex-direction:column;gap:12px"><span style="font-size:40px;font-weight:800">Los otros dos Inicios</span><span style="font-size:28px;font-weight:600;color:#444141">Bienvenida de regreso y tablero del mes, sin viaje activo</span></div>
+</div>
+<div style="display:flex;align-items:center;gap:20px">
+<span style="width:36px;height:36px;background:#c80000"></span>
+<span style="font-size:26px;font-weight:800;letter-spacing:.16em;text-transform:uppercase">Seis pantallas listas · claro y oscuro</span>
+</div>
+</section>
+
+</x-import>
+</x-dc>
+</body>
+</html>

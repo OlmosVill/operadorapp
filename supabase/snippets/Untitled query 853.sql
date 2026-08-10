@@ -1,0 +1,1 @@
+update viajes set estado='en_curso', km_esperados=520, km_recorridos=180 where operador_id=(select id from operadores where numero_empleado='OP-001') and estado='asignado';

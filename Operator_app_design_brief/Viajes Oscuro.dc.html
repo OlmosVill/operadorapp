@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="_ds/modernist-6cdfc298-0756-430c-a8bd-6ba520ebebfe/styles.css">
+<script src="_ds/modernist-6cdfc298-0756-430c-a8bd-6ba520ebebfe/_ds_bundle.js"></script>
+<style>
+body{margin:0;background:#171615;font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#ff8a8a;text-decoration:none}a:hover{color:#ff6b6b}
+::selection{background:#7a1f1f;color:#f3f2f2}
+@keyframes pulseDot{0%,100%{transform:scale(.7);opacity:1}50%{transform:scale(1.35);opacity:.55}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sin-barra{scrollbar-width:none;-ms-overflow-style:none}
+.sin-barra::-webkit-scrollbar{display:none}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:34px 20px;box-sizing:border-box">
+<x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" width="412px" height="880px" hint-size="428px,896px">
+<div data-screen-label="Viajes (oscuro)" style="position:relative;height:100%;background:#2d2b2b;color:#f3f2f2;display:flex;flex-direction:column;overflow:hidden">
+
+<div style="flex:none;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:16px 20px 13px;border-bottom:2px solid #f3f2f2">
+<div style="display:flex;flex-direction:column;gap:3px">
+<span style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9b9797">Historial de rutas</span>
+<h1 style="margin:0;font-size:25px;font-weight:800;line-height:1.05;letter-spacing:-.02em">Mis viajes</h1>
+</div>
+<a href="#" style="flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:1px;border:2px solid #f3f2f2;padding:7px 10px;min-height:44px;box-sizing:border-box;justify-content:center" style-hover="background:#3a3838">
+<span style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9b9797">Mis tractos</span>
+<span style="font-size:13px;font-weight:900;letter-spacing:.04em">T-003</span>
+</a>
+</div>
+
+<div style="flex:none;display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:2px solid #f3f2f2">
+<div style="padding:12px 16px;border-right:2px solid #f3f2f2;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9b9797">Completados</span>
+<span style="font-size:22px;font-weight:900;line-height:1.05;letter-spacing:-.02em">{{ resumenViajes }}</span>
+</div>
+<div style="padding:12px 16px;border-right:2px solid #f3f2f2;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9b9797">Km</span>
+<span style="font-size:22px;font-weight:900;line-height:1.05;letter-spacing:-.02em">{{ resumenKm }}</span>
+</div>
+<div style="padding:12px 16px;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9b9797">Puntos</span>
+<span style="font-size:22px;font-weight:900;line-height:1.05;letter-spacing:-.02em;color:#7ddb9b">+{{ resumenPuntos }}</span>
+</div>
+</div>
+
+<div class="sin-barra" style="flex:1;min-height:0;overflow:auto">
+<sc-for list="{{ items }}" as="it" hint-placeholder-count="8">
+<div>
+<sc-if value="{{ it.esMes }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:12px;padding:16px 20px 8px">
+<span style="font-size:12px;font-weight:900;letter-spacing:.16em;text-transform:uppercase">{{ it.mes }}</span>
+<span style="flex:1;height:2px;background:#f3f2f2"></span>
+</div>
+</sc-if>
+<sc-if value="{{ it.esViaje }}" hint-placeholder-val="{{ true }}">
+<button type="button" onClick="{{ it.onClick }}" style="width:100%;box-sizing:border-box;font-family:inherit;text-align:left;border:none;border-bottom:1px solid rgba(243,242,242,.32);border-left:4px solid {{ it.marca }};background:{{ it.bg }};padding:13px 20px;cursor:pointer;display:flex;flex-direction:column;gap:7px" style-hover="background:#3a3838">
+<div style="display:flex;align-items:center;gap:8px">
+<sc-if value="{{ it.enCurso }}" hint-placeholder-val="{{ false }}">
+<span style="flex:none;width:9px;height:9px;border-radius:50%;background:#c80000;animation:pulseDot 1.4s ease-in-out infinite"></span>
+</sc-if>
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.08em;color:#9b9797">{{ it.fecha }}</span>
+<span style="flex:1"></span>
+<span style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:{{ it.estadoColor }}">{{ it.estado }}</span>
+</div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+<span style="flex:1;min-width:0;font-size:16px;font-weight:800;line-height:1.2;letter-spacing:-.01em">{{ it.ruta }}</span>
+<sc-if value="{{ it.tienePuntos }}" hint-placeholder-val="{{ false }}">
+<span style="flex:none;font-size:17px;font-weight:900;letter-spacing:-.02em;color:#7ddb9b">+{{ it.puntos }}</span>
+</sc-if>
+</div>
+<span style="font-size:11px;font-weight:600;letter-spacing:.04em;color:#bab6b6">{{ it.meta }}</span>
+</button>
+</sc-if>
+</div>
+</sc-for>
+<div style="padding:18px 20px 22px;font-size:12px;font-weight:600;color:#9b9797;text-wrap:pretty">Los puntos se acreditan al marcar el viaje como completado. Mínimo 10 puntos por viaje cerrado.</div>
+</div>
+
+<div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);background:#2d2b2b;border-top:2px solid #f3f2f2">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+<button type="button" onClick="{{ t.onClick }}" style="font-family:inherit;background:transparent;border:none;border-top:3px solid transparent;padding:12px 4px 14px;min-height:50px;cursor:pointer;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;border-top-color:{{ t.rule }};color:{{ t.color }}" style-hover="background:#3a3838">{{ t.label }}</button>
+</sc-for>
+</div>
+
+<sc-if value="{{ hojaAbierta }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ cerrarHoja }}" style="position:absolute;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;z-index:5;animation:fadeUp .2s ease both">
+<div onClick="{{ stop }}" style="width:100%;background:#2d2b2b;border-top:2px solid #f3f2f2;padding:20px;box-sizing:border-box">
+<span style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9b9797">{{ hojaFecha }} · {{ hojaEstado }}</span>
+<h3 style="margin:6px 0 0;font-size:23px;font-weight:900;line-height:1.1;letter-spacing:-.02em">{{ hojaRuta }}</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;margin-top:15px;border-top:2px solid #f3f2f2;border-bottom:2px solid #f3f2f2">
+<div style="padding:11px 14px 11px 0;border-right:2px solid #f3f2f2;display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9b9797">Km rec.</span><span style="font-size:20px;font-weight:900;letter-spacing:-.02em">{{ hojaKm }}</span></div>
+<div style="padding:11px 14px;border-right:2px solid #f3f2f2;display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9b9797">Rend. real</span><span style="font-size:20px;font-weight:900;letter-spacing:-.02em">{{ hojaRend }}</span></div>
+<div style="padding:11px 0 11px 14px;display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9b9797">Calif.</span><span style="font-size:20px;font-weight:900;letter-spacing:-.02em">{{ hojaCalif }}</span></div>
+</div>
+<sc-if value="{{ hojaTieneDesglose }}" hint-placeholder-val="{{ true }}">
+<div style="margin-top:14px;display:flex;flex-direction:column">
+<span style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#9b9797;margin-bottom:6px">Desglose de puntos</span>
+<sc-for list="{{ hojaDesglose }}" as="d" hint-placeholder-count="4">
+<div style="display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid rgba(243,242,242,.32)">
+<span style="font-size:13px;font-weight:600;color:#eae9e9">{{ d.label }}</span>
+<span style="font-size:13px;font-weight:800;color:{{ d.color }}">{{ d.valor }}</span>
+</div>
+</sc-for>
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:11px 12px;margin-top:10px;background:#16301f">
+<span style="font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase">Total acreditado</span>
+<span style="font-size:24px;font-weight:900;letter-spacing:-.02em;color:#7ddb9b">{{ hojaPuntos }}</span>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ hojaSinPuntos }}" hint-placeholder-val="{{ false }}">
+<p style="margin:12px 0 0;font-size:13px;font-weight:500;line-height:1.45;color:#eae9e9;text-wrap:pretty">{{ hojaNota }}</p>
+</sc-if>
+<div style="display:flex;gap:10px;margin-top:16px">
+<a href="Detalle Viaje Oscuro.dc.html" style="flex:1;background:#c80000;color:#fff;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:15px 14px;min-height:48px;box-sizing:border-box;display:flex;align-items:center" style-hover="background:#ff6b6b" style-active="background:#ff8a8a">Ver ruta y alertas</a>
+<button type="button" onClick="{{ cerrarHoja }}" style="flex:none;font-family:inherit;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:15px 14px;min-height:48px;background:transparent;border:2px solid #f3f2f2;color:#f3f2f2;cursor:pointer;text-align:left" style-hover="background:#3a3838">Cerrar</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:500,&quot;height&quot;:960}}">
+const TABS = [
+  { id: 'inicio', label: 'Inicio' },
+  { id: 'viajes', label: 'Viajes' },
+  { id: 'premios', label: 'Premios' },
+  { id: 'perfil', label: 'Perfil' },
+];
+
+// TripStatus + TripStatusX.displayName — trip.dart
+const ESTADO = {
+  asignado: 'Asignado',
+  enCurso: 'En curso',
+  completado: 'Completado',
+  cancelado: 'Cancelado',
+  incidente: 'Incidente',
+};
+
+// Campos de Trip (trip.dart): fechaInicio, kmRecorridos, rendimientoReal,
+// calificacion, puntosObtenidos, notas. Desglose por regla de reglas_puntaje
+// (variable) tal como lo calcula la edge function calcular-puntos-viaje.
+const VIAJES = [
+  { id: '1842', origen: 'Monterrey', destino: 'Guadalajara', mes: 'agosto 2026', fecha: '04 ago 2026', estado: 'enCurso', kmRecorridos: 486, rendimientoReal: 4.6, calificacion: null, puntosObtenidos: 0 },
+  { id: '1836', origen: 'Saltillo', destino: 'Monterrey', mes: 'agosto 2026', fecha: '01 ago 2026', estado: 'completado', kmRecorridos: 88, rendimientoReal: 5.1, calificacion: 4.8, puntosObtenidos: 168, desglose: { rendimiento: 113, puntualidad: 50, sin_reportes_mantenimiento: 30, alertas_seguridad: 0, incidencias: -25 } },
+  { id: '1829', origen: 'Monterrey', destino: 'Nuevo Laredo', mes: 'julio 2026', fecha: '29 jul 2026', estado: 'completado', kmRecorridos: 224, rendimientoReal: 4.8, calificacion: 4.5, puntosObtenidos: 148, desglose: { rendimiento: 118, puntualidad: 50, sin_reportes_mantenimiento: 30, alertas_seguridad: -10, incidencias: -40 } },
+  { id: '1824', origen: 'Monterrey', destino: 'Torreón', mes: 'julio 2026', fecha: '27 jul 2026', estado: 'incidente', kmRecorridos: 312, rendimientoReal: 4.1, calificacion: null, puntosObtenidos: 0 },
+  { id: '1821', origen: 'Querétaro', destino: 'Monterrey', mes: 'julio 2026', fecha: '25 jul 2026', estado: 'completado', kmRecorridos: 712, rendimientoReal: 4.2, calificacion: 3.9, puntosObtenidos: 96, desglose: { rendimiento: 105, puntualidad: 50, sin_reportes_mantenimiento: 0, alertas_seguridad: -15, incidencias: -44 } },
+  { id: '1814', origen: 'Monterrey', destino: 'Querétaro', mes: 'julio 2026', fecha: '22 jul 2026', estado: 'completado', kmRecorridos: 712, rendimientoReal: 4.7, calificacion: 4.7, puntosObtenidos: 193, desglose: { rendimiento: 118, puntualidad: 50, sin_reportes_mantenimiento: 30, alertas_seguridad: -5, incidencias: 0 } },
+  { id: '1808', origen: 'Monterrey', destino: 'Reynosa', mes: 'julio 2026', fecha: '18 jul 2026', estado: 'completado', kmRecorridos: 226, rendimientoReal: 4.9, calificacion: 4.9, puntosObtenidos: 210, desglose: { rendimiento: 130, puntualidad: 50, sin_reportes_mantenimiento: 30, alertas_seguridad: 0, incidencias: 0 } },
+  { id: '1802', origen: 'Torreón', destino: 'Monterrey', mes: 'julio 2026', fecha: '14 jul 2026', estado: 'cancelado', kmRecorridos: null, rendimientoReal: null, calificacion: null, puntosObtenidos: 0 },
+];
+
+// reglas_puntaje.variable → etiqueta legible
+const REGLA = {
+  rendimiento: 'Rendimiento vs. esperado',
+  puntualidad: 'Puntualidad',
+  sin_reportes_mantenimiento: 'Sin reportes de mantenimiento',
+  alertas_seguridad: 'Alertas de seguridad',
+  incidencias: 'Incidencias',
+};
+
+const fmt = (n) => new Intl.NumberFormat('es-MX').format(Math.max(0, Math.round(n)));
+
+class Component extends DCLogic {
+  state = { tab: 'viajes', hoja: null };
+
+  renderVals() {
+    const cerrados = VIAJES.filter((v) => v.estado === 'completado');
+
+    const items = [];
+    let mesActual = null;
+    VIAJES.forEach((v) => {
+      if (v.mes !== mesActual) {
+        mesActual = v.mes;
+        items.push({ key: 'm-' + v.mes, esMes: true, mes: v.mes });
+      }
+      const km = v.kmRecorridos;
+      const rend = v.rendimientoReal;
+      const meta = km == null
+        ? 'Sin recorrido registrado'
+        : fmt(km) + ' km' + (rend != null ? ' · ' + rend.toFixed(1) + ' km/l' : '');
+      items.push({
+        key: v.id,
+        esViaje: true,
+        ruta: v.origen + ' → ' + v.destino,
+        fecha: v.fecha,
+        estado: ESTADO[v.estado],
+        estadoColor: v.estado === 'enCurso' ? '#ff8a8a' : v.estado === 'incidente' ? '#ff8a8a' : v.estado === 'cancelado' ? '#8e8a8a' : '#bab6b6',
+        enCurso: v.estado === 'enCurso',
+        marca: v.estado === 'enCurso' ? '#c80000' : v.estado === 'cancelado' ? '#807c7c' : v.estado === 'incidente' ? '#6e6a6a' : '#f3f2f2',
+        bg: v.estado === 'enCurso' ? '#4a0f0f' : 'transparent',
+        tienePuntos: v.puntosObtenidos > 0,
+        puntos: fmt(v.puntosObtenidos),
+        meta,
+        onClick: () => this.setState({ hoja: v.id }),
+      });
+    });
+
+    const h = VIAJES.find((v) => v.id === this.state.hoja) ?? null;
+    const desglose = h && h.desglose
+      ? Object.keys(h.desglose).map((k) => ({
+        label: REGLA[k] ?? k,
+        valor: (h.desglose[k] >= 0 ? '+' : '') + h.desglose[k],
+        color: h.desglose[k] < 0 ? '#ff8a8a' : h.desglose[k] > 0 ? '#7ddb9b' : '#bab6b6',
+      }))
+      : [];
+
+    return {
+      resumenViajes: cerrados.length,
+      resumenKm: fmt(cerrados.reduce((s, v) => s + (v.kmRecorridos ?? 0), 0)),
+      resumenPuntos: fmt(cerrados.reduce((s, v) => s + v.puntosObtenidos, 0)),
+      items,
+      tabs: TABS.map((t) => ({
+        label: t.label,
+        rule: this.state.tab === t.id ? '#c80000' : 'transparent',
+        color: this.state.tab === t.id ? '#ff8a8a' : '#9b9797',
+        onClick: () => this.setState({ tab: t.id }),
+      })),
+      hojaAbierta: !!h,
+      hojaFecha: h ? h.fecha : '',
+      hojaEstado: h ? ESTADO[h.estado] : '',
+      hojaRuta: h ? h.origen + ' → ' + h.destino : '',
+      hojaKm: h && h.kmRecorridos != null ? fmt(h.kmRecorridos) : '—',
+      hojaRend: h && h.rendimientoReal != null ? h.rendimientoReal.toFixed(1) : '—',
+      hojaCalif: h && h.calificacion != null ? h.calificacion.toFixed(1) : '—',
+      hojaTieneDesglose: desglose.length > 0,
+      hojaDesglose: desglose,
+      hojaPuntos: h ? '+' + fmt(h.puntosObtenidos) : '',
+      hojaSinPuntos: !!h && desglose.length === 0,
+      hojaNota: h
+        ? h.estado === 'enCurso'
+          ? 'Los puntos se calculan al completar el viaje, con el rendimiento y las alertas del recorrido completo.'
+          : h.estado === 'incidente'
+            ? 'Viaje con incidencia abierta. Los puntos quedan en espera hasta que operación lo cierre.'
+            : 'Viaje cancelado por operación. No genera puntos ni afecta tu rendimiento promedio.'
+        : '',
+      cerrarHoja: () => this.setState({ hoja: null }),
+      stop: (e) => e.stopPropagation(),
+    };
+  }
+}
+</script>
+</body>
+</html>

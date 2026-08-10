@@ -66,11 +66,11 @@ flutter:
     - assets/animations/
     - assets/images/
 
-  # fonts:
-  #   - family: Montserrat
-  #     fonts:
-  #       - asset: assets/fonts/Montserrat-Regular.ttf
-  #       - asset: assets/fonts/Montserrat-SemiBold.ttf
-  #         weight: 600
-  #       - asset: assets/fonts/Montserrat-Bold.ttf
-  #         weight: 700
+  # Archivo es una fuente variable (ejes wdth + wght): un solo archivo cubre
+  # 400–900. Flutter no instancia el eje wght desde el `weight:` del pubspec,
+  # así que los estilos deben pedirlo con `fontVariations` — eso lo resuelve
+  # `ModernistType.of()` en core/theme/modernist/modernist_tokens.dart.
+  fonts:
+    - family: Archivo
+      fonts:
+        - asset: assets/fonts/Archivo.ttf

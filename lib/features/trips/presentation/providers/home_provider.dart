@@ -60,8 +60,15 @@ final homeStateProvider = Provider<HomeState>((ref) {
   final trips = ref.watch(tripsProvider).value ?? const [];
 
   // Case A: active trip
+  //
+  // `asignado` cuenta igual que `en_curso`: nada en el sistema mueve un viaje
+  // de un estado al otro —el admin solo crea (siempre en `asignado`) y cierra—,
+  // así que exigir `enCurso` dejaba la pantalla de viaje inalcanzable salvo con
+  // los viajes que el seeder sembró al azar. Si hay de los dos gana el que ya
+  // arrancó.
   final activeTrip =
-      trips.firstWhereOrNull((t) => t.estado == TripStatus.enCurso);
+      trips.firstWhereOrNull((t) => t.estado == TripStatus.enCurso) ??
+          trips.firstWhereOrNull((t) => t.estado == TripStatus.asignado);
   if (activeTrip != null) {
     return HomeStateActiveTrip(trip: activeTrip);
   }
